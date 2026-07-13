@@ -1,0 +1,30 @@
+@if (viewer.imageUrl(); as url) {
+  <div class="viewer-overlay" (click)="close()">
+    <div class="viewer-toolbar" (click)="$event.stopPropagation()">
+      <button type="button" class="viewer-btn" (click)="zoomOut()" [disabled]="!canZoomOut" title="Zoom out">−</button>
+      <span class="viewer-scale">{{ (scale() * 100).toFixed(0) }}%</span>
+      <button type="button" class="viewer-btn" (click)="zoomIn()" [disabled]="!canZoomIn" title="Zoom in">+</button>
+      <button type="button" class="viewer-btn" (click)="reset()" title="Reset zoom">Reset</button>
+      <button type="button" class="viewer-btn viewer-close" (click)="close()" title="Close">×</button>
+    </div>
+
+    <div
+      class="viewer-stage"
+      (click)="$event.stopPropagation()"
+      (wheel)="onWheel($event)"
+      (pointerdown)="onPointerDown($event)"
+      (pointermove)="onPointerMove($event)"
+      (pointerup)="onPointerUp()"
+      (pointerleave)="onPointerUp()"
+    >
+      <img
+        [src]="url"
+        alt="Branch photo"
+        class="viewer-image"
+        [class.zoomed]="scale() > 1"
+        [style.transform]="'translate(' + offsetX() + 'px, ' + offsetY() + 'px) scale(' + scale() + ')'"
+        draggable="false"
+      />
+    </div>
+  </div>
+}

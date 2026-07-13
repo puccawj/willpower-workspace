@@ -1,0 +1,28 @@
+<div class="pad page-wrap">
+  <div class="section-inner">
+    <div class="team-head">
+      <div class="eyebrow">Guidance &amp; teaching</div>
+      <h1 class="page-title">Our teachers</h1>
+      <p class="section-lead center-lead">The directors and instructors who carry the institute's practice across each branch.</p>
+    </div>
+
+    <div class="grid-3 g3">
+      @for (m of team(); track m.id) {
+        <div class="member-card">
+          <div class="member-img">
+            @if (m.photoUrl) {
+              <img [src]="m.photoUrl" alt="" />
+            } @else {
+              <div class="member-img-fallback">{{ m.initials }}</div>
+            }
+          </div>
+          <h3 class="member-name">{{ m.name }}</h3>
+          <div class="member-role">{{ m.role }}</div>
+          <div class="member-branch">{{ m.branch }}</div>
+        </div>
+      } @empty {
+        <p class="muted-label">Our team page is being updated — check back soon.</p>
+      }
+    </div>
+  </div>
+</div>

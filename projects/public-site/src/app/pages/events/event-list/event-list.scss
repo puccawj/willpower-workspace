@@ -1,0 +1,27 @@
+:host {
+  display: block;
+}
+
+.page-wrap {
+  padding-top: 56px;
+  padding-bottom: 72px;
+}
+
+.intro {
+  margin: 0 0 30px;
+}
+
+.filters {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.event-card-lg .event-card-img {
+  height: 150px;
+}
+
+.event-title-lg {
+  font: 500 20px/1.28 var(--w-font-serif);
+}

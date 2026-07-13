@@ -1,0 +1,53 @@
+<section class="pad about-hero">
+  <div class="about-hero-inner">
+    <div class="eyebrow">Since 1932</div>
+    <h1 class="about-title">A discipline of the heart, carried across generations</h1>
+    <p class="about-lead">
+      The Willpower Institute preserves a lineage of meditation teaching devoted to cultivating willpower — the
+      steady, patient strength that turns intention into daily practice. What began as a single hall now welcomes
+      students on three continents.
+    </p>
+  </div>
+</section>
+
+<section class="pad about-banner">
+  <img
+    src="https://images.unsplash.com/photo-1665849050332-8d5d7e59afb6?q=80&w=1600&auto=format&fit=crop"
+    alt=""
+  />
+</section>
+
+<section class="pad about-journey">
+  <div class="journey-grid">
+    <div><h2 class="journey-heading">Our journey</h2></div>
+    <div class="journey-list">
+      @for (t of timeline; track t.year) {
+        <div class="journey-item">
+          <div class="journey-year">{{ t.year }}</div>
+          <div>
+            <h3 class="journey-title">{{ t.title }}</h3>
+            <p class="journey-desc">{{ t.desc }}</p>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<section class="pad about-branches">
+  <div class="branches-inner">
+    <h2 class="branches-heading">Our branches</h2>
+    <div class="grid-3 g3">
+      @for (b of branches; track b.name) {
+        <div class="branch-card">
+          <div class="branch-img"><img [src]="b.img" alt="" /></div>
+          <div class="branch-body">
+            <h3 class="branch-name">{{ b.name }}</h3>
+            <div class="branch-city">{{ b.city }}</div>
+            <p class="branch-desc">{{ b.desc }}</p>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</section>

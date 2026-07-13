@@ -1,0 +1,7 @@
+<div class="tab-row">
+  @for (opt of options; track opt.key) {
+    <button type="button" class="tab" [class.active]="active === opt.key" (click)="select(opt.key)">
+      {{ opt.label }}
+    </button>
+  }
+</div>

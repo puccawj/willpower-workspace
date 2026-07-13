@@ -1,0 +1,67 @@
+:host {
+  display: block;
+}
+
+.page-wrap {
+  padding-top: 56px;
+  padding-bottom: 72px;
+}
+
+.team-head {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.center-lead {
+  margin: 0 auto;
+}
+
+.member-card {
+  background: var(--w-bg-alt);
+  border: 1px solid var(--w-border);
+  border-radius: 12px;
+  overflow: hidden;
+  text-align: center;
+  padding-bottom: 24px;
+}
+
+.member-img {
+  height: 220px;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.member-img-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: 600 40px var(--w-font-serif);
+  color: var(--w-accent);
+  background: linear-gradient(135deg, var(--w-bg-alt), var(--w-border));
+}
+
+.member-name {
+  font: 500 20px var(--w-font-serif);
+  margin: 20px 0 4px;
+}
+
+.member-role {
+  font: 600 12px var(--w-font-sans);
+  color: var(--w-accent);
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+
+.member-branch {
+  font: 500 11px var(--w-font-sans);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--w-muted-2);
+}

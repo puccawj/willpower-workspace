@@ -1,0 +1,63 @@
+<div class="page-toolbar toolbar-end">
+  <button type="button" class="btn btn-solid" (click)="addMember()">+ Add Member</button>
+</div>
+
+@if (error()) {
+  <div class="state-error card">{{ error() }}</div>
+} @else if (loading()) {
+  <div class="state-loading card">Loading team members…</div>
+} @else {
+  <app-table-toolbar [controller]="ctrl" slot="top"></app-table-toolbar>
+
+  @if (ctrl.effectiveView() === 'table') {
+    <div class="card" style="padding:0;overflow:hidden">
+      <table>
+        <thead><tr><th>Name</th><th>Role</th><th>Branch</th><th>Shown on site</th><th></th></tr></thead>
+        <tbody>
+          @for (m of ctrl.pageItems(); track m.id) {
+            <tr class="row">
+              <td>
+                <div class="name-cell">
+                  @if (m.photoUrl) {
+                    <img [src]="m.photoUrl" alt="" class="avatar-sm avatar-photo" (click)="viewPhoto(m)" />
+                  } @else {
+                    <div class="avatar-sm" [style.background]="m.avatarColor">{{ m.initials }}</div>
+                  }
+                  {{ m.name }}
+                </div>
+              </td>
+              <td>{{ m.position }}</td>
+              <td>{{ m.branchName }}</td>
+              <td>{{ m.shownLabel }}</td>
+              <td><button type="button" class="icon-btn icon-btn-accent" (click)="editMember(m)" title="Edit">✎</button></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <div class="cardgrid">
+      @for (m of ctrl.pageItems(); track m.id) {
+        <div class="mcard">
+          <div class="mcard-person">
+            @if (m.photoUrl) {
+              <img [src]="m.photoUrl" alt="" class="avatar-md avatar-photo" (click)="viewPhoto(m)" />
+            } @else {
+              <div class="avatar-md" [style.background]="m.avatarColor">{{ m.initials }}</div>
+            }
+            <div>
+              <div class="person-name">{{ m.name }}</div>
+              <div class="muted-label">{{ m.position }} · {{ m.branchName }}</div>
+            </div>
+          </div>
+          <div class="mcard-row">
+            <span class="muted-label">Shown: {{ m.shownLabel }}</span>
+            <button type="button" class="icon-btn icon-btn-accent" (click)="editMember(m)" title="Edit">✎</button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <app-table-toolbar [controller]="ctrl" slot="bottom"></app-table-toolbar>
+}

@@ -1,0 +1,47 @@
+@if (layout.mobileMenuOpen()) {
+  <div class="mobile-backdrop" (click)="layout.closeMobileMenu()"></div>
+}
+
+<aside class="sidebar" [class.mobile-open]="layout.mobileMenuOpen()">
+  <div class="brand">
+    <div class="brand-mark">◈</div>
+    <div class="brand-text">
+      <div class="brand-name">Willpower</div>
+      <div class="brand-sub">ADMIN PANEL</div>
+    </div>
+    <button type="button" class="mobile-close" (click)="layout.closeMobileMenu()">×</button>
+  </div>
+
+  <div class="role-switch-wrap">
+    <div class="role-switch-label">Viewing as</div>
+    <div class="role-switch">
+      <div class="role-option" [class.active]="roleService.role() === 'superadmin'" (click)="setRole('superadmin')">
+        Superadmin
+      </div>
+      <div class="role-option" [class.active]="roleService.role() === 'admin'" (click)="setRole('admin')">
+        Admin
+      </div>
+      <div class="role-option" [class.active]="roleService.role() === 'instructor'" (click)="setRole('instructor')">
+        Instructor
+      </div>
+    </div>
+    @if (roleService.isInstructor()) {
+      <div class="role-instructor-name">{{ roleService.instructorName }}</div>
+    }
+  </div>
+
+  <nav class="nav">
+    @for (group of visibleGroups(); track group.header) {
+      <div class="nav-header">{{ group.header }}</div>
+      @for (item of group.items; track item.path) {
+        <a [routerLink]="['/', item.path]" routerLinkActive="active" class="nav-link" (click)="onNavClick()">
+          <span class="nav-icon">{{ item.icon }}</span>{{ item.label }}
+        </a>
+      }
+    }
+  </nav>
+
+  <button type="button" class="logout-btn" (click)="logout()">
+    <span class="nav-icon">⏏</span>Log out
+  </button>
+</aside>

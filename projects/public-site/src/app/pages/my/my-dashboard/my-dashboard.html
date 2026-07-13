@@ -1,0 +1,45 @@
+<div class="stat-grid">
+  <div class="stat-box">
+    <div class="stat-value">{{ upcomingRsvpCount() }}</div>
+    <div class="stat-label">Upcoming RSVPs</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-value">{{ coursesInProgress() }}</div>
+    <div class="stat-label">Courses in progress</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-value">{{ certificatesEarned() }}</div>
+    <div class="stat-label">Certificates earned</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-value">{{ donationsCount() }}</div>
+    <div class="stat-label">Donations made</div>
+  </div>
+</div>
+
+<div class="section-block">
+  <div class="section-head-row">
+    <h2 class="block-title">Your upcoming events</h2>
+    <a routerLink="/my/events" class="link-cta">View all →</a>
+  </div>
+
+  @if (nextEvents().length) {
+    <div class="event-rows">
+      @for (item of nextEvents(); track item.eventId) {
+        <a [routerLink]="['/events', item.eventId]" class="event-row">
+          <div class="event-row-date">
+            <div class="event-row-day">{{ item.day }}</div>
+            <div class="event-row-mon">{{ item.mon }}</div>
+          </div>
+          <div class="event-row-info">
+            <div class="event-row-title">{{ item.title }}</div>
+            <div class="muted-label">{{ item.branchName }} · {{ item.time }}</div>
+          </div>
+          <span class="rsvp-pill" [class]="'rsvp-' + item.rsvpStatus">{{ item.rsvpStatus }}</span>
+        </a>
+      }
+    </div>
+  } @else {
+    <p class="empty-note">You haven't RSVP'd to any upcoming events yet.</p>
+  }
+</div>

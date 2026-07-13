@@ -1,0 +1,15 @@
+:host {
+  display: block;
+}
+
+.my-events-title {
+  margin-bottom: 16px;
+}
+
+.cancel-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--w-muted-2);
+  flex-shrink: 0;
+}

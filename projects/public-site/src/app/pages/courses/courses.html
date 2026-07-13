@@ -1,0 +1,83 @@
+<div class="pad page-wrap">
+  <div class="section-inner">
+    <div class="eyebrow">Learn &amp; practice</div>
+    <h1 class="page-title">Courses</h1>
+    <p class="section-lead intro">
+      Each course opens as scheduled sessions at a branch. Log in to enroll and track your attendance toward a
+      certificate.
+    </p>
+
+    <div class="grid-2 g2">
+      @for (c of courses(); track c.id) {
+        <div class="course-card-lg">
+          <div class="course-img"><img [src]="c.img" alt="" /></div>
+          <div class="course-body">
+            <div class="course-tags">
+              <span class="eyebrow small inline">{{ c.level }}</span>
+              <span class="course-format">· {{ c.format }}</span>
+            </div>
+            <h3 class="course-title-lg">{{ c.title }}</h3>
+            <p class="course-desc-lg">{{ c.desc }}</p>
+            <div class="course-stats">
+              <div class="course-stat"><div class="stat-val">{{ c.sessions }}</div><div class="stat-lbl">Sessions</div></div>
+              <div class="stat-sep-v"></div>
+              <div class="course-stat"><div class="stat-val">{{ c.offeringsCount }}</div><div class="stat-lbl">Class offerings</div></div>
+              <div class="stat-sep-v"></div>
+              <div class="course-stat"><div class="stat-val">{{ c.pass }}</div><div class="stat-lbl">To pass</div></div>
+            </div>
+            <div class="course-foot">
+              <span class="open-label">{{ c.open }}</span>
+              @if (!isLoggedIn()) {
+                <a routerLink="/login" [queryParams]="{ returnUrl: '/courses' }" class="btn btn-solid btn-sm">Enroll — log in</a>
+              } @else if (!isStudent()) {
+                <span class="muted-label">Only student accounts can enroll</span>
+              } @else if (c.isOpenForEnrollment) {
+                <button type="button" class="btn btn-solid btn-sm" (click)="toggleEnroll(c.id)">
+                  {{ expandedCourseId() === c.id ? 'Close' : 'Enroll' }}
+                </button>
+              }
+            </div>
+
+            @if (isStudent() && expandedCourseId() === c.id) {
+              <div class="offerings-panel">
+                @if (offeringsLoading()) {
+                  <p class="muted-label">Loading class times…</p>
+                } @else if (offeringsError()) {
+                  <p class="muted-label">{{ offeringsError() }}</p>
+                } @else if (offerings().length === 0) {
+                  <p class="muted-label">No open class times right now.</p>
+                } @else {
+                  @for (o of offerings(); track o.id) {
+                    <div class="offering-row">
+                      <div class="offering-info">
+                        <div class="offering-branch">{{ o.branchName }} · {{ o.mode }}</div>
+                        <div class="offering-dates">{{ o.startDate }} – {{ o.endDate }}</div>
+                      </div>
+                      @if (enrolledOfferingIds().has(o.id)) {
+                        <span class="muted-label">Enrolled ✓</span>
+                      } @else {
+                        <button
+                          type="button"
+                          class="btn btn-outline btn-sm"
+                          [disabled]="enrollingOfferingId() === o.id"
+                          (click)="enrollIn(o.id)"
+                        >
+                          {{ enrollingOfferingId() === o.id ? 'Enrolling…' : 'Confirm' }}
+                        </button>
+                      }
+                    </div>
+                  }
+                }
+                @if (enrollError()) {
+                  <p class="offering-error">{{ enrollError() }}</p>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      } @empty {
+        <p class="muted-label">No courses are open for enrollment right now — check back soon.</p>
+      }
+    </div>
+  </div>
+</div>

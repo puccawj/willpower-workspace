@@ -1,0 +1,42 @@
+:host {
+  display: block;
+}
+
+.my-wrap {
+  padding-top: 48px;
+  padding-bottom: 72px;
+}
+
+.my-inner {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.my-head {
+  margin-bottom: 30px;
+}
+
+.my-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 32px;
+  border-bottom: 1px solid var(--w-border);
+  padding-bottom: 14px;
+
+  a {
+    font: 600 13px var(--w-font-sans);
+    color: var(--w-muted);
+    padding: 9px 16px;
+    border-radius: 20px;
+
+    &:hover {
+      color: var(--w-ink);
+    }
+
+    &.active {
+      background: var(--w-accent);
+      color: #fff;
+    }
+  }
+}

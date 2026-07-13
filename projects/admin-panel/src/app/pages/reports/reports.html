@@ -1,0 +1,28 @@
+<div class="report-tabs">
+  <app-filter-tabs [options]="tabOptions" [active]="tab()" [select]="setTab"></app-filter-tabs>
+</div>
+
+<app-stat-cards [stats]="current().stats"></app-stat-cards>
+
+<div class="card pad">
+  <div class="report-head">
+    <h3 class="section-title">{{ current().title }}</h3>
+    <div class="export-actions">
+      <button type="button" class="btn btn-outline" (click)="exportExcel()">⤓ Excel</button>
+      <button type="button" class="btn btn-outline" (click)="exportPdf()">⤓ PDF</button>
+    </div>
+  </div>
+  <div class="bar-list">
+    @for (b of current().bars; track b.name) {
+      <div>
+        <div class="bar-row">
+          <span>{{ b.name }}</span>
+          <span class="muted-label">{{ b.value }}</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill" [style.width]="b.pct" [style.background]="b.color"></div></div>
+      </div>
+    } @empty {
+      <div class="muted-label">No data yet.</div>
+    }
+  </div>
+</div>

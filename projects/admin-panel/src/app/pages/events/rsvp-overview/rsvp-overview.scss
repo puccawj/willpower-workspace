@@ -1,0 +1,58 @@
+:host {
+  display: block;
+}
+
+.view-toggle {
+  display: flex;
+  background: var(--w-bg-alt);
+  border-radius: 8px;
+  padding: 3px;
+  gap: 3px;
+}
+
+.toggle-btn {
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font: 600 12px var(--w-font-sans);
+  color: var(--w-ink-soft);
+  border: none;
+  background: transparent;
+
+  &.active {
+    background: var(--w-sidebar);
+    color: var(--w-bg);
+  }
+}
+
+.branch-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.branch-stat-card {
+  padding: 16px 18px;
+}
+
+.branch-stat-title {
+  font: 500 15px var(--w-font-serif);
+  margin: 0 0 12px;
+}
+
+.branch-stat-row {
+  display: flex;
+  gap: 18px;
+}
+
+.branch-stat-value {
+  font: 500 17px var(--w-font-serif);
+}
+
+.branch-stat-label {
+  font: 500 10px var(--w-font-sans);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--w-muted);
+}

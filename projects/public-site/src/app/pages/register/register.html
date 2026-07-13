@@ -1,0 +1,40 @@
+<div class="pad login-wrap">
+  <div class="login-box">
+    <div class="login-head">
+      <div class="login-mark">◈</div>
+      <h1 class="login-title">Create your account</h1>
+      <p class="login-sub">Join to enroll in courses, RSVP to events, and track your learning history.</p>
+    </div>
+
+    <form class="login-card" (ngSubmit)="submit()">
+      <div class="name-row">
+        <div>
+          <label class="login-label" for="firstName">First name</label>
+          <input id="firstName" class="login-input" [ngModel]="firstName()" (ngModelChange)="firstName.set($event)" name="firstName" />
+        </div>
+        <div>
+          <label class="login-label" for="lastName">Last name</label>
+          <input id="lastName" class="login-input" [ngModel]="lastName()" (ngModelChange)="lastName.set($event)" name="lastName" />
+        </div>
+      </div>
+
+      <label class="login-label" for="email">Email</label>
+      <input id="email" class="login-input" placeholder="you@email.com" [ngModel]="email()" (ngModelChange)="email.set($event)" name="email" />
+
+      <label class="login-label" for="password">Password</label>
+      <input id="password" type="password" class="login-input" placeholder="At least 8 characters" [ngModel]="password()" (ngModelChange)="password.set($event)" name="password" />
+
+      @if (error()) {
+        <div class="login-error">{{ error() }}</div>
+      }
+
+      <button type="submit" class="btn btn-solid signin-btn" [disabled]="loading()">
+        {{ loading() ? 'Creating account…' : 'Create account' }}
+      </button>
+
+      <div class="signup-row">Already have an account? <a routerLink="/login" class="signup-link">Sign in</a></div>
+    </form>
+
+    <app-sso-buttons mode="register" (success)="onSsoSuccess()" (failure)="onSsoFailure($event)"></app-sso-buttons>
+  </div>
+</div>

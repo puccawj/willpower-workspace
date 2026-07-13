@@ -1,0 +1,105 @@
+@if (!offerings().length) {
+  <div class="card pad state-error">
+    No class offerings yet. Create one in <strong>Class Schedule</strong> and enroll students before issuing certificates here.
+  </div>
+} @else {
+  <div class="card pad session-banner">
+    <div>
+      <div class="field-inline">
+        <label class="muted-label">Offering</label>
+        <select class="form-input" [ngModel]="selectedOfferingId()" (ngModelChange)="selectOffering($event)">
+          @for (o of offerings(); track o.id) {
+            <option [value]="o.id">{{ o.courseTitle }} — {{ o.branchName }} ({{ o.instructorName ?? 'Unassigned' }})</option>
+          }
+        </select>
+      </div>
+      @if (selectedOffering(); as off) {
+        <div class="muted-label" style="margin-top:8px">Passing criteria: ≥ {{ passingPercent() }}% attendance</div>
+      }
+      @if (templateLoaded()) {
+        <div class="active-template-indicator">
+          @if (activeTemplate(); as tpl) {
+            @if (tpl.backgroundImageUrl) {
+              <img [src]="tpl.backgroundImageUrl" alt="" class="active-template-thumb" />
+            }
+            <span class="muted-label">Using template: <strong>{{ tpl.name }}</strong></span>
+          } @else {
+            <span class="muted-label" style="color:var(--w-red)">No active template for this branch</span>
+          }
+        </div>
+      }
+    </div>
+    <button type="button" class="btn btn-solid" (click)="bulkIssue()">Generate all eligible</button>
+  </div>
+}
+
+@if (templateLoaded() && !activeTemplate() && selectedOffering()) {
+  <div class="card pad state-error" style="margin-bottom:14px">
+    No active certificate template is configured for this branch. Set one up in <strong>Certificate Templates</strong> before issuing.
+  </div>
+}
+
+@if (offerings().length) {
+  @if (error()) {
+    <div class="state-error card">{{ error() }}</div>
+  } @else if (loading()) {
+    <div class="state-loading card">Loading students…</div>
+  } @else {
+  <app-table-toolbar [controller]="ctrl" slot="top"></app-table-toolbar>
+
+  @if (ctrl.effectiveView() === 'table') {
+    <div class="card" style="padding:0;overflow:hidden">
+      <table>
+        <thead><tr><th>Student</th><th>Attendance</th><th>Eligible</th><th>Certificate no.</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+          @for (c of ctrl.pageItems(); track c.userId) {
+            <tr class="row">
+              <td style="font-weight:500">{{ c.name }}</td>
+              <td>{{ c.pctLabel }}</td>
+              <td><span class="badge" [style.background]="c.eligibleColor">{{ c.eligibleLabel }}</span></td>
+              <td class="muted-cell">{{ c.certNo }}</td>
+              <td>{{ c.issueLabel }}</td>
+              <td>
+                <button
+                  type="button"
+                  class="icon-btn"
+                  [style.color]="c.actionColor"
+                  [disabled]="!c.issued && !c.eligible"
+                  [title]="c.issued ? 'Download certificate' : c.eligible ? 'Issue certificate' : 'Not yet eligible'"
+                  (click)="toggle(c)"
+                >{{ c.actionIcon }}</button>
+              </td>
+            </tr>
+          }
+          @if (!ctrl.pageItems().length) {
+            <tr><td colspan="6" class="muted-cell" style="text-align:center;padding:20px">No students enrolled in this offering.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <div class="cardgrid">
+      @for (c of ctrl.pageItems(); track c.userId) {
+        <div class="mcard">
+          <div class="mcard-head">
+            <h4 class="mcard-title mcard-title-sans">{{ c.name }}</h4>
+            <span class="badge badge-sm" [style.background]="c.eligibleColor">{{ c.eligibleLabel }}</span>
+          </div>
+          <div class="muted-label">Attendance {{ c.pctLabel }}</div>
+          <div class="muted-label mcard-meta">{{ c.certNo }} · {{ c.issueLabel }}</div>
+          <button
+            type="button"
+            class="icon-btn"
+            [style.color]="c.actionColor"
+            [disabled]="!c.issued && !c.eligible"
+            [title]="c.issued ? 'Download certificate' : c.eligible ? 'Issue certificate' : 'Not yet eligible'"
+            (click)="toggle(c)"
+          >{{ c.actionIcon }}</button>
+        </div>
+      }
+    </div>
+  }
+
+  <app-table-toolbar [controller]="ctrl" slot="bottom"></app-table-toolbar>
+  }
+}

@@ -1,0 +1,19 @@
+<div class="section-block">
+  <h2 class="block-title my-cert-title">Your certificates</h2>
+
+  @if (certificates().length) {
+    <div class="cert-rows">
+      @for (c of certificates(); track c.id) {
+        <div class="cert-row">
+          <div>
+            <div class="cert-row-title">{{ c.courseTitle }}</div>
+            <div class="muted-label">Issued {{ c.issuedDate }} · {{ c.certNo }}</div>
+          </div>
+          <a class="btn btn-outline" [href]="c.fileUrl" target="_blank" rel="noopener">Download PDF</a>
+        </div>
+      }
+    </div>
+  } @else {
+    <p class="empty-note">No certificates yet — complete a course to earn one.</p>
+  }
+</div>

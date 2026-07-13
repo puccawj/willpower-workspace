@@ -1,0 +1,222 @@
+@if (modal.config(); as cfg) {
+  <div class="overlay">
+    <div class="dialog" (click)="onDialogClick($event)">
+      <div class="dialog-head">
+        <h2 class="dialog-title">{{ cfg.title }}</h2>
+        <span class="dialog-close" (click)="modal.close()">×</span>
+      </div>
+
+      <div class="dialog-fields" [class.two-col]="cfg.fields.length > 4">
+        @for (f of cfg.fields; track f.key) {
+          <div class="field" [class.field-full]="f.type === 'image' || f.type === 'textarea'">
+            <label class="field-label">
+              {{ f.label }}
+              @if (f.hint) {
+                <span class="field-hint-inline">{{ f.hint }}</span>
+              }
+            </label>
+            @switch (f.type) {
+              @case ('text') {
+                <input
+                  class="form-input"
+                  [ngModel]="cfg.values[f.key]"
+                  (ngModelChange)="onFieldChange(f.key, $event)"
+                />
+              }
+              @case ('textarea') {
+                <textarea
+                  class="form-input form-textarea"
+                  rows="4"
+                  [ngModel]="cfg.values[f.key]"
+                  (ngModelChange)="onFieldChange(f.key, $event)"
+                ></textarea>
+              }
+              @case ('email') {
+                <input
+                  type="email"
+                  class="form-input"
+                  [class.form-input-readonly]="f.readonly"
+                  placeholder="name@example.com"
+                  [readonly]="f.readonly"
+                  [ngModel]="cfg.values[f.key]"
+                  (ngModelChange)="onFieldChange(f.key, $event)"
+                />
+              }
+              @case ('password') {
+                <input
+                  type="password"
+                  class="form-input"
+                  autocomplete="new-password"
+                  [ngModel]="cfg.values[f.key]"
+                  (ngModelChange)="onFieldChange(f.key, $event)"
+                />
+              }
+              @case ('number') {
+                <input
+                  type="number"
+                  class="form-input"
+                  [ngModel]="cfg.values[f.key]"
+                  (ngModelChange)="onFieldChange(f.key, $event)"
+                />
+              }
+              @case ('datetime') {
+                <input
+                  type="datetime-local"
+                  class="form-input"
+                  [ngModel]="cfg.values[f.key]"
+                  (ngModelChange)="onFieldChange(f.key, $event)"
+                />
+              }
+              @case ('date') {
+                <input
+                  type="date"
+                  class="form-input"
+                  [ngModel]="cfg.values[f.key]"
+                  (ngModelChange)="onFieldChange(f.key, $event)"
+                />
+              }
+              @case ('select') {
+                <select
+                  class="form-input"
+                  [ngModel]="cfg.values[f.key]"
+                  (ngModelChange)="onFieldChange(f.key, $event)"
+                >
+                  @for (opt of f.options; track opt) {
+                    <option [value]="opt">{{ opt }}</option>
+                  }
+                </select>
+              }
+              @case ('combobox') {
+                <input
+                  class="form-input"
+                  [attr.list]="f.key + '-list'"
+                  autocomplete="off"
+                  placeholder="Type to search…"
+                  [ngModel]="cfg.values[f.key]"
+                  (ngModelChange)="onFieldChange(f.key, $event)"
+                />
+                <datalist [id]="f.key + '-list'">
+                  @for (opt of comboboxOptions(f); track opt) {
+                    <option [value]="opt"></option>
+                  }
+                </datalist>
+              }
+              @case ('timezone') {
+                <input
+                  class="form-input"
+                  [attr.list]="f.key + '-tz-list'"
+                  autocomplete="off"
+                  placeholder="Type to search timezone…"
+                  [ngModel]="cfg.values[f.key]"
+                  (ngModelChange)="onFieldChange(f.key, $event)"
+                />
+                <datalist [id]="f.key + '-tz-list'">
+                  @for (t of timezones; track t.tz) {
+                    <option [value]="t.tz">{{ t.tz }} ({{ t.offset }})</option>
+                  }
+                </datalist>
+              }
+              @case ('phone') {
+                <div class="PhoneInput">
+                  <div class="PhoneInputCountry">
+                    <select
+                      aria-label="Phone number country"
+                      class="PhoneInputCountrySelect"
+                      [ngModel]="selectedCountryIso(f)"
+                      (ngModelChange)="onCountryChange(f, $event)"
+                    >
+                      @for (c of countries; track trackCountry($index, c)) {
+                        <option [value]="c.iso">{{ c.name }} ({{ c.dial }})</option>
+                      }
+                    </select>
+                    <div class="PhoneInputCountryIcon">
+                      <img class="PhoneInputCountryIconImg" [src]="countryFlagUrl(selectedCountryIso(f))" alt="" />
+                    </div>
+                    <div class="PhoneInputCountrySelectArrow"></div>
+                  </div>
+                  <input
+                    type="tel"
+                    inputmode="numeric"
+                    autocomplete="tel"
+                    class="PhoneInputInput"
+                    placeholder="812345678"
+                    [ngModel]="cfg.values[f.key]"
+                    (ngModelChange)="onFieldChange(f.key, $event)"
+                  />
+                </div>
+              }
+              @case ('multiselect') {
+                <div class="multiselect-dropdown" (click)="$event.stopPropagation()">
+                  <button
+                    type="button"
+                    class="form-input multiselect-toggle"
+                    (click)="toggleMultiSelectOpen(f, $event)"
+                  >
+                    <span [class.multiselect-placeholder]="!multiSelectValues(f).length">{{ multiSelectSummary(f) }}</span>
+                    <span class="multiselect-arrow" [class.open]="isMultiSelectOpen(f)">▾</span>
+                  </button>
+                  @if (isMultiSelectOpen(f)) {
+                    <div class="multiselect-panel">
+                      @if (f.selectAllLabel) {
+                        <label class="multiselect-option multiselect-option-all">
+                          <input
+                            type="checkbox"
+                            [checked]="isMultiSelected(f, f.selectAllLabel)"
+                            (change)="toggleMultiSelect(f, f.selectAllLabel, $any($event.target).checked)"
+                          />
+                          {{ f.selectAllLabel }}
+                        </label>
+                      }
+                      @for (opt of f.options; track opt) {
+                        <label class="multiselect-option">
+                          <input
+                            type="checkbox"
+                            [checked]="isMultiSelected(f, opt)"
+                            (change)="toggleMultiSelect(f, opt, $any($event.target).checked)"
+                          />
+                          {{ opt }}
+                        </label>
+                      }
+                      @if (!f.options?.length) {
+                        <div class="multiselect-empty">No options available.</div>
+                      }
+                    </div>
+                  }
+                </div>
+              }
+              @case ('image') {
+                <label class="image-slot" [class.has-image]="cfg.values[f.key]">
+                  @if (cfg.values[f.key]) {
+                    <img [src]="cfg.values[f.key]" alt="" class="image-slot-preview" />
+                    <span class="image-slot-replace">Click to replace</span>
+                  } @else {
+                    <span>⇪ Click to upload {{ f.label }}</span>
+                  }
+                  <input
+                    type="file"
+                    accept="image/*"
+                    class="hidden-file-input"
+                    #fileInput
+                    (change)="onImageSelected(f.key, fileInput)"
+                  />
+                </label>
+              }
+            }
+          </div>
+        }
+      </div>
+
+      <div class="dialog-foot">
+        @if (cfg.isEdit) {
+          <button type="button" class="delete-link" (click)="modal.delete()">Delete</button>
+        } @else {
+          <span></span>
+        }
+        <div class="dialog-actions">
+          <button type="button" class="cancel-btn" (click)="modal.close()">Cancel</button>
+          <button type="button" class="btn btn-solid" (click)="modal.save()">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

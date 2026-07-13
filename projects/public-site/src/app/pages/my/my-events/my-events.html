@@ -1,0 +1,28 @@
+<div class="section-block">
+  <h2 class="block-title my-events-title">Your RSVPs</h2>
+
+  @if (loading()) {
+    <p class="empty-note">Loading your RSVPs…</p>
+  } @else if (rows().length) {
+    <div class="event-rows">
+      @for (item of rows(); track item.eventId) {
+        <div class="event-row">
+          <a [routerLink]="['/events', item.eventId]" class="event-row-date">
+            <div class="event-row-day">{{ item.day }}</div>
+            <div class="event-row-mon">{{ item.mon }}</div>
+          </a>
+          <a [routerLink]="['/events', item.eventId]" class="event-row-info">
+            <div class="event-row-title">{{ item.title }}</div>
+            <div class="muted-label">{{ item.branchName }} · {{ item.dateFull }}</div>
+          </a>
+          <span class="rsvp-pill" [class]="'rsvp-' + item.rsvpStatus">{{ item.rsvpStatus }}</span>
+          @if (item.rsvpStatus !== 'cancel') {
+            <button type="button" class="link-cta cancel-btn" (click)="cancel(item.eventId)">Cancel</button>
+          }
+        </div>
+      }
+    </div>
+  } @else {
+    <p class="empty-note">You haven't RSVP'd to any events yet. <a routerLink="/events" class="link-cta">Browse events →</a></p>
+  }
+</div>

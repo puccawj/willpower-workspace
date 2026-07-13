@@ -1,0 +1,129 @@
+<div class="page-toolbar toolbar-end">
+  <button type="button" class="btn btn-solid" (click)="addTemplate()">⇪ Upload new template</button>
+</div>
+
+@if (error()) {
+  <div class="state-error card">{{ error() }}</div>
+} @else if (loading()) {
+  <div class="state-loading card">Loading certificate templates…</div>
+} @else {
+  <app-table-toolbar [controller]="ctrl" slot="top"></app-table-toolbar>
+
+  @if (ctrl.effectiveView() === 'table') {
+    <div class="card" style="padding:0;overflow:hidden">
+      <table>
+        <thead><tr><th>Background</th><th>Name</th><th>Type</th><th>Year</th><th>Branch</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+          @for (t of ctrl.pageItems(); track t.id) {
+            <tr class="row" [class.row-selected]="selectedTemplateId() === t.id" (click)="selectForDesign(t)">
+              <td>
+                @if (t.backgroundImageUrl) {
+                  <img [src]="t.backgroundImageUrl" alt="" class="template-thumb template-thumb-clickable" (click)="$event.stopPropagation(); viewBackground(t)" />
+                } @else {
+                  <span class="template-thumb template-thumb-placeholder">{{ t.name.charAt(0) }}</span>
+                }
+              </td>
+              <td style="font-weight:500">{{ t.name }}</td>
+              <td>{{ t.typeLabel }}</td>
+              <td>{{ t.year }}</td>
+              <td>{{ t.branchName }}</td>
+              <td><span class="badge" [style.background]="t.statusColor">{{ t.statusLabel }}</span></td>
+              <td>
+                <div class="action-group">
+                  <button type="button" class="icon-btn icon-btn-accent" (click)="$event.stopPropagation(); selectForDesign(t)" title="Edit layout">▦</button>
+                  <button type="button" class="icon-btn" [style.color]="t.isActive ? 'var(--w-red)' : 'var(--w-green)'" (click)="$event.stopPropagation(); toggleActive(t)" [title]="t.isActive ? 'Archive' : 'Set active'">⏻</button>
+                  <button type="button" class="icon-btn" (click)="$event.stopPropagation(); editTemplate(t)" title="Edit details">✎</button>
+                </div>
+              </td>
+            </tr>
+          }
+          @if (!ctrl.pageItems().length) {
+            <tr><td colspan="7" class="muted-cell" style="text-align:center;padding:20px">No certificate templates yet.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <div class="cardgrid">
+      @for (t of ctrl.pageItems(); track t.id) {
+        <div class="mcard" [class.mcard-selected]="selectedTemplateId() === t.id" (click)="selectForDesign(t)">
+          <div class="mcard-head">
+            <div class="template-name-cell">
+              @if (t.backgroundImageUrl) {
+                <img [src]="t.backgroundImageUrl" alt="" class="template-thumb template-thumb-clickable" (click)="$event.stopPropagation(); viewBackground(t)" />
+              } @else {
+                <span class="template-thumb template-thumb-placeholder">{{ t.name.charAt(0) }}</span>
+              }
+              <h4 class="mcard-title">{{ t.name }}</h4>
+            </div>
+            <span class="badge badge-sm" [style.background]="t.statusColor">{{ t.statusLabel }}</span>
+          </div>
+          <div class="muted-label mcard-meta">{{ t.typeLabel }} · {{ t.year }} · {{ t.branchName }}</div>
+          <div class="mcard-actions action-group">
+            <button type="button" class="icon-btn icon-btn-accent" (click)="$event.stopPropagation(); selectForDesign(t)" title="Edit layout">▦</button>
+            <button type="button" class="icon-btn" [style.color]="t.isActive ? 'var(--w-red)' : 'var(--w-green)'" (click)="$event.stopPropagation(); toggleActive(t)" [title]="t.isActive ? 'Archive' : 'Set active'">⏻</button>
+            <button type="button" class="icon-btn" (click)="$event.stopPropagation(); editTemplate(t)" title="Edit details">✎</button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <app-table-toolbar [controller]="ctrl" slot="bottom"></app-table-toolbar>
+
+  @if (selectedTemplate(); as sel) {
+    <div class="card pad designer-card">
+      <div class="designer-head">
+        <div>
+          <h3 class="section-title">Layout designer — {{ sel.name }}</h3>
+          <div class="muted-label designer-hint">Click a field below to place it on the certificate, drag it to position, or remove it to send it back.</div>
+        </div>
+        <div class="field-inline designer-kicker-input">
+          <label class="muted-label">Header text</label>
+          <input
+            class="form-input"
+            [ngModel]="kickerText()"
+            (ngModelChange)="onKickerTextChange($event)"
+          />
+        </div>
+      </div>
+
+      <div class="designer-palette">
+        @if (!paletteFields().length) {
+          <span class="muted-label">All fields are placed on the certificate.</span>
+        }
+        @for (f of paletteFields(); track f) {
+          <button type="button" class="palette-chip" (click)="addFieldToCanvas(f)">+ {{ paletteLabel(f) }}</button>
+        }
+      </div>
+
+      <div
+        class="designer-canvas"
+        #designerCanvas
+        (pointermove)="onCanvasPointerMove($event)"
+        (pointerup)="endDrag()"
+        (pointerleave)="endDrag()"
+      >
+        @if (sel.backgroundImageUrl) {
+          <img [src]="sel.backgroundImageUrl" alt="" class="designer-bg-img" />
+        }
+        <div class="designer-frame"></div>
+        @if (!placedFields().length) {
+          <div class="designer-empty-hint">Click a field above to add it here</div>
+        }
+        @for (f of placedFields(); track f) {
+          <div
+            class="designer-field"
+            [class]="'designer-' + f"
+            [style.left.%]="positions()[f]!.xPct"
+            [style.top.%]="positions()[f]!.yPct"
+            (pointerdown)="startDrag(f, $event)"
+          >
+            {{ fieldLabel(f) }}
+            <span class="designer-field-remove" (pointerdown)="$event.stopPropagation()" (click)="removeField(f, $event)">×</span>
+          </div>
+        }
+      </div>
+    </div>
+  }
+}

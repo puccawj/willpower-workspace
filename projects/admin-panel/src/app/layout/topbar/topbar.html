@@ -1,0 +1,42 @@
+<header class="topbar">
+  <div class="topbar-left">
+    <button type="button" class="hamburger-btn" (click)="layout.toggleMobileMenu()" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+    <div>
+      <h1 class="page-title">{{ title() }}</h1>
+      <div class="page-subtitle">{{ subtitle() }}</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="scope-pill">{{ roleService.scopeLabel() }}</div>
+
+    <div class="bell-wrap">
+      <button type="button" class="bell-btn" (click)="toggleBell()">
+        🔔
+        @if (notifications.unreadCount() > 0) {
+          <span class="bell-badge">{{ notifications.unreadCount() }}</span>
+        }
+      </button>
+      @if (bellOpen()) {
+        <div class="bell-dropdown">
+          <div class="bell-dropdown-head">Notifications</div>
+          @if (notifications.notifications().length) {
+            <div class="bell-list">
+              @for (n of notifications.notifications(); track n.id) {
+                <div class="bell-item">
+                  <div class="bell-item-msg">{{ n.message }}</div>
+                  <div class="bell-item-time">{{ timeAgo(n.timestamp) }}</div>
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="bell-empty">No notifications yet.</div>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="avatar">{{ roleService.userInitials() }}</div>
+  </div>
+</header>

@@ -1,0 +1,114 @@
+:host {
+  display: block;
+}
+
+.my-courses-title {
+  margin-bottom: 16px;
+}
+
+.course-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.course-row {
+  background: var(--w-bg-alt);
+  border: 1px solid var(--w-border);
+  border-radius: 10px;
+  padding: 18px 20px;
+}
+
+.course-row-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 14px;
+}
+
+.course-row-title {
+  font: 500 17px var(--w-font-serif);
+}
+
+.status-pill {
+  font: 600 11px var(--w-font-sans);
+  padding: 4px 10px;
+  border-radius: 20px;
+  color: #fff;
+  white-space: nowrap;
+
+  &.status-in-progress {
+    background: var(--w-gold);
+  }
+
+  &.status-completed {
+    background: var(--w-green);
+  }
+
+  &.status-failed {
+    background: var(--w-muted-2);
+  }
+}
+
+.attendance-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.attendance-track {
+  flex: 1;
+  height: 7px;
+  background: var(--w-border);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.attendance-fill {
+  height: 100%;
+  background: var(--w-gold);
+
+  &.pass {
+    background: var(--w-green);
+  }
+}
+
+.attendance-label {
+  font: 600 12px var(--w-font-sans);
+  white-space: nowrap;
+}
+
+.sessions-toggle {
+  margin-top: 12px;
+}
+
+.sessions-panel {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--w-border);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.session-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.session-label {
+  font: 500 13px var(--w-font-sans);
+}
+
+.session-scan {
+  padding: 12px 0;
+}
+
+.session-qr-error {
+  font: 500 12.5px/1.5 var(--w-font-sans);
+  color: var(--w-accent);
+  margin: 0;
+}

@@ -1,0 +1,62 @@
+:host {
+  display: block;
+}
+
+.sso-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 18px 0;
+  font: 500 12px var(--w-font-sans);
+  color: var(--w-muted-2);
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid var(--w-border);
+  }
+
+  span {
+    padding: 0 12px;
+    white-space: nowrap;
+  }
+}
+
+.sso-row {
+  display: flex;
+  flex-direction: row;
+  gap: 14px;
+  align-items: center;
+  justify-content: center;
+}
+
+.google-btn-slot {
+  display: flex;
+}
+
+.fb-icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: #1877f2;
+  transition: opacity 0.15s ease;
+
+  &:hover {
+    opacity: 0.85;
+  }
+}
+
+.fb-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font: 700 20px Georgia, serif;
+}

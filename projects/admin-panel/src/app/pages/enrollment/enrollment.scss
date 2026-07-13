@@ -1,0 +1,91 @@
+:host {
+  display: block;
+}
+
+.session-banner {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--w-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.session-title {
+  font: 500 19px var(--w-font-serif);
+  margin: 0 0 3px;
+}
+
+.session-picker-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.field-inline {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 220px;
+}
+
+.qr-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(36, 28, 21, 0.55);
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.qr-dialog {
+  background: var(--w-panel);
+  border-radius: 14px;
+  max-width: 420px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 26px;
+  box-shadow: 0 30px 70px -30px rgba(36, 28, 21, 0.5);
+}
+
+.qr-dialog-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.qr-dialog-title {
+  font: 500 19px var(--w-font-serif);
+  margin: 0;
+}
+
+.qr-dialog-close {
+  cursor: pointer;
+  font: 600 20px var(--w-font-sans);
+  color: var(--w-muted);
+}
+
+.qr-dialog-hint {
+  margin: 0 0 16px;
+}
+
+.qr-display-img {
+  display: block;
+  width: 100%;
+  max-width: 280px;
+  margin: 0 auto;
+  border-radius: 10px;
+}
+
+.qr-camera-error {
+  font: 500 12.5px var(--w-font-sans);
+  color: var(--w-red);
+  margin: -6px 0 12px;
+}

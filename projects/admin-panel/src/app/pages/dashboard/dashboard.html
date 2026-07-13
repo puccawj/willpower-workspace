@@ -1,0 +1,65 @@
+<app-stat-cards [stats]="statCards()"></app-stat-cards>
+
+<div class="dash-grid">
+  <div class="card pad">
+    <div class="card-head">
+      <h3 class="section-title">Members by branch</h3>
+      <span class="muted-label">Top 5</span>
+    </div>
+    <div class="bar-list">
+      @for (b of branchBars(); track b.name) {
+        <div>
+          <div class="bar-row">
+            <span>{{ b.name }}</span>
+            <span class="muted-label">{{ b.value }}</span>
+          </div>
+          <div class="bar-track"><div class="bar-fill" [style.width]="b.pct" [style.background]="b.color"></div></div>
+        </div>
+      } @empty {
+        <div class="muted-label">No branches yet.</div>
+      }
+    </div>
+  </div>
+
+  <div class="card pad">
+    <h3 class="section-title rsvp-title">RSVP breakdown — upcoming</h3>
+    <div class="rsvp-list">
+      @for (r of rsvpBreakdown(); track r.label) {
+        <div class="rsvp-row">
+          <div class="rsvp-dot" [style.background]="r.color"></div>
+          <div class="rsvp-label">{{ r.label }}</div>
+          <div class="rsvp-value">{{ r.value }}</div>
+        </div>
+      }
+    </div>
+    <div class="rsvp-avg">
+      <span class="muted-label">Avg. attendance rate</span>
+      <span class="rsvp-avg-value">{{ avgAttendanceRate() }}</span>
+    </div>
+  </div>
+</div>
+
+<div class="card" style="padding:0;overflow:hidden">
+  <div class="activity-head">
+    <h3 class="section-title">Recent activity</h3>
+    <button type="button" class="link-accent" (click)="goEvents()">View events →</button>
+  </div>
+  <table>
+    <thead>
+      <tr><th>Event</th><th>Branch</th><th>Date</th><th>RSVP</th><th>Status</th></tr>
+    </thead>
+    <tbody>
+      @for (ev of activity(); track ev.id) {
+        <tr class="row">
+          <td style="font-weight:500">{{ ev.title }}</td>
+          <td>{{ ev.branch }}</td>
+          <td>{{ ev.dateShort }}</td>
+          <td>{{ ev.rsvpSummary }}</td>
+          <td><span class="badge" [style.background]="ev.statusColor">{{ ev.status }}</span></td>
+        </tr>
+      } @empty {
+        <tr><td colspan="5" class="muted-label" style="padding:16px">No events yet.</td></tr>
+      }
+    </tbody>
+  </table>
+</div>

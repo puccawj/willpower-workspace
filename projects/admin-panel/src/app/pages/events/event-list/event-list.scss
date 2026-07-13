@@ -1,0 +1,36 @@
+:host {
+  display: block;
+}
+
+.event-title-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.event-cover {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.event-cover-clickable {
+  cursor: zoom-in;
+
+  &:hover {
+    outline: 2px solid var(--w-accent);
+    outline-offset: 1px;
+  }
+}
+
+.event-cover-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--w-border);
+  color: var(--w-muted);
+  font: 600 15px var(--w-font-sans);
+  text-transform: uppercase;
+}

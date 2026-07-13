@@ -1,0 +1,62 @@
+:host {
+  display: block;
+}
+
+.branch-name {
+  font: 500 19px var(--w-font-serif);
+  margin: 0 0 3px;
+}
+
+.branch-stats {
+  display: flex;
+  gap: 20px;
+  padding: 14px 0;
+  border-top: 1px solid var(--w-border);
+  border-bottom: 1px solid var(--w-border);
+  margin-bottom: 14px;
+}
+
+.branch-stat-value {
+  font: 500 17px var(--w-font-serif);
+}
+
+.branch-stat-label {
+  font: 500 10px var(--w-font-sans);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--w-muted);
+}
+
+.branch-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.branch-logo {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.branch-logo-clickable {
+  cursor: zoom-in;
+
+  &:hover {
+    outline: 2px solid var(--w-accent);
+    outline-offset: 1px;
+  }
+}
+
+.branch-logo-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--w-border);
+  color: var(--w-muted);
+  font: 600 13px var(--w-font-sans);
+  text-transform: uppercase;
+}
+

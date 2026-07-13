@@ -1,0 +1,64 @@
+<header class="site-header">
+  <a routerLink="/" class="brand">
+    <div class="brand-mark">◈</div>
+    <div class="brand-text">
+      <span class="brand-name">Willpower Institute</span>
+      <span class="brand-name-th">สถาบันพลังจิตตานุภาพ</span>
+    </div>
+  </a>
+
+  <nav class="nav-links">
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
+    <a routerLink="/events" routerLinkActive="active">Events</a>
+    <a routerLink="/courses" routerLinkActive="active">Courses</a>
+    <a routerLink="/about" routerLinkActive="active">About</a>
+    <a routerLink="/team" routerLinkActive="active">Team</a>
+  </nav>
+
+  <div class="header-actions">
+    @if (auth.isLoggedIn()) {
+      <a routerLink="/my" routerLinkActive="active" class="account-chip">
+        <span class="account-avatar">{{ auth.currentUser()?.initials }}</span>
+        My Account
+      </a>
+      <button type="button" class="btn btn-outline logout-btn" (click)="logout()">Log out</button>
+    } @else {
+      <a routerLink="/login" class="btn btn-outline">Log in</a>
+    }
+  </div>
+
+  <button
+    type="button"
+    class="menu-toggle"
+    [class.open]="menuOpen()"
+    [attr.aria-expanded]="menuOpen()"
+    aria-label="Toggle menu"
+    (click)="toggleMenu()"
+  >
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+
+  @if (menuOpen()) {
+    <nav class="mobile-menu">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">Home</a>
+      <a routerLink="/events" routerLinkActive="active" (click)="closeMenu()">Events</a>
+      <a routerLink="/courses" routerLinkActive="active" (click)="closeMenu()">Courses</a>
+      <a routerLink="/about" routerLinkActive="active" (click)="closeMenu()">About</a>
+      <a routerLink="/team" routerLinkActive="active" (click)="closeMenu()">Team</a>
+
+      <div class="mobile-menu-actions">
+        @if (auth.isLoggedIn()) {
+          <a routerLink="/my" routerLinkActive="active" class="account-chip" (click)="closeMenu()">
+            <span class="account-avatar">{{ auth.currentUser()?.initials }}</span>
+            My Account
+          </a>
+          <button type="button" class="btn btn-outline logout-btn" (click)="logout()">Log out</button>
+        } @else {
+          <a routerLink="/login" class="btn btn-outline" (click)="closeMenu()">Log in</a>
+        }
+      </div>
+    </nav>
+  }
+</header>

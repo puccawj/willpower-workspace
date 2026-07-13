@@ -1,0 +1,98 @@
+<button type="button" class="link-muted back-link" (click)="goEvents()">← All events</button>
+
+@if (error()) {
+  <div class="state-error card">{{ error() }}</div>
+} @else if (loading()) {
+  <div class="state-loading card">Loading attendees…</div>
+} @else if (event(); as ev) {
+  <div class="card summary-card">
+    <div>
+      <h2 class="summary-title">{{ ev.title }}</h2>
+      <div class="muted-label">{{ dateFull() }}</div>
+    </div>
+    <div class="summary-counts">
+      <div class="count-block"><div class="count-value" style="color:var(--w-green)">{{ ev.going }}</div><div class="count-label">Confirmed</div></div>
+      <div class="count-block"><div class="count-value" style="color:var(--w-gold)">{{ ev.maybe }}</div><div class="count-label">Maybe</div></div>
+      <div class="count-block"><div class="count-value" style="color:var(--w-red)">{{ ev.cancel }}</div><div class="count-label">Cancelled</div></div>
+      <div class="count-block"><div class="count-value" style="color:var(--w-accent)">{{ ev.waitlist }}</div><div class="count-label">Waitlist</div></div>
+    </div>
+  </div>
+
+  <div class="qr-row">
+    @if (ev.waitlist > 0 && (!ev.capacity || ev.going < ev.capacity)) {
+      <button type="button" class="btn btn-outline" (click)="promoteFromWaitlist()">Promote from waitlist</button>
+    }
+    <button type="button" class="btn btn-outline" (click)="addAttendee()">+ Add Attendee</button>
+    <button type="button" class="btn btn-outline" (click)="openQrDialog()">▤ Show check-in QR</button>
+  </div>
+}
+
+@if (qrOpen()) {
+  <div class="qr-overlay" (click)="closeQrDialog()">
+    <div class="qr-dialog" (click)="$event.stopPropagation()">
+      <div class="qr-dialog-head">
+        <h3 class="qr-dialog-title">Check-in QR code</h3>
+        <span class="qr-dialog-close" (click)="closeQrDialog()">×</span>
+      </div>
+      <p class="muted-label qr-dialog-hint">
+        Display this at the door — guests scan it with their own phone to check themselves in.
+      </p>
+
+      @if (qrLoading()) {
+        <p class="muted-label">Loading…</p>
+      } @else if (qrError()) {
+        <p class="qr-camera-error">{{ qrError() }}</p>
+      } @else if (qrDataUrl(); as url) {
+        <img [src]="url" alt="Event check-in QR code" class="qr-display-img" />
+      }
+    </div>
+  </div>
+}
+
+<app-table-toolbar [controller]="ctrl" slot="top"></app-table-toolbar>
+
+@if (ctrl.effectiveView() === 'table') {
+  <div class="card" style="padding:0;overflow:hidden">
+    <table>
+      <thead><tr><th>Name</th><th>Email</th><th>RSVP status</th><th>Checked in</th><th></th></tr></thead>
+      <tbody>
+        @for (a of ctrl.pageItems(); track a.userId) {
+          <tr class="row">
+            <td style="font-weight:500">{{ a.name }}</td>
+            <td class="muted-cell">{{ a.email }}</td>
+            <td><span class="badge" [style.background]="rsvpColor[a.rsvp]">{{ rsvpLabel[a.rsvp] }}</span></td>
+            <td>{{ a.checkedIn ? '✓ Checked in' : '—' }}</td>
+            <td>
+              <div class="action-group">
+                <button type="button" class="icon-btn icon-btn-accent" (click)="toggleCheckin(a)" [title]="a.checkedIn ? 'Undo check-in' : 'Mark present'">{{ a.checkedIn ? '↺' : '☑' }}</button>
+                <button type="button" class="icon-btn" style="color:var(--w-red)" (click)="removeAttendee(a)" title="Remove attendee">✕</button>
+              </div>
+            </td>
+          </tr>
+        }
+        @if (!ctrl.pageItems().length) {
+          <tr><td colspan="5" class="muted-cell" style="text-align:center;padding:20px">No attendees yet — click "+ Add Attendee" to RSVP a guest.</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+} @else {
+  <div class="cardgrid">
+    @for (a of ctrl.pageItems(); track a.userId) {
+      <div class="mcard">
+        <div class="mcard-head">
+          <h4 class="mcard-title mcard-title-sans">{{ a.name }}</h4>
+          <span class="badge badge-sm" [style.background]="rsvpColor[a.rsvp]">{{ rsvpLabel[a.rsvp] }}</span>
+        </div>
+        <div class="muted-label mcard-meta">{{ a.email }}</div>
+        <div class="muted-label mcard-meta">Checked in: {{ a.checkedIn ? '✓ Checked in' : '—' }}</div>
+        <div class="mcard-actions action-group">
+          <button type="button" class="icon-btn icon-btn-accent" (click)="toggleCheckin(a)" [title]="a.checkedIn ? 'Undo check-in' : 'Mark present'">{{ a.checkedIn ? '↺' : '☑' }}</button>
+          <button type="button" class="icon-btn" style="color:var(--w-red)" (click)="removeAttendee(a)" title="Remove attendee">✕</button>
+        </div>
+      </div>
+    }
+  </div>
+}
+
+<app-table-toolbar [controller]="ctrl" slot="bottom"></app-table-toolbar>

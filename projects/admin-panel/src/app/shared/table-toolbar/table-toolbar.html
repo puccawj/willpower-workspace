@@ -1,0 +1,35 @@
+@if (slot === 'top') {
+  <div class="toolbar-top">
+    <input
+      class="search-input"
+      [ngModel]="controller.search()"
+      (ngModelChange)="onSearchInput($event)"
+      placeholder="Search..."
+    />
+    <div class="toolbar-right">
+      <div class="per-page">
+        <span class="per-page-label">Rows per page</span>
+        <select class="per-page-select" [ngModel]="controller.perPage()" (ngModelChange)="onPerPageChange($event)">
+          @for (opt of controller.perPageOptions; track opt) {
+            <option [value]="opt">{{ opt }}</option>
+          }
+        </select>
+      </div>
+      @if (!controller.isMobile()) {
+        <div class="view-switch">
+          <span class="view-btn" [class.active]="controller.view() === 'table'" (click)="controller.setView('table')">☰ Table</span>
+          <span class="view-btn" [class.active]="controller.view() === 'card'" (click)="controller.setView('card')">▦ Cards</span>
+        </div>
+      }
+    </div>
+  </div>
+} @else {
+  <div class="toolbar-bottom">
+    <div class="summary">{{ controller.summaryLabel() }}</div>
+    <div class="pager">
+      <span class="pager-btn" [class.disabled]="controller.currentPage() <= 1" (click)="controller.prev()">‹</span>
+      <span class="pager-label">{{ controller.pageLabel() }}</span>
+      <span class="pager-btn" [class.disabled]="controller.currentPage() >= controller.totalPages()" (click)="controller.next()">›</span>
+    </div>
+  </div>
+}

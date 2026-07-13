@@ -1,0 +1,77 @@
+<div class="page-toolbar">
+  <app-filter-tabs [options]="filterOptions()" [active]="filter()" [select]="setFilter"></app-filter-tabs>
+  <div class="toolbar-actions">
+    <button type="button" class="btn btn-outline" (click)="importInput.click()">⇪ Import Excel</button>
+    <input
+      #importInput
+      type="file"
+      accept=".xlsx,.xls,.csv"
+      class="hidden-file-input"
+      (change)="$any($event.target).files[0] && importFromFile($any($event.target).files[0]); $any($event.target).value = ''"
+    />
+    <button type="button" class="btn btn-solid" (click)="addUser()">+ Add User</button>
+  </div>
+</div>
+
+@if (error()) {
+  <div class="state-error card">{{ error() }}</div>
+} @else if (loading()) {
+  <div class="state-loading card">Loading users…</div>
+} @else {
+  <app-table-toolbar [controller]="ctrl" slot="top"></app-table-toolbar>
+
+  @if (ctrl.effectiveView() === 'table') {
+    <div class="card" style="padding:0;overflow:hidden">
+      <table>
+        <thead><tr><th>Name</th><th>Role</th><th>Branch</th><th>Email</th><th>Registered via</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody>
+          @for (u of ctrl.pageItems(); track u.id) {
+            <tr class="row">
+              <td>
+                <div class="name-cell">
+                  <div class="avatar-sm" [style.background]="u.avatarColor">{{ u.initials }}</div>{{ u.name }}
+                </div>
+              </td>
+              <td>{{ u.roleLabel }}</td>
+              <td>{{ u.branchNamesLabel }}</td>
+              <td class="muted-cell">{{ u.email }}</td>
+              <td><span class="badge badge-sm badge-outline">{{ u.registrationLabel }}</span></td>
+              <td><span class="badge" [style.background]="u.statusColor">{{ u.statusLabel }}</span></td>
+              <td>
+                <div class="action-group">
+                  <button type="button" class="icon-btn icon-btn-accent" (click)="editUser(u)" title="Edit">✎</button>
+                  <button type="button" class="icon-btn" [style.color]="u.actionColor" (click)="toggleStatus(u)" [title]="u.actionLabel">⏻</button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <div class="cardgrid">
+      @for (u of ctrl.pageItems(); track u.id) {
+        <div class="mcard">
+          <div class="mcard-person">
+            <div class="avatar-md" [style.background]="u.avatarColor">{{ u.initials }}</div>
+            <div>
+              <div class="person-name">{{ u.name }}</div>
+              <div class="muted-label">{{ u.roleLabel }} · {{ u.branchNamesLabel }}</div>
+            </div>
+          </div>
+          <div class="muted-label mcard-meta">{{ u.email }}</div>
+          <div class="mcard-row">
+            <span class="badge badge-sm" [style.background]="u.statusColor">{{ u.statusLabel }}</span>
+            <span class="badge badge-sm badge-outline">{{ u.registrationLabel }}</span>
+            <div class="mcard-actions action-group">
+              <button type="button" class="icon-btn icon-btn-accent" (click)="editUser(u)" title="Edit">✎</button>
+              <button type="button" class="icon-btn" [style.color]="u.actionColor" (click)="toggleStatus(u)" [title]="u.actionLabel">⏻</button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <app-table-toolbar [controller]="ctrl" slot="bottom"></app-table-toolbar>
+}

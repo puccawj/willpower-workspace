@@ -1,0 +1,65 @@
+<app-stat-cards [stats]="stats()"></app-stat-cards>
+
+<div class="page-toolbar">
+  <app-filter-tabs [options]="filterOptions" [active]="filter()" [select]="setFilter"></app-filter-tabs>
+  <button type="button" class="btn btn-solid" (click)="addDonation()">+ Log Donation</button>
+</div>
+
+@if (error()) {
+  <div class="state-error card">{{ error() }}</div>
+} @else if (loading()) {
+  <div class="state-loading card">Loading donations…</div>
+} @else {
+  <app-table-toolbar [controller]="ctrl" slot="top"></app-table-toolbar>
+
+  @if (ctrl.effectiveView() === 'table') {
+    <div class="card" style="padding:0;overflow:hidden">
+      <table>
+        <thead>
+          <tr><th>Donor</th><th>Type</th><th>Amount / item</th><th>Branch</th><th>Event</th><th>Status</th><th>Certificate</th><th></th></tr>
+        </thead>
+        <tbody>
+          @for (d of ctrl.pageItems(); track d.id) {
+            <tr class="row">
+              <td style="font-weight:500">{{ d.donorLabel }}</td>
+              <td>{{ d.typeLabel }}</td>
+              <td>{{ d.amountOrItem }}</td>
+              <td>{{ d.branchName }}</td>
+              <td>{{ d.eventTitle }}</td>
+              <td><span class="badge" [style.background]="d.statusColor">{{ d.statusLabel }}</span></td>
+              <td [style.color]="d.certColor" style="font-weight:500">{{ d.certLabel }}</td>
+              <td>
+                <div class="action-group">
+                  <button type="button" class="icon-btn icon-btn-accent" (click)="action(d)" [title]="d.actionLabel">{{ d.actionIcon }}</button>
+                  <button type="button" class="icon-btn" (click)="editDonation(d)" title="Edit">✎</button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <div class="cardgrid">
+      @for (d of ctrl.pageItems(); track d.id) {
+        <div class="mcard">
+          <div class="mcard-head">
+            <h4 class="mcard-title">{{ d.donorLabel }}</h4>
+            <span class="badge badge-sm" [style.background]="d.statusColor">{{ d.statusLabel }}</span>
+          </div>
+          <div class="muted-label">{{ d.typeLabel }} · {{ d.amountOrItem }}</div>
+          <div class="muted-label mcard-meta">{{ d.branchName }} · {{ d.eventTitle }}</div>
+          <div class="mcard-row">
+            <span [style.color]="d.certColor" style="font-weight:500">{{ d.certLabel }}</span>
+            <div class="mcard-actions action-group">
+              <button type="button" class="icon-btn icon-btn-accent" (click)="action(d)" [title]="d.actionLabel">{{ d.actionIcon }}</button>
+              <button type="button" class="icon-btn" (click)="editDonation(d)" title="Edit">✎</button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <app-table-toolbar [controller]="ctrl" slot="bottom"></app-table-toolbar>
+}

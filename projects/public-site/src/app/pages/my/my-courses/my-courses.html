@@ -1,0 +1,74 @@
+<div class="section-block">
+  <h2 class="block-title my-courses-title">Your learning</h2>
+
+  @if (enrollments().length) {
+    <div class="course-rows">
+      @for (e of enrollments(); track e.offeringId) {
+        <div class="course-row">
+          <div class="course-row-head">
+            <div>
+              <div class="course-row-title">{{ e.courseTitle }}</div>
+              <div class="muted-label">{{ e.category ?? 'Course' }} · {{ e.branchName }}</div>
+            </div>
+            <span class="status-pill" [class]="'status-' + statusClass(e.status)">{{ statusLabel(e.status) }}</span>
+          </div>
+          <div class="attendance-row">
+            <div class="attendance-track">
+              <div class="attendance-fill" [style.width.%]="e.attendancePercent" [class.pass]="e.attendancePercent >= +e.passingPercent"></div>
+            </div>
+            <span class="attendance-label">{{ e.attendancePercent }}% attendance</span>
+          </div>
+          <div class="muted-label">{{ e.sessionsAttended }} / {{ e.sessionsTotal }} sessions attended · Pass mark {{ +e.passingPercent }}%</div>
+
+          @if (e.status === 'enrolled') {
+            <button type="button" class="btn btn-outline btn-sm sessions-toggle" (click)="toggleSessions(e.offeringId)">
+              {{ expandedOfferingId() === e.offeringId ? 'Hide sessions' : 'View sessions' }}
+            </button>
+
+            @if (expandedOfferingId() === e.offeringId) {
+              <div class="sessions-panel">
+                @if (sessionsLoading()) {
+                  <p class="muted-label">Loading sessions…</p>
+                } @else if (sessionsError()) {
+                  <p class="muted-label">{{ sessionsError() }}</p>
+                } @else if (!sessions().length) {
+                  <p class="muted-label">No sessions scheduled yet.</p>
+                } @else {
+                  @for (s of sessions(); track s.id) {
+                    <div class="session-row">
+                      <div class="session-info">
+                        <div class="session-label">Session {{ s.sessionNo }} · {{ s.sessionDate }}</div>
+                        <div class="muted-label">{{ s.startTime.slice(0, 5) }}–{{ s.endTime.slice(0, 5) }}</div>
+                      </div>
+                      @if (s.checkedIn) {
+                        <span class="muted-label">Checked in ✓</span>
+                      } @else if (scanSessionId() !== s.id) {
+                        <button type="button" class="btn btn-outline btn-sm" (click)="openScan(s.id)">
+                          Scan to check in
+                        </button>
+                      }
+                    </div>
+
+                    @if (scanSessionId() === s.id) {
+                      <div class="session-scan">
+                        <app-qr-camera [enabled]="scanSessionId() === s.id" (detected)="onCodeDetected($event)"></app-qr-camera>
+                        <button type="button" class="btn btn-outline btn-sm" [disabled]="scanSubmitting()" (click)="closeScan()">
+                          {{ scanSubmitting() ? 'Checking in…' : 'Cancel' }}
+                        </button>
+                        @if (scanError()) {
+                          <p class="session-qr-error">{{ scanError() }}</p>
+                        }
+                      </div>
+                    }
+                  }
+                }
+              </div>
+            }
+          }
+        </div>
+      }
+    </div>
+  } @else {
+    <p class="empty-note">You're not enrolled in any courses yet.</p>
+  }
+</div>

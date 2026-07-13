@@ -1,0 +1,466 @@
+@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Archivo:wght@400;500;600;700&display=swap');
+
+:root {
+  // Brand palette — cream / terracotta / gold (Willpower Institute public site)
+  --w-bg: #f4eddd;
+  --w-bg-alt: #f7f1e4;
+  --w-ink: #241c15;
+  --w-ink-soft: #5a5044;
+  --w-muted: #7a6f60;
+  --w-muted-2: #8a7d6a;
+  --w-accent: #a94b2c;
+  --w-gold: #b98a32;
+  --w-gold-deep: #c6a24a;
+  --w-dark: #241c15;
+  --w-dark-2: #1c150f;
+  --w-border: rgba(36, 28, 21, 0.12);
+  --w-border-strong: rgba(36, 28, 21, 0.28);
+  --w-green: #7c9068;
+
+  --w-font-serif: 'Newsreader', serif;
+  --w-font-sans: 'Archivo', system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--w-bg);
+  color: var(--w-ink);
+  font-family: var(--w-font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+// ---------------------------------------------------------------------------
+// Shared utility classes used across the public-site pages
+// ---------------------------------------------------------------------------
+
+.pad {
+  padding-left: 44px;
+  padding-right: 44px;
+}
+
+.eyebrow {
+  font: 500 11.5px var(--w-font-sans);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--w-gold);
+  margin-bottom: 10px;
+
+  &.gold {
+    color: var(--w-gold-deep);
+  }
+
+  &.small {
+    letter-spacing: 0.14em;
+    margin-bottom: 14px;
+  }
+}
+
+.section-title {
+  font: 400 34px var(--w-font-serif);
+  margin: 0;
+}
+
+.section-lead {
+  font: 400 15px/1.6 var(--w-font-sans);
+  color: var(--w-muted);
+  max-width: 560px;
+}
+
+.section-inner {
+  max-width: 1160px;
+  margin: 0 auto;
+
+  &.center {
+    text-align: center;
+  }
+}
+
+.section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 30px;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.link-cta {
+  font: 600 13.5px var(--w-font-sans);
+  color: var(--w-accent);
+  white-space: nowrap;
+}
+
+.muted-label {
+  font: 500 12px var(--w-font-sans);
+  color: var(--w-muted-2);
+}
+
+.branch-pill {
+  font: 500 11px var(--w-font-sans);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--w-green);
+  border: 1px solid rgba(124, 144, 104, 0.4);
+  padding: 3px 8px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.live-pill {
+  font: 600 11px var(--w-font-sans);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff;
+  background: #d0342c;
+  padding: 3px 8px;
+  border-radius: 20px;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+
+  &::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #fff;
+    animation: live-pulse 1.4s ease-in-out infinite;
+  }
+}
+
+@keyframes live-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+.btn {
+  font: 600 14px var(--w-font-sans);
+  border-radius: 7px;
+  padding: 14px 26px;
+  display: inline-block;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.btn-solid {
+  color: #fff;
+  background: var(--w-accent);
+}
+
+.btn-outline {
+  color: var(--w-ink);
+  border: 1px solid var(--w-border-strong);
+}
+
+.btn-gold {
+  color: var(--w-ink);
+  background: var(--w-gold-deep);
+  padding: 15px 30px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.event-card {
+  background: var(--w-bg-alt);
+  border: 1px solid var(--w-border);
+  border-radius: 10px;
+  overflow: hidden;
+  display: block;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 34px -20px rgba(36, 28, 21, 0.45);
+  }
+}
+
+.event-card-img {
+  height: 130px;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.event-card-body {
+  padding: 20px;
+}
+
+.event-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.event-date {
+  text-align: center;
+  background: var(--w-accent);
+  color: #fff;
+  border-radius: 7px;
+  padding: 6px 11px;
+  line-height: 1;
+}
+
+.event-day {
+  font: 600 18px var(--w-font-sans);
+}
+
+.event-mon {
+  font: 600 9px var(--w-font-sans);
+  letter-spacing: 0.1em;
+  margin-top: 2px;
+}
+
+.event-title {
+  font: 500 18px/1.3 var(--w-font-serif);
+  margin: 0 0 6px;
+}
+
+.event-blurb {
+  font: 400 13px/1.5 var(--w-font-sans);
+  color: var(--w-muted);
+  margin: 0 0 14px;
+}
+
+.course-card {
+  background: var(--w-bg-alt);
+  border: 1px solid var(--w-border);
+  border-radius: 10px;
+  padding: 24px;
+  transition: transform 0.15s;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+.course-title {
+  font: 500 20px/1.25 var(--w-font-serif);
+  margin: 0 0 10px;
+}
+
+.course-desc {
+  font: 400 13.5px/1.55 var(--w-font-sans);
+  color: var(--w-muted);
+  margin: 0 0 18px;
+}
+
+.course-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 16px;
+  border-top: 1px solid var(--w-border);
+}
+
+.page-title {
+  font: 400 46px var(--w-font-serif);
+  margin: 0 0 8px;
+}
+
+.event-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 14px;
+  border-top: 1px solid var(--w-border);
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.btn-sm {
+  padding: 10px 20px;
+  font-size: 13px;
+  border-radius: 7px;
+}
+
+.filter-pill {
+  font: 600 13px var(--w-font-sans);
+  color: var(--w-ink-soft);
+  background: transparent;
+  border: 1px solid var(--w-border-strong);
+  padding: 9px 18px;
+  border-radius: 30px;
+  cursor: pointer;
+
+  &.active {
+    background: var(--w-accent);
+    color: #fff;
+    border-color: var(--w-accent);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// My Account (student portal) shared classes
+// ---------------------------------------------------------------------------
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 36px;
+}
+
+.stat-box {
+  background: var(--w-bg-alt);
+  border: 1px solid var(--w-border);
+  border-radius: 10px;
+  padding: 18px;
+}
+
+.stat-value {
+  font: 500 26px var(--w-font-serif);
+  color: var(--w-accent);
+}
+
+.stat-label {
+  font: 500 11.5px var(--w-font-sans);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--w-muted-2);
+  margin-top: 4px;
+}
+
+.section-block {
+  margin-bottom: 40px;
+}
+
+.section-head-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 16px;
+}
+
+.block-title {
+  font: 400 22px var(--w-font-serif);
+  margin: 0;
+}
+
+.empty-note {
+  font: 400 14px var(--w-font-sans);
+  color: var(--w-muted);
+}
+
+.event-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.event-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 16px;
+  background: var(--w-bg-alt);
+  border: 1px solid var(--w-border);
+  border-radius: 10px;
+}
+
+.event-row-date {
+  text-align: center;
+  background: var(--w-accent);
+  color: #fff;
+  border-radius: 7px;
+  padding: 6px 11px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.event-row-day {
+  font: 600 16px var(--w-font-sans);
+}
+
+.event-row-mon {
+  font: 600 9px var(--w-font-sans);
+  letter-spacing: 0.1em;
+  margin-top: 2px;
+}
+
+.event-row-info {
+  flex: 1;
+}
+
+.event-row-title {
+  font: 500 15px var(--w-font-serif);
+}
+
+.rsvp-pill {
+  font: 600 11px var(--w-font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 4px 10px;
+  border-radius: 20px;
+  color: #fff;
+
+  &.rsvp-confirm {
+    background: var(--w-green);
+  }
+
+  &.rsvp-maybe {
+    background: var(--w-gold);
+  }
+
+  &.rsvp-cancel {
+    background: var(--w-muted-2);
+  }
+}
+
+@media (max-width: 880px) {
+  .pad {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  .grid-3,
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .page-title {
+    font-size: 36px;
+  }
+
+  .stat-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}

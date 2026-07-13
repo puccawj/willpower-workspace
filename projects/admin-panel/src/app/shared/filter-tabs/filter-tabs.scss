@@ -1,0 +1,10 @@
+.tab {
+  color: var(--w-ink-soft);
+  border-color: var(--w-border-strong);
+
+  &.active {
+    background: var(--w-accent);
+    color: #fff;
+    border-color: var(--w-accent);
+  }
+}

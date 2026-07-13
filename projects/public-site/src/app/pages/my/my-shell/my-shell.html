@@ -1,0 +1,22 @@
+<div class="pad my-wrap">
+  <div class="my-inner">
+    <div class="my-head">
+      <div>
+        <div class="eyebrow">My account</div>
+        <h1 class="page-title">Welcome, {{ auth.currentUser()?.name }}</h1>
+      </div>
+    </div>
+
+    <nav class="my-tabs">
+      <a routerLink="/my/dashboard" routerLinkActive="active">Overview</a>
+      <a routerLink="/my/events" routerLinkActive="active">My Events</a>
+      <a routerLink="/my/courses" routerLinkActive="active">My Learning</a>
+      <a routerLink="/my/certificates" routerLinkActive="active">Certificates</a>
+      <a routerLink="/my/donations" routerLinkActive="active">Donations</a>
+    </nav>
+
+    <div class="my-content">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>

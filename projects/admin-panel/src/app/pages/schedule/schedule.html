@@ -1,0 +1,96 @@
+@if (!roleService.isInstructor()) {
+  <div class="page-toolbar toolbar-end">
+    <button type="button" class="btn btn-solid" (click)="addOffering()">+ New Offering</button>
+  </div>
+}
+
+@if (error()) {
+  <div class="state-error card">{{ error() }}</div>
+} @else if (loading()) {
+  <div class="state-loading card">Loading class offerings…</div>
+} @else {
+  <app-table-toolbar [controller]="ctrl" slot="top"></app-table-toolbar>
+
+  @if (ctrl.effectiveView() === 'table') {
+    <div class="card" style="padding:0;overflow:hidden">
+      <table>
+        <thead><tr><th>Course</th><th>Branch</th><th>Instructor</th><th>Dates</th><th>Enrolled</th><th>Mode</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+          @for (o of ctrl.pageItems(); track o.id) {
+            <tr class="row">
+              <td style="font-weight:500">{{ o.courseTitle }}</td>
+              <td>{{ o.branchName }}</td>
+              <td>{{ o.instructorName }}</td>
+              <td>{{ o.dateRangeLabel }}</td>
+              <td>{{ o.enrolledCount }} / {{ o.capacity }}</td>
+              <td>{{ o.modeLabel }}</td>
+              <td><span class="badge" [style.background]="statusColors[o.statusKey]">{{ o.statusLabel }}</span></td>
+              <td>
+                <div class="action-group">
+                  <button type="button" class="icon-btn icon-btn-accent" (click)="goEnrollment(o)" title="Enrollment & Attendance">☑</button>
+                  <button type="button" class="icon-btn" (click)="viewSessions(o)" title="View session calendar">▥</button>
+                  @if (!roleService.isInstructor()) {
+                    <button type="button" class="icon-btn" (click)="editOffering(o)" title="Edit">✎</button>
+                  }
+                </div>
+              </td>
+            </tr>
+          }
+          @if (!ctrl.pageItems().length) {
+            <tr><td colspan="8" class="muted-cell" style="text-align:center;padding:20px">No class offerings yet.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <div class="cardgrid">
+      @for (o of ctrl.pageItems(); track o.id) {
+        <div class="mcard">
+          <div class="mcard-head">
+            <h4 class="mcard-title">{{ o.courseTitle }}</h4>
+            <span class="badge badge-sm" [style.background]="statusColors[o.statusKey]">{{ o.statusLabel }}</span>
+          </div>
+          <div class="muted-label">{{ o.branchName }} · {{ o.instructorName }}</div>
+          <div class="muted-label mcard-meta">{{ o.dateRangeLabel }} · {{ o.modeLabel }}</div>
+          <div class="mcard-row">
+            <span>{{ o.enrolledCount }}/{{ o.capacity }} enrolled</span>
+            <div class="mcard-actions action-group">
+              <button type="button" class="icon-btn icon-btn-accent" (click)="goEnrollment(o)" title="Enrollment & Attendance">☑</button>
+              <button type="button" class="icon-btn" (click)="viewSessions(o)" title="View session calendar">▥</button>
+              @if (!roleService.isInstructor()) {
+                <button type="button" class="icon-btn" (click)="editOffering(o)" title="Edit">✎</button>
+              }
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <app-table-toolbar [controller]="ctrl" slot="bottom"></app-table-toolbar>
+
+  <div class="card pad calendar-card">
+    @if (selectedOffering(); as sel) {
+      <h3 class="section-title calendar-title">Session calendar — {{ sel.courseTitle }} ({{ sel.branchName }} · {{ sel.instructorName }})</h3>
+      <div class="session-list">
+        @for (s of sessions(); track s.id) {
+          <div class="session-row">
+            <div class="session-date">
+              <div class="session-day">{{ s.sessionDate.slice(8, 10) }}</div>
+              <div class="session-mon">{{ s.sessionDate.slice(5, 7) }}</div>
+            </div>
+            <div class="session-info">
+              <div class="session-topic">Session {{ s.sessionNo }}{{ s.topic ? ' — ' + s.topic : '' }}</div>
+              <div class="muted-label">{{ s.startTime.slice(0, 5) }}–{{ s.endTime.slice(0, 5) }}{{ s.location ? ' · ' + s.location : '' }}</div>
+            </div>
+          </div>
+        }
+        @if (!sessions().length) {
+          <div class="muted-cell" style="padding:14px 0">No sessions found for this offering.</div>
+        }
+      </div>
+    } @else {
+      <p class="muted-label">Click the calendar icon on an offering above to view its session schedule.</p>
+    }
+  </div>
+}

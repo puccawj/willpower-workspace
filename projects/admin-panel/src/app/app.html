@@ -1,0 +1,25 @@
+<div class="shell" [class.shell-auth]="isAuthPage()">
+  @if (!isAuthPage()) {
+    <app-sidebar></app-sidebar>
+  }
+  <div class="main">
+    @if (!isAuthPage()) {
+      <app-topbar></app-topbar>
+    }
+    <main class="content" [class.content-auth]="isAuthPage()">
+      <router-outlet></router-outlet>
+    </main>
+    @if (!isAuthPage()) {
+      <footer class="app-footer">
+        <span>© 2026 Willpower Institute USA. All Rights Reserved.</span>
+        <span>Version 1.0.0.0</span>
+      </footer>
+    }
+  </div>
+</div>
+@if (!isAuthPage()) {
+  <app-crud-modal></app-crud-modal>
+  <app-toast-host></app-toast-host>
+  <app-image-viewer></app-image-viewer>
+  <app-confirm-dialog></app-confirm-dialog>
+}

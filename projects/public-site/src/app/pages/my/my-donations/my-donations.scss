@@ -1,0 +1,28 @@
+:host {
+  display: block;
+}
+
+.my-donations-title {
+  margin-bottom: 16px;
+}
+
+.donation-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.donation-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: var(--w-bg-alt);
+  border: 1px solid var(--w-border);
+  border-radius: 10px;
+  padding: 16px 20px;
+}
+
+.donation-row-title {
+  font: 500 15px var(--w-font-sans);
+}

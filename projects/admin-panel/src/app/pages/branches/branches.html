@@ -1,0 +1,79 @@
+<div class="page-toolbar toolbar-end">
+  <button type="button" class="btn btn-solid" (click)="addBranch()">+ Add Branch</button>
+</div>
+
+@if (error()) {
+  <div class="state-error card">{{ error() }}</div>
+} @else if (loading()) {
+  <div class="state-loading card">Loading branches…</div>
+} @else {
+  <app-table-toolbar [controller]="ctrl" slot="top"></app-table-toolbar>
+
+  @if (ctrl.effectiveView() === 'table') {
+    <div class="card" style="padding:0;overflow:hidden">
+      <table>
+        <thead><tr><th>Branch</th><th>City</th><th>Country</th><th>Admins</th><th>Members</th><th>Events</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody>
+          @for (b of ctrl.pageItems(); track b.key) {
+            <tr class="row">
+              <td>
+                <div class="branch-name-cell">
+                  @if (b.logoUrl) {
+                    <img [src]="b.logoUrl" alt="" class="branch-logo branch-logo-clickable" (click)="viewLogo(b)" />
+                  } @else {
+                    <span class="branch-logo branch-logo-placeholder">{{ b.name.charAt(0) }}</span>
+                  }
+                  <span style="font-weight:500">{{ b.name }}</span>
+                </div>
+              </td>
+              <td>{{ b.city }}</td>
+              <td>{{ b.country }}</td>
+              <td>{{ b.adminCount }}</td>
+              <td>{{ b.userCount }}</td>
+              <td>{{ b.eventCount }}</td>
+              <td><span class="badge" [style.background]="b.statusColor">{{ b.statusLabel }}</span></td>
+              <td>
+                <div class="action-group">
+                  <button type="button" class="icon-btn icon-btn-accent" (click)="editBranch(b)" title="Edit">✎</button>
+                  <button type="button" class="icon-btn" [style.color]="b.toggleColor" (click)="toggleStatus(b)" [title]="b.toggleLabel">⏻</button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <div class="cardgrid">
+      @for (b of ctrl.pageItems(); track b.key) {
+        <div class="mcard">
+          <div class="mcard-head">
+            <div class="branch-name-cell">
+              @if (b.logoUrl) {
+                <img [src]="b.logoUrl" alt="" class="branch-logo branch-logo-clickable" (click)="viewLogo(b)" />
+              } @else {
+                <span class="branch-logo branch-logo-placeholder">{{ b.name.charAt(0) }}</span>
+              }
+              <div>
+                <h3 class="branch-name">{{ b.name }}</h3>
+                <div class="muted-label">{{ b.city }}{{ b.city && b.country ? ', ' : '' }}{{ b.country }}</div>
+              </div>
+            </div>
+            <span class="badge badge-sm" [style.background]="b.statusColor">{{ b.statusLabel }}</span>
+          </div>
+          <div class="branch-stats">
+            <div><div class="branch-stat-value">{{ b.adminCount }}</div><div class="branch-stat-label">Admins</div></div>
+            <div><div class="branch-stat-value">{{ b.userCount }}</div><div class="branch-stat-label">Members</div></div>
+            <div><div class="branch-stat-value">{{ b.eventCount }}</div><div class="branch-stat-label">Events</div></div>
+          </div>
+          <div class="mcard-actions action-group">
+            <button type="button" class="icon-btn icon-btn-accent" (click)="editBranch(b)" title="Edit">✎</button>
+            <button type="button" class="icon-btn" [style.color]="b.toggleColor" (click)="toggleStatus(b)" [title]="b.toggleLabel">⏻</button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <app-table-toolbar [controller]="ctrl" slot="bottom"></app-table-toolbar>
+}

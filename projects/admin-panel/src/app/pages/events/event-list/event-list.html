@@ -1,0 +1,76 @@
+<div class="page-toolbar">
+  <app-filter-tabs [options]="filterOptions" [active]="filter()" [select]="setFilter"></app-filter-tabs>
+  <button type="button" class="btn btn-solid" (click)="addEvent()">+ New Event</button>
+</div>
+
+@if (error()) {
+  <div class="state-error card">{{ error() }}</div>
+} @else if (loading()) {
+  <div class="state-loading card">Loading events…</div>
+} @else {
+  <app-table-toolbar [controller]="ctrl" slot="top"></app-table-toolbar>
+
+  @if (ctrl.effectiveView() === 'table') {
+    <div class="card" style="padding:0;overflow:hidden">
+      <table>
+        <thead>
+          <tr><th>Cover</th><th>Event</th><th>Branch</th><th>Date &amp; time</th><th>Capacity</th><th>RSVP</th><th>Status</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+          @for (ev of ctrl.pageItems(); track ev.id) {
+            <tr class="row">
+              <td>
+                @if (ev.coverImageUrl) {
+                  <img [src]="ev.coverImageUrl" alt="" class="event-cover event-cover-clickable" (click)="viewCover(ev)" />
+                } @else {
+                  <span class="event-cover event-cover-placeholder">{{ ev.title.charAt(0) }}</span>
+                }
+              </td>
+              <td style="font-weight:500">{{ ev.title }}</td>
+              <td>{{ ev.branchName }}</td>
+              <td>{{ ev.dateFull }}</td>
+              <td>{{ ev.going }} / {{ ev.capacity }}</td>
+              <td>{{ rsvpSummary(ev) }}</td>
+              <td><span class="badge" [style.background]="statusColors[ev.status]">{{ ev.status }}</span></td>
+              <td>
+                <div class="action-group">
+                  <button type="button" class="icon-btn icon-btn-accent" (click)="openRsvp(ev)" title="RSVP & Attendance">☑</button>
+                  <button type="button" class="icon-btn" (click)="editEvent(ev)" title="Edit">✎</button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <div class="cardgrid">
+      @for (ev of ctrl.pageItems(); track ev.id) {
+        <div class="mcard">
+          <div class="mcard-head">
+            <div class="event-title-cell">
+              @if (ev.coverImageUrl) {
+                <img [src]="ev.coverImageUrl" alt="" class="event-cover event-cover-clickable" (click)="viewCover(ev)" />
+              } @else {
+                <span class="event-cover event-cover-placeholder">{{ ev.title.charAt(0) }}</span>
+              }
+              <h4 class="mcard-title">{{ ev.title }}</h4>
+            </div>
+            <span class="badge badge-sm" [style.background]="statusColors[ev.status]">{{ ev.status }}</span>
+          </div>
+          <div class="muted-label mcard-meta">{{ ev.branchName }} · {{ ev.dateFull }}</div>
+          <div class="mcard-row">
+            <span>Capacity {{ ev.going }}/{{ ev.capacity }}</span>
+            <span class="muted-label">{{ rsvpSummary(ev) }}</span>
+          </div>
+          <div class="mcard-actions action-group">
+            <button type="button" class="icon-btn icon-btn-accent" (click)="openRsvp(ev)" title="RSVP & Attendance">☑</button>
+            <button type="button" class="icon-btn" (click)="editEvent(ev)" title="Edit">✎</button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <app-table-toolbar [controller]="ctrl" slot="bottom"></app-table-toolbar>
+}

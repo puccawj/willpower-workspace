@@ -1,0 +1,8 @@
+@if (supported) {
+  <video #videoEl class="qr-camera-video" muted playsinline></video>
+  @if (error()) {
+    <p class="qr-camera-error">{{ error() }}</p>
+  }
+} @else {
+  <p class="qr-camera-error">Your browser doesn't support camera scanning. Try Chrome or Edge.</p>
+}

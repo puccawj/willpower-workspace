@@ -1,0 +1,33 @@
+<div class="pad login-wrap">
+  <div class="login-box">
+    <div class="login-head">
+      <div class="login-mark">◈</div>
+      <h1 class="login-title">Welcome back</h1>
+      <p class="login-sub">Sign in to enroll, RSVP, and view your learning history.</p>
+    </div>
+
+    <form class="login-card" (ngSubmit)="submit()">
+      <label class="login-label" for="email">Email</label>
+      <input id="email" class="login-input" placeholder="you@email.com" [ngModel]="email()" (ngModelChange)="email.set($event)" name="email" />
+
+      <label class="login-label" for="password">Password</label>
+      <input id="password" type="password" class="login-input" placeholder="••••••••" [ngModel]="password()" (ngModelChange)="password.set($event)" name="password" />
+
+      <div class="forgot-row"><a href="#" class="forgot-link">Forgot password?</a></div>
+
+      @if (error()) {
+        <div class="login-error">{{ error() }}</div>
+      }
+
+      <button type="submit" class="btn btn-solid signin-btn" [disabled]="loading()">
+        {{ loading() ? 'Signing in…' : 'Sign in' }}
+      </button>
+
+      <div class="signup-row">New here? <a routerLink="/register" class="signup-link">Create an account</a></div>
+    </form>
+
+    <app-sso-buttons mode="login" (success)="onSsoSuccess()" (failure)="onSsoFailure($event)"></app-sso-buttons>
+
+    <div class="login-note">Admins &amp; instructors sign in here too — you'll be routed to your portal.</div>
+  </div>
+</div>

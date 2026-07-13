@@ -1,0 +1,141 @@
+:host {
+  display: block;
+}
+
+.hero {
+  text-align: center;
+  padding-top: 76px;
+  padding-bottom: 62px;
+}
+
+.heroh1 {
+  font: 400 60px/1.06 var(--w-font-serif);
+  margin: 0 auto;
+  max-width: 760px;
+  letter-spacing: -0.01em;
+}
+
+.hero-lead {
+  font: 400 17px/1.65 var(--w-font-sans);
+  color: var(--w-ink-soft);
+  max-width: 560px;
+  margin: 26px auto 0;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  margin-top: 34px;
+  flex-wrap: wrap;
+}
+
+.stat-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 34px;
+  margin-top: 52px;
+  padding-top: 30px;
+  border-top: 1px solid var(--w-border);
+  max-width: 620px;
+  margin-left: auto;
+  margin-right: auto;
+  flex-wrap: wrap;
+}
+
+.stat-num {
+  font: 500 30px var(--w-font-serif);
+  color: var(--w-accent);
+}
+
+.stat-label {
+  font: 500 11px var(--w-font-sans);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--w-muted-2);
+  margin-top: 4px;
+}
+
+.stat-sep {
+  width: 1px;
+  height: 34px;
+  background: var(--w-border);
+}
+
+.events-section {
+  padding-top: 56px;
+  padding-bottom: 56px;
+  background: var(--w-bg-alt);
+  border-top: 1px solid var(--w-border);
+}
+
+.courses-section {
+  padding-top: 64px;
+  padding-bottom: 64px;
+}
+
+.donate-section {
+  padding-top: 0;
+  padding-bottom: 64px;
+}
+
+.donate-card {
+  max-width: 1160px;
+  margin: 0 auto;
+  background: var(--w-dark);
+  border-radius: 14px;
+  padding: 52px 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 36px;
+  flex-wrap: wrap;
+  position: relative;
+  overflow: hidden;
+}
+
+.donate-ring {
+  position: absolute;
+  border: 1.5px solid rgba(185, 138, 50, 0.35);
+  border-radius: 50%;
+}
+
+.donate-ring-1 {
+  right: -40px;
+  top: -40px;
+  width: 220px;
+  height: 220px;
+}
+
+.donate-ring-2 {
+  right: 10px;
+  top: 10px;
+  width: 150px;
+  height: 150px;
+  border-color: rgba(185, 138, 50, 0.25);
+}
+
+.donate-copy {
+  position: relative;
+}
+
+.donate-title {
+  font: 400 30px/1.2 var(--w-font-serif);
+  color: var(--w-bg);
+  margin: 0 0 10px;
+  max-width: 420px;
+}
+
+.donate-lead {
+  font: 400 14px/1.6 var(--w-font-sans);
+  color: #b6a892;
+  margin: 0;
+  max-width: 440px;
+}
+
+@media (max-width: 880px) {
+  .heroh1 {
+    font-size: 42px;
+  }
+}

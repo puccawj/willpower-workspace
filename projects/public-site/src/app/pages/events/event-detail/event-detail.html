@@ -1,0 +1,127 @@
+<div class="pad page-wrap">
+  <div class="detail-inner">
+    <a routerLink="/events" class="back-link">← All events</a>
+
+    @if (error()) {
+      <p class="section-lead">{{ error() }}</p>
+    } @else if (loading()) {
+      <p class="section-lead">Loading event…</p>
+    } @else if (event(); as ev) {
+      <div class="hero-img"><img [src]="ev.img" alt="" /></div>
+
+      <div class="detail-grid">
+        <div class="detail-main">
+          <span class="branch-pill">{{ ev.branch }}</span>
+          @if (ev.when === 'live') {
+            <span class="live-pill">Live</span>
+          }
+          <h1 class="detail-title">{{ ev.title }}</h1>
+          <div class="detail-facts">
+            <div class="fact"><div class="fact-label">Date</div><div class="fact-value">{{ ev.dateFull }}</div></div>
+            <div class="fact"><div class="fact-label">Time</div><div class="fact-value">{{ ev.time }}</div></div>
+            <div class="fact"><div class="fact-label">Location</div><div class="fact-value">{{ ev.location }}</div></div>
+          </div>
+          <p class="detail-body">{{ ev.body1 }}</p>
+          @if (ev.body2) {
+            <p class="detail-body">{{ ev.body2 }}</p>
+          }
+        </div>
+
+        <aside class="detail-aside">
+          <div class="aside-card">
+            <div class="seats-row">
+              <span class="muted-label">Seats reserved</span>
+              <span class="seats-value">{{ ev.going }} / {{ ev.capacity }}</span>
+            </div>
+            <div class="seats-bar"><div class="seats-fill" [style.width.%]="percentFull()"></div></div>
+
+            <div class="aside-heading">Will you attend?</div>
+            @if (rsvpClosed()) {
+              <p class="rsvp-closed-note">RSVPs closed on {{ rsvpCutoffLabel() }}.</p>
+            } @else {
+              <div class="rsvp-list">
+                @for (r of rsvpOptions; track r.key) {
+                  <button
+                    type="button"
+                    [class]="'rsvp-btn rsvp-' + r.key"
+                    [class.active]="rsvp() === r.key"
+                    [disabled]="rsvpSaving()"
+                    (click)="setRsvp(r.key)"
+                  >
+                    {{ r.label }}
+                  </button>
+                }
+              </div>
+            }
+            @if (rsvpError()) {
+              <div class="rsvp-error">{{ rsvpError() }}</div>
+            }
+            @if (rsvp()) {
+              <div class="rsvp-msg">{{ rsvpMessage() }}</div>
+            }
+            @if (rsvp() === 'confirm') {
+              @if (checkedIn()) {
+                <p class="checkin-qr-hint">You're checked in ✓</p>
+              } @else if (!scanOpen()) {
+                <button type="button" class="btn btn-outline checkin-qr-btn" (click)="openScan()">
+                  Scan to check in
+                </button>
+              } @else {
+                <div class="checkin-scan">
+                  <app-qr-camera [enabled]="scanOpen()" (detected)="onCodeDetected($event)"></app-qr-camera>
+                  <button type="button" class="btn btn-outline checkin-qr-btn" [disabled]="scanSubmitting()" (click)="closeScan()">
+                    {{ scanSubmitting() ? 'Checking in…' : 'Cancel' }}
+                  </button>
+                </div>
+              }
+              @if (scanError()) {
+                <p class="checkin-qr-error">{{ scanError() }}</p>
+              }
+            }
+          </div>
+
+          <div class="aside-card donate-block">
+            <div class="aside-heading gold">Donate to this event</div>
+            @if (donated()) {
+              <div class="donate-thanks">
+                Thank you for your generosity. A certificate of appreciation will be emailed to you with a reference
+                number.
+              </div>
+            } @else if (!isLoggedIn()) {
+              <p class="donate-login-note">Log in to make a donation.</p>
+              <a routerLink="/login" [queryParams]="{ returnUrl: '/events/' + ev.id }" class="btn btn-gold donate-submit">
+                Log in to donate
+              </a>
+            } @else {
+              <div class="donate-type-row">
+                @for (d of donateOptions; track d.key) {
+                  <button
+                    type="button"
+                    class="donate-type-btn"
+                    [class.active]="donateType() === d.key"
+                    (click)="setDonateType(d.key)"
+                  >
+                    {{ d.label }}
+                  </button>
+                }
+              </div>
+              <input class="donate-input" [placeholder]="donatePlaceholder()" [(ngModel)]="donateAmount" name="donateAmount" />
+              <input class="donate-input" placeholder="Phone number" [(ngModel)]="donatePhone" name="donatePhone" />
+              @if (donateError()) {
+                <p class="donate-error">{{ donateError() }}</p>
+              }
+              <button
+                type="button"
+                class="btn btn-gold donate-submit"
+                [disabled]="donateSubmitting()"
+                (click)="submitDonate()"
+              >
+                {{ donateSubmitting() ? 'Submitting…' : 'Submit donation' }}
+              </button>
+            }
+          </div>
+        </aside>
+      </div>
+    }
+  </div>
+</div>

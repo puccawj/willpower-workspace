@@ -1,0 +1,80 @@
+<div class="page-toolbar">
+  <app-filter-tabs [options]="branchFilterOptions()" [active]="branchFilter()" [select]="setBranchFilter"></app-filter-tabs>
+  <div class="view-toggle">
+    <button type="button" class="toggle-btn" [class.active]="viewMode() === 'combined'" (click)="setViewMode('combined')">Combined</button>
+    <button type="button" class="toggle-btn" [class.active]="viewMode() === 'byBranch'" (click)="setViewMode('byBranch')">By branch</button>
+  </div>
+</div>
+
+@if (error()) {
+  <div class="state-error card">{{ error() }}</div>
+} @else if (loading()) {
+  <div class="state-loading card">Loading RSVP overview…</div>
+} @else {
+  @if (viewMode() === 'combined') {
+    <app-stat-cards [stats]="combinedStats()"></app-stat-cards>
+  } @else {
+    <div class="branch-stat-grid">
+      @for (b of byBranchRows(); track b.branchId) {
+        <div class="card branch-stat-card">
+          <h4 class="branch-stat-title">{{ b.branchName }}</h4>
+          <div class="branch-stat-row">
+            <div><div class="branch-stat-value" style="color:var(--w-green)">{{ b.going }}</div><div class="branch-stat-label">Confirmed</div></div>
+            <div><div class="branch-stat-value" style="color:var(--w-gold)">{{ b.maybe }}</div><div class="branch-stat-label">Maybe</div></div>
+            <div><div class="branch-stat-value" style="color:var(--w-red)">{{ b.cancel }}</div><div class="branch-stat-label">Cancelled</div></div>
+            <div><div class="branch-stat-value" style="color:var(--w-accent)">{{ b.waitlist }}</div><div class="branch-stat-label">Waitlist</div></div>
+          </div>
+        </div>
+      }
+      @if (!byBranchRows().length) {
+        <div class="card muted-cell" style="padding:20px;text-align:center">No events yet.</div>
+      }
+    </div>
+  }
+
+  <app-table-toolbar [controller]="ctrl" slot="top"></app-table-toolbar>
+
+  @if (ctrl.effectiveView() === 'table') {
+    <div class="card" style="padding:0;overflow:hidden">
+      <table>
+        <thead>
+          <tr><th>Event</th><th>Branch</th><th>Date</th><th>Confirmed</th><th>Maybe</th><th>Cancelled</th><th>Waitlist</th><th></th></tr>
+        </thead>
+        <tbody>
+          @for (ev of ctrl.pageItems(); track ev.id) {
+            <tr class="row">
+              <td style="font-weight:500">{{ ev.title }}</td>
+              <td>{{ ev.branchName }}</td>
+              <td>{{ ev.dateFull }}</td>
+              <td>{{ ev.going }}</td>
+              <td>{{ ev.maybe }}</td>
+              <td>{{ ev.cancel }}</td>
+              <td>{{ ev.waitlist }}</td>
+              <td><button type="button" class="icon-btn icon-btn-accent" (click)="openEvent(ev)" title="View RSVP & Attendance">☑</button></td>
+            </tr>
+          }
+          @if (!ctrl.pageItems().length) {
+            <tr><td colspan="8" class="muted-cell" style="text-align:center;padding:20px">No events found.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <div class="cardgrid">
+      @for (ev of ctrl.pageItems(); track ev.id) {
+        <div class="mcard">
+          <div class="mcard-head">
+            <h4 class="mcard-title">{{ ev.title }}</h4>
+          </div>
+          <div class="muted-label mcard-meta">{{ ev.branchName }} · {{ ev.dateFull }}</div>
+          <div class="mcard-row">
+            <span class="muted-label">✓{{ ev.going }} ?{{ ev.maybe }} ✕{{ ev.cancel }} ⏳{{ ev.waitlist }}</span>
+            <button type="button" class="icon-btn icon-btn-accent" (click)="openEvent(ev)" title="View RSVP & Attendance">☑</button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <app-table-toolbar [controller]="ctrl" slot="bottom"></app-table-toolbar>
+}
