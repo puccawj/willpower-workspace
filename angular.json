@@ -45,7 +45,13 @@
                   "maximumError": "8kB"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "fileReplacements": [
+                {
+                  "replace": "projects/public-site/src/environments/environment.ts",
+                  "with": "projects/public-site/src/environments/environment.prod.ts"
+                }
+              ]
             },
             "development": {
               "optimization": false,
@@ -114,7 +120,13 @@
                   "maximumError": "8kB"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "fileReplacements": [
+                {
+                  "replace": "projects/admin-panel/src/environments/environment.ts",
+                  "with": "projects/admin-panel/src/environments/environment.prod.ts"
+                }
+              ]
             },
             "development": {
               "optimization": false,

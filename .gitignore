@@ -62,3 +62,6 @@ Thumbs.db
 !**/src/environments/environment.template.ts
 !**/src/environments/environment.example.ts
 !**/src/environments/environment.ts.example
+# environment.prod.ts ships in the production build and only holds public values
+# (API base URL, OAuth public client IDs) — safe and necessary to commit for Vercel builds.
+!**/src/environments/environment.prod.ts
