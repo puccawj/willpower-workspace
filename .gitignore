@@ -57,11 +57,10 @@ Thumbs.db
 !**/.env.example
 !**/.env.*.example
 
-# Angular environment config (may contain secrets)
-**/src/environments/environment.*
-!**/src/environments/environment.template.ts
-!**/src/environments/environment.example.ts
-!**/src/environments/environment.ts.example
-# environment.prod.ts ships in the production build and only holds public values
-# (API base URL, OAuth public client IDs) — safe and necessary to commit for Vercel builds.
-!**/src/environments/environment.prod.ts
+# NOTE: environment.ts / environment.prod.ts under src/environments/ are intentionally NOT
+# gitignored. They hold no real secrets in this repo (just the API base URL + public OAuth
+# client IDs — see comments in those files), and environment.ts must be committed anyway:
+# Angular's fileReplacements swaps its *contents* at build time but still needs the file to
+# physically exist for module resolution, even in a fresh clone (this broke the first Vercel
+# deploy — the file was gitignored, so a clean `git clone` had no environment.ts at all).
+# If a real secret is ever added to either file, split it out into a separate gitignored file.
