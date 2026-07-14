@@ -1,0 +1,50 @@
+:host {
+  display: block;
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 14px;
+}
+
+.summary-card {
+  padding: 22px 24px;
+  margin-bottom: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.summary-title {
+  font: 500 21px var(--w-font-serif);
+  margin: 0 0 4px;
+}
+
+.need-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.need-row {
+  padding: 18px 20px;
+}
+
+.need-row-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.need-title {
+  font: 500 15px var(--w-font-sans);
+}
+
+.state-empty {
+  text-align: center;
+  color: var(--w-muted);
+  padding: 30px 20px;
+}

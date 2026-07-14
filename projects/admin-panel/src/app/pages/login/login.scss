@@ -124,23 +124,3 @@
     transform: none;
   }
 }
-
-.demo-hint {
-  margin-top: 24px;
-  padding-top: 18px;
-  border-top: 1px solid var(--w-border);
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.demo-chip-row {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.chip {
-  border: 1px solid var(--w-border-strong);
-  color: var(--w-ink-soft);
-}

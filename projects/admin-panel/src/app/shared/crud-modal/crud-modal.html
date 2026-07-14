@@ -55,6 +55,7 @@
                 <input
                   type="number"
                   class="form-input"
+                  [attr.min]="f.min ?? null"
                   [ngModel]="cfg.values[f.key]"
                   (ngModelChange)="onFieldChange(f.key, $event)"
                 />

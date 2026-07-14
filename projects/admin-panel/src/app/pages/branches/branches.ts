@@ -110,7 +110,7 @@ export class Branches {
 
   private readonly rows = computed<BranchRow[]>(() => this.api.branches().map(toRow));
 
-  readonly ctrl = new ListController<BranchRow>(this.rows, 'card');
+  readonly ctrl = new ListController<BranchRow>(this.rows);
 
   constructor() {
     this.api.load().subscribe();

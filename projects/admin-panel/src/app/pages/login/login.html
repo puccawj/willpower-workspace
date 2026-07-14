@@ -51,13 +51,6 @@
       </button>
     </form>
 
-    <div class="demo-hint">
-      <span class="muted-label">Demo accounts</span>
-      <div class="demo-chip-row">
-        <button type="button" class="chip" (click)="fillDemo('superadmin')">Superadmin</button>
-        <button type="button" class="chip" (click)="fillDemo('admin')">Admin</button>
-        <button type="button" class="chip" (click)="fillDemo('instructor')">Instructor</button>
-      </div>
-    </div>
+    <app-sso-buttons (success)="onSsoSuccess()" (failure)="onSsoFailure($event)"></app-sso-buttons>
   </div>
 </div>

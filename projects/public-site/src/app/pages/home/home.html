@@ -6,8 +6,8 @@
     strength through timeless practice.
   </p>
   <div class="hero-actions">
-    <a routerLink="/courses" class="btn btn-solid">Explore courses</a>
     <a routerLink="/events" class="btn btn-outline">Upcoming events</a>
+    <a routerLink="/courses" class="btn btn-solid">Explore courses</a>
   </div>
   <div class="stat-row">
     <div class="stat"><div class="stat-num">3</div><div class="stat-label">Branches</div></div>
@@ -72,15 +72,30 @@
   </div>
 </section>
 
-<section class="donate-section pad">
-  <div class="donate-card">
-    <div class="donate-ring donate-ring-1"></div>
-    <div class="donate-ring donate-ring-2"></div>
-    <div class="donate-copy">
-      <div class="eyebrow gold">Give &amp; support</div>
-      <h2 class="donate-title">Sustain the teaching for the next generation</h2>
-      <p class="donate-lead">Every donation of funds or goods is acknowledged with a certificate of appreciation.</p>
+@if (isLoggedIn()) {
+  <section class="donate-section pad">
+    <div class="donate-card">
+      <div class="donate-ring donate-ring-1"></div>
+      <div class="donate-ring donate-ring-2"></div>
+      <div class="donate-copy">
+        <div class="eyebrow gold">Give &amp; support</div>
+        <h2 class="donate-title">Sustain the teaching for the next generation</h2>
+        <p class="donate-lead">Every donation of funds or goods is acknowledged with a certificate of appreciation.</p>
+      </div>
+      <a routerLink="/events" class="btn btn-gold">Make a donation</a>
     </div>
-    <a routerLink="/events" class="btn btn-gold">Make a donation</a>
-  </div>
-</section>
+  </section>
+} @else {
+  <section class="donate-section pad">
+    <div class="donate-card">
+      <div class="donate-ring donate-ring-1"></div>
+      <div class="donate-ring donate-ring-2"></div>
+      <div class="donate-copy">
+        <div class="eyebrow gold">Join us</div>
+        <h2 class="donate-title">Create a free account to get started</h2>
+        <p class="donate-lead">Sign up to RSVP for events, enroll in courses, and keep track of your certificates in one place.</p>
+      </div>
+      <a routerLink="/register" class="btn btn-gold">Sign up</a>
+    </div>
+  </section>
+}

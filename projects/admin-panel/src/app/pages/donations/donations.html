@@ -5,6 +5,64 @@
   <button type="button" class="btn btn-solid" (click)="addDonation()">+ Log Donation</button>
 </div>
 
+<div class="filters-row">
+  <div class="field-inline">
+    <label class="muted-label">Branch</label>
+    <select class="form-input" [ngModel]="branchFilter()" (ngModelChange)="setBranchFilter($event)">
+      <option value="all">All branches</option>
+      @for (b of branchFilterOptions(); track b.id) {
+        <option [value]="b.id">{{ b.label }}</option>
+      }
+    </select>
+  </div>
+  <div class="field-inline">
+    <label class="muted-label">Target type</label>
+    <select class="form-input" [ngModel]="targetTypeFilter()" (ngModelChange)="setTargetTypeFilter($event)">
+      <option value="all">All targets</option>
+      <option value="event">Event</option>
+      <option value="course">Course</option>
+      <option value="general">General</option>
+    </select>
+  </div>
+  <div class="field-inline">
+    <label class="muted-label">Event / Course</label>
+    <select class="form-input" [ngModel]="targetFilter()" (ngModelChange)="setTargetFilter($event)">
+      <option value="all">All events &amp; courses</option>
+      @if (targetFilterOptions().events.length) {
+        <optgroup label="Events">
+          @for (e of targetFilterOptions().events; track e.id) {
+            <option [value]="e.id">{{ e.label }}</option>
+          }
+        </optgroup>
+      }
+      @if (targetFilterOptions().courses.length) {
+        <optgroup label="Courses">
+          @for (c of targetFilterOptions().courses; track c.id) {
+            <option [value]="c.id">{{ c.label }}</option>
+          }
+        </optgroup>
+      }
+    </select>
+  </div>
+  <div class="field-inline">
+    <label class="muted-label">Donor</label>
+    <select class="form-input" [ngModel]="donorFilter()" (ngModelChange)="setDonorFilter($event)">
+      <option value="all">All donors</option>
+      @for (d of donorFilterOptions(); track d) {
+        <option [value]="d">{{ d }}</option>
+      }
+    </select>
+  </div>
+  <div class="field-inline">
+    <label class="muted-label">Type</label>
+    <select class="form-input" [ngModel]="typeFilter()" (ngModelChange)="setTypeFilter($event)">
+      <option value="all">All types</option>
+      <option value="money">Money</option>
+      <option value="goods">Goods</option>
+    </select>
+  </div>
+</div>
+
 @if (error()) {
   <div class="state-error card">{{ error() }}</div>
 } @else if (loading()) {
@@ -16,7 +74,7 @@
     <div class="card" style="padding:0;overflow:hidden">
       <table>
         <thead>
-          <tr><th>Donor</th><th>Type</th><th>Amount / item</th><th>Branch</th><th>Event</th><th>Status</th><th>Certificate</th><th></th></tr>
+          <tr><th>Donor</th><th>Type</th><th>Amount / item</th><th>Branch</th><th>Target type</th><th>Event / Course name</th><th>Status</th><th>Certificate</th><th></th></tr>
         </thead>
         <tbody>
           @for (d of ctrl.pageItems(); track d.id) {
@@ -25,7 +83,14 @@
               <td>{{ d.typeLabel }}</td>
               <td>{{ d.amountOrItem }}</td>
               <td>{{ d.branchName }}</td>
-              <td>{{ d.eventTitle }}</td>
+              <td>
+                @if (d.targetType !== 'general') {
+                  <span class="badge badge-sm" style="background:var(--w-muted)">{{ d.targetTypeLabel }}</span>
+                } @else {
+                  <span class="muted-label">General</span>
+                }
+              </td>
+              <td>{{ d.targetLabel }}</td>
               <td><span class="badge" [style.background]="d.statusColor">{{ d.statusLabel }}</span></td>
               <td [style.color]="d.certColor" style="font-weight:500">{{ d.certLabel }}</td>
               <td>
@@ -48,7 +113,12 @@
             <span class="badge badge-sm" [style.background]="d.statusColor">{{ d.statusLabel }}</span>
           </div>
           <div class="muted-label">{{ d.typeLabel }} · {{ d.amountOrItem }}</div>
-          <div class="muted-label mcard-meta">{{ d.branchName }} · {{ d.eventTitle }}</div>
+          <div class="muted-label mcard-meta">
+            {{ d.branchName }}
+            @if (d.targetType !== 'general') {
+              · {{ d.targetTypeLabel }}: {{ d.targetLabel }}
+            }
+          </div>
           <div class="mcard-row">
             <span [style.color]="d.certColor" style="font-weight:500">{{ d.certLabel }}</span>
             <div class="mcard-actions action-group">

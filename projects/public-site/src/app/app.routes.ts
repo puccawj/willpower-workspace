@@ -3,8 +3,10 @@ import { Home } from './pages/home/home';
 import { EventList } from './pages/events/event-list/event-list';
 import { EventDetail } from './pages/events/event-detail/event-detail';
 import { Courses } from './pages/courses/courses';
+import { CourseDetail } from './pages/courses/course-detail/course-detail';
 import { About } from './pages/about/about';
 import { Team } from './pages/team/team';
+import { Policy } from './pages/policy/policy';
 import { Login } from './pages/login/login';
 import { Register } from './pages/register/register';
 import { MyShell } from './pages/my/my-shell/my-shell';
@@ -20,8 +22,10 @@ export const routes: Routes = [
   { path: 'events', component: EventList },
   { path: 'events/:id', component: EventDetail },
   { path: 'courses', component: Courses },
+  { path: 'courses/:id', component: CourseDetail },
   { path: 'about', component: About },
   { path: 'team', component: Team },
+  { path: 'policy', component: Policy },
   { path: 'login', component: Login },
   { path: 'register', component: Register },
   {

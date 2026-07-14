@@ -16,6 +16,10 @@ interface ApiPublicCourseRow {
   isOpenForEnrollment: boolean;
 }
 
+interface ApiPublicCourseDetailRow extends ApiPublicCourseRow {
+  syllabus: string | null;
+}
+
 export interface PublicCourse {
   id: string;
   level: string;
@@ -30,14 +34,40 @@ export interface PublicCourse {
   isOpenForEnrollment: boolean;
 }
 
+export interface PublicCourseDetail extends PublicCourse {
+  syllabusTopics: string[];
+}
+
 export interface PublicOffering {
   id: string;
+  branchId: string;
   branchName: string;
   mode: 'online' | 'onsite';
   location: string | null;
   startDate: string;
   endDate: string;
   spotsLeft: number | null;
+}
+
+export interface PublicCourseNeed {
+  id: string;
+  sessionNumber: number | null;
+  title: string;
+  type: 'money' | 'goods';
+  unit: string | null;
+  targetQuantity: string;
+  receivedQuantity: string;
+}
+
+export interface PublicDonationRow {
+  id: string;
+  donorName: string;
+  type: 'money' | 'goods';
+  amount: string | null;
+  itemDescription: string | null;
+  quantity: string | null;
+  needTitle: string | null;
+  createdAt: string;
 }
 
 const FALLBACK_IMAGES = [
@@ -72,6 +102,16 @@ function toPublicCourse(row: ApiPublicCourseRow, index: number): PublicCourse {
   };
 }
 
+function toPublicCourseDetail(row: ApiPublicCourseDetailRow): PublicCourseDetail {
+  return {
+    ...toPublicCourse(row, 0),
+    syllabusTopics: (row.syllabus ?? '')
+      .split('\n')
+      .map((line) => line.trim())
+      .filter(Boolean),
+  };
+}
+
 @Injectable({ providedIn: 'root' })
 export class PublicCourseApiService {
   private readonly http = inject(HttpClient);
@@ -98,7 +138,21 @@ export class PublicCourseApiService {
     );
   }
 
+  loadOne(id: string): Observable<PublicCourseDetail> {
+    return this.http
+      .get<ApiPublicCourseDetailRow>(`${environment.apiUrl}/public/courses/${id}`)
+      .pipe(map(toPublicCourseDetail));
+  }
+
   loadOfferings(courseId: string): Observable<PublicOffering[]> {
     return this.http.get<PublicOffering[]>(`${environment.apiUrl}/public/courses/${courseId}/offerings`);
+  }
+
+  loadNeeds(courseId: string): Observable<PublicCourseNeed[]> {
+    return this.http.get<PublicCourseNeed[]>(`${environment.apiUrl}/public/courses/${courseId}/needs`);
+  }
+
+  loadDonations(courseId: string): Observable<PublicDonationRow[]> {
+    return this.http.get<PublicDonationRow[]>(`${environment.apiUrl}/public/courses/${courseId}/donations`);
   }
 }

@@ -1,5 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { Observable, map, of, switchMap, tap } from 'rxjs';
+import { FormsModule } from '@angular/forms';
+import { Observable, catchError, map, of, switchMap, tap } from 'rxjs';
 import {
   ApiDonation,
   ApiDonationStatus,
@@ -9,9 +10,12 @@ import {
 } from '../../core/services/donation-api.service';
 import { BranchApiService } from '../../core/services/branch-api.service';
 import { EventApiService } from '../../core/services/event-api.service';
+import { CourseApiService } from '../../core/services/course-api.service';
+import { CertificateTemplateApiService } from '../../core/services/certificate-template-api.service';
 import { CrudModalService } from '../../core/services/crud-modal.service';
 import { UploadApiService } from '../../core/services/upload-api.service';
 import { PdfService } from '../../core/services/pdf.service';
+import { CertificatePreviewService } from '../../core/services/certificate-preview.service';
 import { ToastService } from '../../core/services/toast.service';
 import { ListController } from '../../core/list-controller';
 import { TableToolbar } from '../../shared/table-toolbar/table-toolbar';
@@ -20,6 +24,8 @@ import { StatCards, StatCardData } from '../../shared/stat-cards/stat-cards';
 import { FieldDef } from '../../core/models/admin.models';
 
 const NO_EVENT = '—';
+
+type TargetType = 'event' | 'course' | 'general';
 
 interface DonationRow {
   id: string;
@@ -36,11 +42,18 @@ interface DonationRow {
   branchName: string;
   eventId: string | null;
   eventTitle: string;
+  courseId: string | null;
+  courseTitle: string;
+  sessionNumber: number | null;
+  targetType: TargetType;
+  targetTypeLabel: string;
+  targetLabel: string;
   proofImageUrl: string;
   statusKey: ApiDonationStatus;
   statusLabel: string;
   statusColor: string;
   certificateNo: string | null;
+  certificateUrl: string | null;
   certLabel: string;
   certColor: string;
   actionLabel: string;
@@ -68,6 +81,14 @@ function toRow(d: ApiDonation): DonationRow {
   const isVerify = d.status !== 'verified';
   const issued = !!d.certificateNo;
   const isIssue = !isVerify && !issued;
+  const targetType: TargetType = d.eventId ? 'event' : d.courseId ? 'course' : 'general';
+  const targetTypeLabel = targetType === 'event' ? 'Event' : targetType === 'course' ? 'Course' : 'General';
+  const targetLabel =
+    targetType === 'event'
+      ? d.eventTitle ?? NO_EVENT
+      : targetType === 'course'
+        ? `${d.courseTitle ?? NO_EVENT}${d.sessionNumber ? ` · Session ${d.sessionNumber}` : ''}`
+        : NO_EVENT;
   return {
     id: d.id,
     donorName: d.donorName,
@@ -83,11 +104,18 @@ function toRow(d: ApiDonation): DonationRow {
     branchName: d.branchName,
     eventId: d.eventId,
     eventTitle: d.eventTitle ?? NO_EVENT,
+    courseId: d.courseId,
+    courseTitle: d.courseTitle ?? NO_EVENT,
+    sessionNumber: d.sessionNumber,
+    targetType,
+    targetTypeLabel,
+    targetLabel,
     proofImageUrl: d.proofImageUrl ?? '',
     statusKey: d.status,
     statusLabel: STATUS_LABEL[d.status],
     statusColor: STATUS_COLOR[d.status],
     certificateNo: d.certificateNo,
+    certificateUrl: d.certificateUrl,
     certLabel: issued ? '✓ Issued' : d.status === 'verified' ? 'Not issued' : '—',
     certColor: issued ? 'var(--w-green)' : 'var(--w-muted)',
     actionLabel: isVerify ? 'Verify' : isIssue ? 'Issue certificate' : 'Resend email',
@@ -140,7 +168,7 @@ function toPayload(
 
 @Component({
   selector: 'app-donations',
-  imports: [TableToolbar, FilterTabs, StatCards],
+  imports: [TableToolbar, FilterTabs, StatCards, FormsModule],
   templateUrl: './donations.html',
   styleUrl: './donations.scss',
 })
@@ -148,6 +176,9 @@ export class Donations {
   private readonly api = inject(DonationApiService);
   private readonly branchApi = inject(BranchApiService);
   private readonly eventApi = inject(EventApiService);
+  private readonly courseApi = inject(CourseApiService);
+  private readonly templateApi = inject(CertificateTemplateApiService);
+  private readonly certPreview = inject(CertificatePreviewService);
   private readonly modal = inject(CrudModalService);
   private readonly uploads = inject(UploadApiService);
   private readonly pdf = inject(PdfService);
@@ -164,6 +195,12 @@ export class Donations {
     { key: 'verified', label: 'Verified' },
   ];
 
+  readonly branchFilter = signal('all');
+  readonly targetFilter = signal('all');
+  readonly donorFilter = signal('all');
+  readonly typeFilter = signal('all');
+  readonly targetTypeFilter = signal('all');
+
   private readonly branchNames = computed(() => this.branchApi.branches().map((b) => b.name));
   private readonly branchNameToId = computed(() => {
     const map = new Map<string, string>();
@@ -178,11 +215,43 @@ export class Donations {
     return map;
   });
 
+  readonly branchFilterOptions = computed(() => this.branchApi.branches().map((b) => ({ id: b.id, label: b.name })));
+  private readonly eventFilterOptions = computed(() => this.eventApi.events().map((e) => ({ id: e.id, label: e.title })));
+  private readonly courseFilterOptions = computed(() => this.courseApi.courses().map((c) => ({ id: c.id, label: c.title })));
+
+  /** Options for the combined Event/Course dropdown — scoped to whichever target type is currently selected. */
+  readonly targetFilterOptions = computed(() => {
+    const targetType = this.targetTypeFilter();
+    return {
+      events: targetType === 'course' ? [] : this.eventFilterOptions(),
+      courses: targetType === 'event' ? [] : this.courseFilterOptions(),
+    };
+  });
+
+  readonly donorFilterOptions = computed(() => {
+    const names = new Set(this.rows().map((r) => r.donorLabel));
+    return [...names].sort((a, b) => a.localeCompare(b));
+  });
+
   private readonly rows = computed<DonationRow[]>(() => this.api.donations().map(toRow));
 
   private readonly filteredRows = computed(() => {
-    const f = this.filter();
-    return f === 'all' ? this.rows() : this.rows().filter((d) => d.statusKey === f);
+    const status = this.filter();
+    const branch = this.branchFilter();
+    const target = this.targetFilter();
+    const donor = this.donorFilter();
+    const type = this.typeFilter();
+    const targetType = this.targetTypeFilter();
+
+    return this.rows().filter(
+      (d) =>
+        (status === 'all' || d.statusKey === status) &&
+        (branch === 'all' || d.branchId === branch) &&
+        (target === 'all' || d.eventId === target || d.courseId === target) &&
+        (donor === 'all' || d.donorLabel === donor) &&
+        (type === 'all' || d.type === type) &&
+        (targetType === 'all' || d.targetType === targetType),
+    );
   });
 
   readonly ctrl = new ListController<DonationRow>(this.filteredRows);
@@ -210,9 +279,31 @@ export class Donations {
     this.api.load().subscribe();
     this.branchApi.load().subscribe();
     this.eventApi.load().subscribe();
+    this.courseApi.load().subscribe();
   }
 
   setFilter = (key: string) => this.filter.set(key);
+
+  setBranchFilter(value: string): void {
+    this.branchFilter.set(value);
+  }
+
+  setTargetFilter(value: string): void {
+    this.targetFilter.set(value);
+  }
+
+  setDonorFilter(value: string): void {
+    this.donorFilter.set(value);
+  }
+
+  setTypeFilter(value: string): void {
+    this.typeFilter.set(value);
+  }
+
+  setTargetTypeFilter(value: string): void {
+    this.targetTypeFilter.set(value);
+    this.targetFilter.set('all');
+  }
 
   private showError(err: unknown, fallback: string): void {
     const message = (err as { error?: { message?: string } })?.error?.message ?? fallback;
@@ -238,24 +329,69 @@ export class Donations {
       return;
     }
 
-    this.api.issueCertificate(row.id).subscribe({
-      next: (res) => {
-        this.pdf.downloadCertificate({
-          kind: 'Certificate of Appreciation',
-          recipientName: row.donorLabel,
-          bodyLine: `In grateful acknowledgement of your generous donation of ${row.amountOrItem} toward ${row.eventTitle === NO_EVENT ? 'the institute' : row.eventTitle}.`,
-          refNo: res.certificateNo ?? row.certificateNo ?? '',
-          issueDate: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
-        });
-        this.toast.show(
-          row.isResend
-            ? `Anumodana certificate re-sent to ${row.donorLabel} by email (simulated) — PDF downloaded.`
-            : `Anumodana certificate issued to ${row.donorLabel} and emailed (simulated) — PDF downloaded.`,
-          'success',
-        );
-        this.api.load().subscribe();
+    if (row.isResend) {
+      if (row.certificateUrl) window.open(row.certificateUrl, '_blank');
+      this.toast.show(`Anumodana certificate re-sent to ${row.donorLabel} by email (simulated).`, 'success');
+      return;
+    }
+
+    const templateType = row.type === 'money' ? 'donation_money' : 'donation_goods';
+    this.templateApi.findActiveForBranch(row.branchId, templateType).subscribe({
+      next: (template) => {
+        if (!template) {
+          this.toast.show(
+            `No active ${row.typeLabel.toLowerCase()} donation certificate template is configured for this branch — set one up in Certificate Templates.`,
+            'error',
+          );
+          return;
+        }
+
+        const certificateNo = `WPI-DON-${new Date().getFullYear()}-${Math.floor(Math.random() * 9000) + 1000}`;
+        const issueDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        const targetLine = row.targetType === 'general' ? 'the institute' : row.targetLabel;
+        const detailLine = `${row.amountOrItem} toward ${targetLine}`;
+
+        this.certPreview
+          .ask(
+            {
+              backgroundImageUrl: template.backgroundImageUrl,
+              layoutConfig: template.layoutConfig,
+              recipientName: row.donorLabel,
+              detailLine,
+              certificateNo,
+              issueDate,
+            },
+            { title: `Certificate for ${row.donorLabel}` },
+          )
+          .then(async (confirmed) => {
+            if (!confirmed) return;
+
+            const dataUri = await this.pdf.certificateFromTemplateDataUri({
+              backgroundImageUrl: template.backgroundImageUrl,
+              layoutConfig: template.layoutConfig,
+              recipientName: row.donorLabel,
+              courseLine: detailLine,
+              certificateNo,
+              issueDate,
+            });
+
+            this.uploads
+              .uploadDataUri(dataUri)
+              .pipe(
+                switchMap((fileUrl) => this.api.issueCertificate(row.id, { templateId: template.id, fileUrl, certificateNo })),
+                catchError((err) => {
+                  this.showError(err, 'Failed to issue certificate.');
+                  return of(null);
+                }),
+              )
+              .subscribe((res) => {
+                if (!res) return;
+                this.toast.show(`Anumodana certificate issued to ${row.donorLabel} and emailed (simulated).`, 'success');
+                this.api.load().subscribe();
+              });
+          });
       },
-      error: (err) => this.showError(err, 'Failed to issue certificate.'),
+      error: (err) => this.showError(err, 'Failed to look up the certificate template.'),
     });
   }
 

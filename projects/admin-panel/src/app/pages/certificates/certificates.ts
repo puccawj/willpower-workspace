@@ -11,6 +11,7 @@ import {
 } from '../../core/services/certificate-template-api.service';
 import { UploadApiService } from '../../core/services/upload-api.service';
 import { PdfService } from '../../core/services/pdf.service';
+import { CertificatePreviewService } from '../../core/services/certificate-preview.service';
 import { ToastService } from '../../core/services/toast.service';
 import { ListController } from '../../core/list-controller';
 import { TableToolbar } from '../../shared/table-toolbar/table-toolbar';
@@ -46,6 +47,7 @@ export class Certificates {
   private readonly templateApi = inject(CertificateTemplateApiService);
   private readonly uploads = inject(UploadApiService);
   private readonly pdf = inject(PdfService);
+  private readonly certPreview = inject(CertificatePreviewService);
   private readonly toast = inject(ToastService);
 
   readonly loading = this.enrollmentApi.loading;
@@ -172,14 +174,54 @@ export class Certificates {
       return;
     }
     if (!row.eligible) return;
-    if (!this.activeTemplate()) {
+
+    const offering = this.selectedOffering();
+    const template = this.activeTemplate();
+    if (!offering || !template) {
       this.toast.show('No active certificate template is configured for this branch — set one up in Certificate Templates.', 'error');
       return;
     }
 
-    this.issueOne(row).subscribe((ok) => {
-      if (ok) this.toast.show(`Certificate issued to ${row.name}.`, 'success');
-    });
+    const certificateNo = `WPI-CERT-${new Date().getFullYear()}-${Math.floor(Math.random() * 9000) + 1000}`;
+    const issueDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+    this.certPreview
+      .ask(
+        {
+          backgroundImageUrl: template.backgroundImageUrl,
+          layoutConfig: template.layoutConfig,
+          recipientName: row.name,
+          detailLine: offering.courseTitle,
+          certificateNo,
+          issueDate,
+        },
+        { title: `Certificate for ${row.name}` },
+      )
+      .then(async (confirmed) => {
+        if (!confirmed) return;
+
+        const dataUri = await this.pdf.certificateFromTemplateDataUri({
+          backgroundImageUrl: template.backgroundImageUrl,
+          layoutConfig: template.layoutConfig,
+          recipientName: row.name,
+          courseLine: offering.courseTitle,
+          certificateNo,
+          issueDate,
+        });
+
+        this.uploads
+          .uploadDataUri(dataUri)
+          .pipe(
+            switchMap((fileUrl) => this.certApi.issue({ offeringId: offering.id, userId: row.userId, fileUrl, certificateNo })),
+            catchError((err) => {
+              this.showError(err, `Failed to issue certificate for ${row.name}.`);
+              return of(null);
+            }),
+          )
+          .subscribe((res) => {
+            if (res) this.toast.show(`Certificate issued to ${row.name}.`, 'success');
+          });
+      });
   }
 
   bulkIssue(): void {

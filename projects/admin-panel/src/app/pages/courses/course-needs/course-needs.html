@@ -1,0 +1,42 @@
+<button type="button" class="link-muted back-link" (click)="goCourses()">← All courses</button>
+
+<div class="card summary-card">
+  @if (course(); as c) {
+    <div>
+      <h2 class="summary-title">{{ c.title }}</h2>
+      <div class="muted-label">{{ c.category ?? 'Course' }}</div>
+    </div>
+  } @else {
+    <div class="muted-label">Loading course…</div>
+  }
+  <button type="button" class="btn btn-outline" (click)="addNeed()">+ Add Need</button>
+</div>
+
+@if (error()) {
+  <div class="state-error card">{{ error() }}</div>
+} @else if (loading()) {
+  <div class="state-loading card">Loading needs…</div>
+} @else {
+  <div class="need-rows">
+    @for (row of rows(); track row.id) {
+      <div class="card need-row">
+        <div class="need-row-head">
+          <div>
+            <div class="need-title">{{ row.title }}</div>
+            <div class="muted-label">{{ row.sessionLabel }} · {{ row.type === 'money' ? 'Funds' : 'Goods' }}</div>
+          </div>
+          <div class="action-group">
+            <button type="button" class="icon-btn" (click)="editNeed(row)" title="Edit">✎</button>
+          </div>
+        </div>
+        <div class="pct-row">
+          <div class="pct-track"><div class="pct-fill" [style.width.%]="row.pct" [style.background]="row.pct >= 100 ? 'var(--w-green)' : 'var(--w-gold)'"></div></div>
+          <span class="pct-label">{{ row.progressLabel }}</span>
+        </div>
+      </div>
+    }
+    @if (!rows().length) {
+      <div class="card state-empty">No needs added yet — click "+ Add Need" to create the first wishlist item.</div>
+    }
+  </div>
+}

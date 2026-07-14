@@ -9,6 +9,7 @@ export interface ApiCourse {
   id: string;
   title: string;
   description: string | null;
+  syllabus: string | null;
   category: string | null;
   imageUrl: string | null;
   totalSessions: number;
@@ -20,6 +21,7 @@ export interface ApiCourse {
 export interface CoursePayload {
   title: string;
   description?: string;
+  syllabus?: string;
   category?: string;
   image?: string;
   totalSessions: number;
@@ -51,6 +53,10 @@ export class CourseApiService {
         },
       }),
     );
+  }
+
+  getOne(id: string) {
+    return this.http.get<ApiCourse>(`${this.baseUrl}/${id}`);
   }
 
   create(payload: CoursePayload) {

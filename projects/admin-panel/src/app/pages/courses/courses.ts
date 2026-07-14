@@ -14,6 +14,8 @@ import { FieldDef } from '../../core/models/admin.models';
 interface CourseRow {
   id: string;
   title: string;
+  description: string;
+  syllabus: string;
   category: string;
   imageUrl: string;
   totalSessions: number;
@@ -26,6 +28,8 @@ interface CourseRow {
 
 const FIELDS: FieldDef[] = [
   { key: 'title', label: 'Course title', type: 'text' },
+  { key: 'description', label: 'Description', type: 'textarea' },
+  { key: 'syllabus', label: 'Syllabus', type: 'textarea', hint: 'One topic per line — shown on the public course page.' },
   { key: 'category', label: 'Category', type: 'text' },
   { key: 'totalSessions', label: 'Total sessions', type: 'number' },
   { key: 'passingAttendancePercent', label: 'Passing % (attendance)', type: 'number' },
@@ -36,6 +40,8 @@ function toRow(c: ApiCourse): CourseRow {
   return {
     id: c.id,
     title: c.title,
+    description: c.description ?? '',
+    syllabus: c.syllabus ?? '',
     category: c.category ?? '—',
     imageUrl: c.imageUrl ?? '',
     totalSessions: c.totalSessions,
@@ -82,6 +88,10 @@ export class Courses {
     this.router.navigate(['/schedule']);
   }
 
+  goNeeds(row: CourseRow): void {
+    this.router.navigate(['/courses', row.id, 'needs']);
+  }
+
   viewCover(row: CourseRow): void {
     if (row.imageUrl) this.imageViewer.open(row.imageUrl);
   }
@@ -89,6 +99,8 @@ export class Courses {
   private toPayload(values: Record<string, string | number>): CoursePayload {
     return {
       title: String(values['title'] ?? '').trim(),
+      description: String(values['description'] ?? '').trim() || undefined,
+      syllabus: String(values['syllabus'] ?? '').trim() || undefined,
       category: String(values['category'] ?? '').trim() || undefined,
       totalSessions: Number(values['totalSessions']) || 1,
       passingAttendancePercent: Number(values['passingAttendancePercent']) || 80,
@@ -110,7 +122,7 @@ export class Courses {
       title: 'Add Course',
       fields: FIELDS,
       isEdit: false,
-      values: { title: '', category: '', totalSessions: 8, passingAttendancePercent: 80, image: '' },
+      values: { title: '', description: '', syllabus: '', category: '', totalSessions: 8, passingAttendancePercent: 80, image: '' },
       onSave: (values) =>
         this.resolvePayload(values).pipe(
           switchMap((payload) => this.api.create(payload)),
@@ -126,6 +138,8 @@ export class Courses {
       isEdit: true,
       values: {
         title: row.title,
+        description: row.description,
+        syllabus: row.syllabus,
         category: row.category === '—' ? '' : row.category,
         totalSessions: row.totalSessions,
         passingAttendancePercent: Number(row.passingLabel.replace('%', '')),

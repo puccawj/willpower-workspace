@@ -71,8 +71,9 @@ export class CertificateTemplateApiService {
     return this.http.patch<ApiCertificateTemplate>(`${this.baseUrl}/${id}`, { layoutConfig });
   }
 
-  findActiveForBranch(branchId: string | null): Observable<ApiCertificateTemplate | null> {
-    const url = branchId ? `${this.baseUrl}/active/lookup?branchId=${branchId}` : `${this.baseUrl}/active/lookup`;
-    return this.http.get<ApiCertificateTemplate | null>(url);
+  findActiveForBranch(branchId: string | null, type: ApiTemplateType = 'certificate'): Observable<ApiCertificateTemplate | null> {
+    const params = new URLSearchParams({ type });
+    if (branchId) params.set('branchId', branchId);
+    return this.http.get<ApiCertificateTemplate | null>(`${this.baseUrl}/active/lookup?${params.toString()}`);
   }
 }

@@ -20,6 +20,26 @@ interface ApiPublicEventRow {
   going: number;
 }
 
+export interface PublicEventNeed {
+  id: string;
+  title: string;
+  type: 'money' | 'goods';
+  unit: string | null;
+  targetQuantity: string;
+  receivedQuantity: string;
+}
+
+export interface PublicDonationRow {
+  id: string;
+  donorName: string;
+  type: 'money' | 'goods';
+  amount: string | null;
+  itemDescription: string | null;
+  quantity: string | null;
+  needTitle: string | null;
+  createdAt: string;
+}
+
 const FALLBACK_IMG =
   'https://images.unsplash.com/photo-1600618528240-fb9fc964b853?q=80&w=1200&auto=format&fit=crop';
 
@@ -91,5 +111,13 @@ export class PublicEventApiService {
     return this.http
       .get<ApiPublicEventRow>(`${environment.apiUrl}/public/events/${id}`)
       .pipe(map(toPublicEvent));
+  }
+
+  loadNeeds(eventId: string): Observable<PublicEventNeed[]> {
+    return this.http.get<PublicEventNeed[]>(`${environment.apiUrl}/public/events/${eventId}/needs`);
+  }
+
+  loadDonations(eventId: string): Observable<PublicDonationRow[]> {
+    return this.http.get<PublicDonationRow[]>(`${environment.apiUrl}/public/events/${eventId}/donations`);
   }
 }

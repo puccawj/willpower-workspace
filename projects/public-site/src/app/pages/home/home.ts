@@ -2,6 +2,7 @@ import { Component, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { PublicEventApiService } from '../../core/services/public-event-api.service';
 import { PublicCourseApiService } from '../../core/services/public-course-api.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-home',
@@ -12,6 +13,9 @@ import { PublicCourseApiService } from '../../core/services/public-course-api.se
 export class Home {
   private readonly eventsApi = inject(PublicEventApiService);
   private readonly coursesApi = inject(PublicCourseApiService);
+  private readonly auth = inject(AuthService);
+
+  readonly isLoggedIn = this.auth.isLoggedIn;
 
   readonly homeEvents = computed(() =>
     this.eventsApi

@@ -59,11 +59,24 @@
   margin: 0 0 10px;
 }
 
+.course-title-link {
+  color: var(--w-ink);
+
+  &:hover {
+    color: var(--w-gold-deep);
+  }
+}
+
 .course-desc-lg {
   font: 400 14px/1.6 var(--w-font-sans);
   color: var(--w-muted);
   margin: 0 0 18px;
   flex: 1;
+}
+
+.course-details-link {
+  display: inline-block;
+  margin-bottom: 18px;
 }
 
 .course-stats {

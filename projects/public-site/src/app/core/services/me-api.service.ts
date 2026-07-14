@@ -68,6 +68,11 @@ export interface DonateRequest {
   amountOrItem: string;
   branchId: string;
   eventId?: string;
+  needId?: string;
+  courseId?: string;
+  courseNeedId?: string;
+  quantity?: number;
+  proofImage?: string;
 }
 
 @Injectable({ providedIn: 'root' })

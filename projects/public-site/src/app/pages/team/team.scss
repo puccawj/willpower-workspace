@@ -16,6 +16,21 @@
   margin: 0 auto;
 }
 
+.team-branch-group {
+  margin-bottom: 48px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.team-branch-heading {
+  font: 500 24px var(--w-font-serif);
+  margin: 0 0 22px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--w-border);
+}
+
 .member-card {
   background: var(--w-bg-alt);
   border: 1px solid var(--w-border);
@@ -59,9 +74,3 @@
   margin-bottom: 6px;
 }
 
-.member-branch {
-  font: 500 11px var(--w-font-sans);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--w-muted-2);
-}

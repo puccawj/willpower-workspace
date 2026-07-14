@@ -74,15 +74,6 @@ export class Sidebar {
       .filter((g) => g.items.length > 0);
   });
 
-  setRole(role: Role): void {
-    this.roleService.setRole(role);
-    const current = this.router.url.split('/').pop() ?? '';
-    const stillVisible = this.groups.some((g) => g.items.some((it) => it.path === current && it.allow.includes(role)));
-    if (!stillVisible) {
-      this.router.navigate([role === 'instructor' ? '/courses' : '/dashboard']);
-    }
-  }
-
   onNavClick(): void {
     this.layout.closeMobileMenu();
   }

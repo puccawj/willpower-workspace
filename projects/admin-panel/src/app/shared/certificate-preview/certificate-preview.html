@@ -1,0 +1,38 @@
+@if (preview.request(); as req) {
+  <div class="cert-preview-overlay" (click)="respond(false)">
+    <div class="cert-preview-card" (click)="$event.stopPropagation()">
+      <div class="cert-preview-head">
+        <h3 class="cert-preview-title">{{ req.title }}</h3>
+        <span class="cert-preview-close" (click)="respond(false)">×</span>
+      </div>
+
+      <div class="cert-canvas">
+        @if (req.data.backgroundImageUrl) {
+          <img [src]="req.data.backgroundImageUrl" alt="" class="cert-canvas-bg" />
+        }
+        <div class="cert-canvas-frame"></div>
+
+        @if (positions()['kicker']; as pos) {
+          <div class="cert-field cert-field-kicker" [style.left.%]="pos.xPct" [style.top.%]="pos.yPct">{{ kickerText() }}</div>
+        }
+        @if (positions()['name']; as pos) {
+          <div class="cert-field cert-field-name" [style.left.%]="pos.xPct" [style.top.%]="pos.yPct">{{ req.data.recipientName }}</div>
+        }
+        @if (positions()['course']; as pos) {
+          <div class="cert-field cert-field-course" [style.left.%]="pos.xPct" [style.top.%]="pos.yPct">{{ req.data.detailLine }}</div>
+        }
+        @if (positions()['certNo']; as pos) {
+          <div class="cert-field cert-field-certno" [style.left.%]="pos.xPct" [style.top.%]="pos.yPct">No. {{ req.data.certificateNo }}</div>
+        }
+        @if (positions()['issueDate']; as pos) {
+          <div class="cert-field cert-field-issuedate" [style.left.%]="pos.xPct" [style.top.%]="pos.yPct">Issued {{ req.data.issueDate }}</div>
+        }
+      </div>
+
+      <div class="cert-preview-actions">
+        <button type="button" class="cancel-btn" (click)="respond(false)">Cancel</button>
+        <button type="button" class="btn btn-solid" (click)="respond(true)">{{ req.confirmLabel }}</button>
+      </div>
+    </div>
+  </div>
+}

@@ -9,9 +9,12 @@ export type ApiDonationStatus = 'pending' | 'received' | 'verified' | 'rejected'
 export interface ApiDonation {
   id: string;
   eventId: string | null;
+  courseId: string | null;
   branchId: string;
   branchName: string;
   eventTitle: string | null;
+  courseTitle: string | null;
+  sessionNumber: number | null;
   donorName: string;
   isAnonymous: boolean;
   donorPhoneCountryCode: string | null;
@@ -24,8 +27,16 @@ export interface ApiDonation {
   proofImageUrl: string | null;
   status: ApiDonationStatus;
   certificateNo: string | null;
+  certificateTemplateId: string | null;
+  certificateUrl: string | null;
   certificateIssuedAt: string | null;
   createdAt: string;
+}
+
+export interface IssueDonationCertificatePayload {
+  templateId: string;
+  fileUrl: string;
+  certificateNo: string;
 }
 
 export interface DonationPayload {
@@ -83,7 +94,7 @@ export class DonationApiService {
     return this.http.patch<ApiDonation>(`${this.baseUrl}/${id}/verify`, {}).pipe(switchMap(() => this.load()));
   }
 
-  issueCertificate(id: string) {
-    return this.http.patch<ApiDonation>(`${this.baseUrl}/${id}/certificate`, {});
+  issueCertificate(id: string, payload: IssueDonationCertificatePayload) {
+    return this.http.patch<ApiDonation>(`${this.baseUrl}/${id}/certificate`, payload);
   }
 }

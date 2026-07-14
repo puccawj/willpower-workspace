@@ -172,4 +172,6 @@ export interface FieldDef {
   selectAllLabel?: string;
   /** Renders the input locked/uneditable (e.g. email after account creation). */
   readonly?: boolean;
+  /** For type 'number': the HTML `min` attribute (e.g. 0 to disallow negative quantities). */
+  min?: number;
 }

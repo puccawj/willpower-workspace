@@ -1,0 +1,47 @@
+.confirm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(36, 28, 21, 0.55);
+  z-index: 210;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.confirm-card {
+  background: var(--w-bg);
+  border-radius: 14px;
+  max-width: 420px;
+  width: 100%;
+  padding: 26px;
+  box-shadow: 0 30px 70px -30px rgba(36, 28, 21, 0.5);
+}
+
+.confirm-title {
+  font: 500 19px var(--w-font-serif);
+  margin: 0 0 10px;
+  color: var(--w-ink);
+}
+
+.confirm-message {
+  font: 400 14px var(--w-font-sans);
+  color: var(--w-ink-soft);
+  margin: 0 0 22px;
+  line-height: 1.5;
+}
+
+.confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.cancel-btn {
+  font: 600 13px var(--w-font-sans);
+  color: var(--w-ink-soft);
+  background: none;
+  border: none;
+  padding: 11px 16px;
+  cursor: pointer;
+}

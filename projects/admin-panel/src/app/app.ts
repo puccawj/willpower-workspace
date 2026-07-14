@@ -8,10 +8,11 @@ import { ConfirmDialog } from './shared/confirm-dialog/confirm-dialog';
 import { CrudModal } from './shared/crud-modal/crud-modal';
 import { ImageViewer } from './shared/image-viewer/image-viewer';
 import { ToastHost } from './shared/toast-host/toast-host';
+import { CertificatePreview } from './shared/certificate-preview/certificate-preview';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Sidebar, Topbar, CrudModal, ToastHost, ImageViewer, ConfirmDialog],
+  imports: [RouterOutlet, Sidebar, Topbar, CrudModal, ToastHost, ImageViewer, ConfirmDialog, CertificatePreview],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })

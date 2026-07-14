@@ -16,8 +16,9 @@
               <span class="eyebrow small inline">{{ c.level }}</span>
               <span class="course-format">· {{ c.format }}</span>
             </div>
-            <h3 class="course-title-lg">{{ c.title }}</h3>
+            <h3 class="course-title-lg"><a [routerLink]="['/courses', c.id]" class="course-title-link">{{ c.title }}</a></h3>
             <p class="course-desc-lg">{{ c.desc }}</p>
+            <a [routerLink]="['/courses', c.id]" class="link-cta course-details-link">View details →</a>
             <div class="course-stats">
               <div class="course-stat"><div class="stat-val">{{ c.sessions }}</div><div class="stat-lbl">Sessions</div></div>
               <div class="stat-sep-v"></div>

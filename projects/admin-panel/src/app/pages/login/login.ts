@@ -2,10 +2,11 @@ import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { SsoButtons } from '../../shared/sso-buttons/sso-buttons';
 
 @Component({
   selector: 'app-login',
-  imports: [FormsModule],
+  imports: [FormsModule, SsoButtons],
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
@@ -38,18 +39,21 @@ export class Login {
         return;
       }
 
-      const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') ?? '/dashboard';
-      this.router.navigateByUrl(returnUrl);
+      this.afterLogin();
     });
   }
 
-  fillDemo(role: 'superadmin' | 'admin' | 'instructor'): void {
-    const map = {
-      superadmin: { email: 'superadmin@willpower.org', password: 'superadmin123' },
-      admin: { email: 'admin@willpower.org', password: 'admin123' },
-      instructor: { email: 'instructor@willpower.org', password: 'instructor123' },
-    };
-    this.email.set(map[role].email);
-    this.password.set(map[role].password);
+  onSsoSuccess(): void {
+    this.error.set('');
+    this.afterLogin();
+  }
+
+  onSsoFailure(message: string): void {
+    this.error.set(message);
+  }
+
+  private afterLogin(): void {
+    const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') ?? '/dashboard';
+    this.router.navigateByUrl(returnUrl);
   }
 }

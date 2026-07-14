@@ -12,24 +12,6 @@
     <button type="button" class="mobile-close" (click)="layout.closeMobileMenu()">×</button>
   </div>
 
-  <div class="role-switch-wrap">
-    <div class="role-switch-label">Viewing as</div>
-    <div class="role-switch">
-      <div class="role-option" [class.active]="roleService.role() === 'superadmin'" (click)="setRole('superadmin')">
-        Superadmin
-      </div>
-      <div class="role-option" [class.active]="roleService.role() === 'admin'" (click)="setRole('admin')">
-        Admin
-      </div>
-      <div class="role-option" [class.active]="roleService.role() === 'instructor'" (click)="setRole('instructor')">
-        Instructor
-      </div>
-    </div>
-    @if (roleService.isInstructor()) {
-      <div class="role-instructor-name">{{ roleService.instructorName }}</div>
-    }
-  </div>
-
   <nav class="nav">
     @for (group of visibleGroups(); track group.header) {
       <div class="nav-header">{{ group.header }}</div>

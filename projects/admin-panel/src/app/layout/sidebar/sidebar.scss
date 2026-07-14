@@ -61,48 +61,6 @@
   color: var(--w-sidebar-faint);
 }
 
-.role-switch-wrap {
-  padding: 16px 22px 6px;
-}
-
-.role-switch-label {
-  font: 600 9.5px var(--w-font-sans);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--w-sidebar-header);
-  margin-bottom: 9px;
-}
-
-.role-switch {
-  display: flex;
-  background: rgba(244, 237, 221, 0.06);
-  border-radius: 8px;
-  padding: 3px;
-  gap: 3px;
-}
-
-.role-option {
-  flex: 1;
-  text-align: center;
-  padding: 7px 2px;
-  border-radius: 6px;
-  font: 600 10.5px var(--w-font-sans);
-  cursor: pointer;
-  color: var(--w-sidebar-muted);
-
-  &.active {
-    background: var(--w-gold-deep);
-    color: var(--w-ink);
-  }
-}
-
-.role-instructor-name {
-  margin-top: 8px;
-  font: 500 11px var(--w-font-sans);
-  color: var(--w-sidebar-faint);
-  text-align: center;
-}
-
 .nav {
   padding: 10px 12px 24px;
   display: flex;
