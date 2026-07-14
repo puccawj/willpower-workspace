@@ -1,0 +1,28 @@
+:host {
+  display: block;
+}
+
+.iab-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  background: var(--w-gold-deep);
+  color: var(--w-ink);
+  font: 500 12.5px/1.5 var(--w-font-sans);
+}
+
+.iab-text {
+  flex: 1;
+}
+
+.iab-close {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  font: 600 18px var(--w-font-sans);
+  line-height: 1;
+  color: var(--w-ink);
+  cursor: pointer;
+  padding: 0 4px;
+}

@@ -8,6 +8,21 @@
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <script>
+      // Google/Facebook Sign-In refuse to work inside in-app browsers (LINE, Facebook,
+      // Instagram, etc.) — on Android, force-open the page in Chrome via an intent: URL so
+      // login actually works. iOS has no equivalent JS-triggerable escape hatch (Apple blocks
+      // it); the InAppBrowserNotice component shows manual instructions there instead.
+      (function () {
+        var ua = navigator.userAgent || '';
+        var isInApp = /\bLine\//i.test(ua) || /FBAN|FBAV/i.test(ua) || /Instagram/i.test(ua);
+        var isAndroid = /Android/i.test(ua);
+        if (isInApp && isAndroid) {
+          var target = location.href.replace(/^https?:\/\//, '');
+          location.href = 'intent://' + target + '#Intent;scheme=https;package=com.android.chrome;end';
+        }
+      })();
+    </script>
   </head>
   <body>
     <app-root></app-root>
