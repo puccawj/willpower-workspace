@@ -53,4 +53,12 @@ export class CertificateApiService {
   issue(payload: IssueCertificatePayload) {
     return this.http.post<ApiCertificate>(this.baseUrl, payload).pipe(switchMap(() => this.load(payload.offeringId)));
   }
+
+  remove(id: string, offeringId?: string) {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`).pipe(switchMap(() => this.load(offeringId)));
+  }
+
+  nextNumber() {
+    return this.http.get<{ certificateNo: string }>(`${this.baseUrl}/next-number`);
+  }
 }

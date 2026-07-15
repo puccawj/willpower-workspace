@@ -16,6 +16,7 @@ import { CrudModalService } from '../../core/services/crud-modal.service';
 import { UploadApiService } from '../../core/services/upload-api.service';
 import { PdfService } from '../../core/services/pdf.service';
 import { CertificatePreviewService } from '../../core/services/certificate-preview.service';
+import { ConfirmService } from '../../core/services/confirm.service';
 import { ToastService } from '../../core/services/toast.service';
 import { ListController } from '../../core/list-controller';
 import { TableToolbar } from '../../shared/table-toolbar/table-toolbar';
@@ -53,6 +54,8 @@ interface DonationRow {
   statusLabel: string;
   statusColor: string;
   certificateNo: string | null;
+  certificateTemplateId: string | null;
+  certificateIssuedAt: string | null;
   certificateUrl: string | null;
   certLabel: string;
   certColor: string;
@@ -60,7 +63,7 @@ interface DonationRow {
   actionIcon: string;
   isVerify: boolean;
   isIssue: boolean;
-  isResend: boolean;
+  isIssued: boolean;
 }
 
 const STATUS_COLOR: Record<ApiDonationStatus, string> = {
@@ -115,14 +118,16 @@ function toRow(d: ApiDonation): DonationRow {
     statusLabel: STATUS_LABEL[d.status],
     statusColor: STATUS_COLOR[d.status],
     certificateNo: d.certificateNo,
+    certificateTemplateId: d.certificateTemplateId,
+    certificateIssuedAt: d.certificateIssuedAt,
     certificateUrl: d.certificateUrl,
     certLabel: issued ? '✓ Issued' : d.status === 'verified' ? 'Not issued' : '—',
     certColor: issued ? 'var(--w-green)' : 'var(--w-muted)',
-    actionLabel: isVerify ? 'Verify' : isIssue ? 'Issue certificate' : 'Resend email',
-    actionIcon: isVerify ? '✓' : isIssue ? '◈' : '✉',
+    actionLabel: isVerify ? 'Verify' : 'Issue certificate',
+    actionIcon: isVerify ? '✓' : '◈',
     isVerify,
     isIssue,
-    isResend: !isVerify && !isIssue,
+    isIssued: issued,
   };
 }
 
@@ -179,6 +184,7 @@ export class Donations {
   private readonly courseApi = inject(CourseApiService);
   private readonly templateApi = inject(CertificateTemplateApiService);
   private readonly certPreview = inject(CertificatePreviewService);
+  private readonly confirm = inject(ConfirmService);
   private readonly modal = inject(CrudModalService);
   private readonly uploads = inject(UploadApiService);
   private readonly pdf = inject(PdfService);
@@ -329,12 +335,6 @@ export class Donations {
       return;
     }
 
-    if (row.isResend) {
-      if (row.certificateUrl) window.open(row.certificateUrl, '_blank');
-      this.toast.show(`Anumodana certificate re-sent to ${row.donorLabel} by email (simulated).`, 'success');
-      return;
-    }
-
     const templateType = row.type === 'money' ? 'donation_money' : 'donation_goods';
     this.templateApi.findActiveForBranch(row.branchId, templateType).subscribe({
       next: (template) => {
@@ -346,52 +346,99 @@ export class Donations {
           return;
         }
 
-        const certificateNo = `WPI-DON-${new Date().getFullYear()}-${Math.floor(Math.random() * 9000) + 1000}`;
         const issueDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-        const targetLine = row.targetType === 'general' ? 'the institute' : row.targetLabel;
-        const detailLine = `${row.amountOrItem} toward ${targetLine}`;
+        const detailLine = this.detailLine(row);
 
-        this.certPreview
-          .ask(
-            {
-              backgroundImageUrl: template.backgroundImageUrl,
-              layoutConfig: template.layoutConfig,
-              recipientName: row.donorLabel,
-              detailLine,
-              certificateNo,
-              issueDate,
-            },
-            { title: `Certificate for ${row.donorLabel}` },
-          )
-          .then(async (confirmed) => {
-            if (!confirmed) return;
-
-            const dataUri = await this.pdf.certificateFromTemplateDataUri({
-              backgroundImageUrl: template.backgroundImageUrl,
-              layoutConfig: template.layoutConfig,
-              recipientName: row.donorLabel,
-              courseLine: detailLine,
-              certificateNo,
-              issueDate,
-            });
-
-            this.uploads
-              .uploadDataUri(dataUri)
-              .pipe(
-                switchMap((fileUrl) => this.api.issueCertificate(row.id, { templateId: template.id, fileUrl, certificateNo })),
-                catchError((err) => {
-                  this.showError(err, 'Failed to issue certificate.');
-                  return of(null);
-                }),
+        this.api.nextCertificateNumber().subscribe({
+          next: ({ certificateNo }) => {
+            this.certPreview
+              .ask(
+                {
+                  backgroundImageUrl: template.backgroundImageUrl,
+                  layoutConfig: template.layoutConfig,
+                  recipientName: row.donorLabel,
+                  detailLine,
+                  certificateNo,
+                  issueDate,
+                },
+                { title: `Certificate for ${row.donorLabel}` },
               )
-              .subscribe((res) => {
-                if (!res) return;
-                this.toast.show(`Anumodana certificate issued to ${row.donorLabel} and emailed (simulated).`, 'success');
-                this.api.load().subscribe();
+              .then(async (confirmed) => {
+                if (!confirmed) return;
+
+                const dataUri = await this.pdf.certificateFromTemplateDataUri({
+                  backgroundImageUrl: template.backgroundImageUrl,
+                  layoutConfig: template.layoutConfig,
+                  recipientName: row.donorLabel,
+                  courseLine: detailLine,
+                  certificateNo,
+                  issueDate,
+                });
+
+                this.uploads
+                  .uploadDataUri(dataUri)
+                  .pipe(
+                    switchMap((fileUrl) => this.api.issueCertificate(row.id, { templateId: template.id, fileUrl, certificateNo })),
+                    catchError((err) => {
+                      this.showError(err, 'Failed to issue certificate.');
+                      return of(null);
+                    }),
+                  )
+                  .subscribe((res) => {
+                    if (!res) return;
+                    this.toast.show(`Anumodana certificate issued to ${row.donorLabel} and emailed (simulated).`, 'success');
+                    this.api.load().subscribe();
+                  });
               });
-          });
+          },
+          error: (err) => this.showError(err, 'Failed to reserve a certificate number.'),
+        });
       },
       error: (err) => this.showError(err, 'Failed to look up the certificate template.'),
+    });
+  }
+
+  private detailLine(row: DonationRow): string {
+    const targetLine = row.targetType === 'general' ? 'the institute' : row.targetLabel;
+    return `${row.amountOrItem} toward ${targetLine}`;
+  }
+
+  viewCertificate(row: DonationRow): void {
+    if (!row.certificateTemplateId) {
+      this.toast.show('This certificate predates template tracking and can’t be previewed — open Manage Donation → Void, then re-issue it to enable preview.', 'error');
+      return;
+    }
+    this.templateApi.getOne(row.certificateTemplateId).subscribe({
+      next: (template) => {
+        const issueDate = row.certificateIssuedAt
+          ? new Date(row.certificateIssuedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+          : '';
+        this.certPreview.ask(
+          {
+            backgroundImageUrl: template.backgroundImageUrl,
+            layoutConfig: template.layoutConfig,
+            recipientName: row.donorLabel,
+            detailLine: this.detailLine(row),
+            certificateNo: row.certificateNo ?? '',
+            issueDate,
+          },
+          { title: `Certificate for ${row.donorLabel}`, confirmLabel: 'Close', viewOnly: true },
+        );
+      },
+      error: (err) => this.showError(err, 'Failed to load the certificate template.'),
+    });
+  }
+
+  async voidCertificate(row: DonationRow): Promise<void> {
+    const confirmed = await this.confirm.ask(
+      `Void the anumodana certificate for ${row.donorLabel}? The donation stays verified — you can issue a new certificate afterward.`,
+      { title: 'Void certificate', confirmLabel: 'Void', danger: true },
+    );
+    if (!confirmed) return;
+
+    this.api.voidCertificate(row.id).subscribe({
+      next: () => this.toast.show(`Certificate for ${row.donorLabel} voided.`, 'success'),
+      error: (err) => this.showError(err, 'Failed to void certificate.'),
     });
   }
 

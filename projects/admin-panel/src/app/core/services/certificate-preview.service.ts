@@ -14,6 +14,7 @@ export interface CertificatePreviewRequest {
   data: CertificatePreviewData;
   title: string;
   confirmLabel: string;
+  viewOnly: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -21,11 +22,12 @@ export class CertificatePreviewService {
   readonly request = signal<CertificatePreviewRequest | null>(null);
   private resolver: ((result: boolean) => void) | null = null;
 
-  ask(data: CertificatePreviewData, options?: { title?: string; confirmLabel?: string }): Promise<boolean> {
+  ask(data: CertificatePreviewData, options?: { title?: string; confirmLabel?: string; viewOnly?: boolean }): Promise<boolean> {
     this.request.set({
       data,
       title: options?.title ?? 'Preview certificate',
       confirmLabel: options?.confirmLabel ?? 'Issue certificate',
+      viewOnly: options?.viewOnly ?? false,
     });
     return new Promise((resolve) => {
       this.resolver = resolve;

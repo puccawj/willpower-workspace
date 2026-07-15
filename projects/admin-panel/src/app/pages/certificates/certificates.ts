@@ -2,7 +2,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { catchError, concatMap, from, map, of, switchMap } from 'rxjs';
 import { CourseApiService } from '../../core/services/course-api.service';
-import { OfferingApiService } from '../../core/services/offering-api.service';
+import { ApiOffering, OfferingApiService } from '../../core/services/offering-api.service';
 import { EnrollmentApiService } from '../../core/services/enrollment-api.service';
 import { CertificateApiService } from '../../core/services/certificate-api.service';
 import {
@@ -12,6 +12,7 @@ import {
 import { UploadApiService } from '../../core/services/upload-api.service';
 import { PdfService } from '../../core/services/pdf.service';
 import { CertificatePreviewService } from '../../core/services/certificate-preview.service';
+import { ConfirmService } from '../../core/services/confirm.service';
 import { ToastService } from '../../core/services/toast.service';
 import { ListController } from '../../core/list-controller';
 import { TableToolbar } from '../../shared/table-toolbar/table-toolbar';
@@ -26,7 +27,10 @@ interface CertRow {
   eligibleLabel: string;
   eligibleColor: string;
   issued: boolean;
+  certId: string;
   certNo: string;
+  templateId: string;
+  issuedAt: string;
   fileUrl: string;
   issueLabel: string;
   actionIcon: string;
@@ -48,6 +52,7 @@ export class Certificates {
   private readonly uploads = inject(UploadApiService);
   private readonly pdf = inject(PdfService);
   private readonly certPreview = inject(CertificatePreviewService);
+  private readonly confirm = inject(ConfirmService);
   private readonly toast = inject(ToastService);
 
   readonly loading = this.enrollmentApi.loading;
@@ -65,8 +70,10 @@ export class Certificates {
   readonly templateLoaded = signal(false);
 
   private readonly issuedByUserId = computed(() => {
-    const map = new Map<string, { certNo: string; fileUrl: string }>();
-    this.certApi.certificates().forEach((c) => map.set(c.userId, { certNo: c.certificateNo, fileUrl: c.fileUrl }));
+    const map = new Map<string, { id: string; certNo: string; templateId: string; issuedAt: string; fileUrl: string }>();
+    this.certApi.certificates().forEach((c) =>
+      map.set(c.userId, { id: c.id, certNo: c.certificateNo, templateId: c.templateId, issuedAt: c.issuedAt, fileUrl: c.fileUrl }),
+    );
     return map;
   });
 
@@ -89,7 +96,10 @@ export class Certificates {
         eligibleLabel: eligible ? 'Eligible' : 'Not yet',
         eligibleColor: eligible ? 'var(--w-green)' : 'var(--w-muted)',
         issued,
+        certId: issuedInfo?.id ?? '',
         certNo: issuedInfo?.certNo ?? '—',
+        templateId: issuedInfo?.templateId ?? '',
+        issuedAt: issuedInfo?.issuedAt ?? '',
         fileUrl: issuedInfo?.fileUrl ?? '',
         issueLabel: issued ? 'Issued' : eligible ? 'Ready to issue' : '—',
         actionIcon: issued ? '⤓' : eligible ? '◈' : '—',
@@ -168,12 +178,52 @@ export class Certificates {
     );
   }
 
-  toggle(row: CertRow): void {
-    if (row.issued) {
-      if (row.fileUrl) window.open(row.fileUrl, '_blank');
+  viewCertificate(row: CertRow): void {
+    const offering = this.selectedOffering();
+    if (!offering) return;
+    if (!row.templateId) {
+      this.toast.show('This certificate predates template tracking and can’t be previewed — void it, then re-issue to enable preview.', 'error');
       return;
     }
-    if (!row.eligible) return;
+
+    this.templateApi.getOne(row.templateId).subscribe({
+      next: (template) => {
+        const issueDate = row.issuedAt
+          ? new Date(row.issuedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+          : '';
+        this.certPreview.ask(
+          {
+            backgroundImageUrl: template.backgroundImageUrl,
+            layoutConfig: template.layoutConfig,
+            recipientName: row.name,
+            detailLine: offering.courseTitle,
+            certificateNo: row.certNo,
+            issueDate,
+          },
+          { title: `Certificate for ${row.name}`, confirmLabel: 'Close', viewOnly: true },
+        );
+      },
+      error: (err) => this.showError(err, 'Failed to load the certificate template.'),
+    });
+  }
+
+  async voidCertificate(row: CertRow): Promise<void> {
+    if (!row.certId) return;
+    const offering = this.selectedOffering();
+    const confirmed = await this.confirm.ask(
+      `Void the certificate for ${row.name}? You can issue a new one afterward.`,
+      { title: 'Void certificate', confirmLabel: 'Void', danger: true },
+    );
+    if (!confirmed) return;
+
+    this.certApi.remove(row.certId, offering?.id).subscribe({
+      next: () => this.toast.show(`Certificate for ${row.name} voided.`, 'success'),
+      error: (err) => this.showError(err, 'Failed to void certificate.'),
+    });
+  }
+
+  toggle(row: CertRow): void {
+    if (row.issued || !row.eligible) return;
 
     const offering = this.selectedOffering();
     const template = this.activeTemplate();
@@ -182,9 +232,21 @@ export class Certificates {
       return;
     }
 
-    const certificateNo = `WPI-CERT-${new Date().getFullYear()}-${Math.floor(Math.random() * 9000) + 1000}`;
     const issueDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
+    this.certApi.nextNumber().subscribe({
+      next: ({ certificateNo }) => this.showIssuePreview(row, offering, template, certificateNo, issueDate),
+      error: (err) => this.showError(err, 'Failed to reserve a certificate number.'),
+    });
+  }
+
+  private showIssuePreview(
+    row: CertRow,
+    offering: ApiOffering,
+    template: ApiCertificateTemplate,
+    certificateNo: string,
+    issueDate: string,
+  ): void {
     this.certPreview
       .ask(
         {

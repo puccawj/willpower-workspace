@@ -60,14 +60,21 @@
               <td class="muted-cell">{{ c.certNo }}</td>
               <td>{{ c.issueLabel }}</td>
               <td>
-                <button
-                  type="button"
-                  class="icon-btn"
-                  [style.color]="c.actionColor"
-                  [disabled]="!c.issued && !c.eligible"
-                  [title]="c.issued ? 'Download certificate' : c.eligible ? 'Issue certificate' : 'Not yet eligible'"
-                  (click)="toggle(c)"
-                >{{ c.actionIcon }}</button>
+                <div class="action-group">
+                  @if (c.issued) {
+                    <button type="button" class="icon-btn icon-btn-accent" (click)="viewCertificate(c)" title="View certificate">👁</button>
+                    <button type="button" class="icon-btn icon-btn-danger" (click)="voidCertificate(c)" title="Void certificate">↺</button>
+                  } @else {
+                    <button
+                      type="button"
+                      class="icon-btn"
+                      [style.color]="c.actionColor"
+                      [disabled]="!c.eligible"
+                      [title]="c.eligible ? 'Issue certificate' : 'Not yet eligible'"
+                      (click)="toggle(c)"
+                    >{{ c.actionIcon }}</button>
+                  }
+                </div>
               </td>
             </tr>
           }
@@ -87,14 +94,21 @@
           </div>
           <div class="muted-label">Attendance {{ c.pctLabel }}</div>
           <div class="muted-label mcard-meta">{{ c.certNo }} · {{ c.issueLabel }}</div>
-          <button
-            type="button"
-            class="icon-btn"
-            [style.color]="c.actionColor"
-            [disabled]="!c.issued && !c.eligible"
-            [title]="c.issued ? 'Download certificate' : c.eligible ? 'Issue certificate' : 'Not yet eligible'"
-            (click)="toggle(c)"
-          >{{ c.actionIcon }}</button>
+          <div class="action-group">
+            @if (c.issued) {
+              <button type="button" class="icon-btn icon-btn-accent" (click)="viewCertificate(c)" title="View certificate">👁</button>
+              <button type="button" class="icon-btn icon-btn-danger" (click)="voidCertificate(c)" title="Void certificate">↺</button>
+            } @else {
+              <button
+                type="button"
+                class="icon-btn"
+                [style.color]="c.actionColor"
+                [disabled]="!c.eligible"
+                [title]="c.eligible ? 'Issue certificate' : 'Not yet eligible'"
+                (click)="toggle(c)"
+              >{{ c.actionIcon }}</button>
+            }
+          </div>
         </div>
       }
     </div>

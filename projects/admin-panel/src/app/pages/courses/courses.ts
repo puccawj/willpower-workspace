@@ -92,6 +92,10 @@ export class Courses {
     this.router.navigate(['/courses', row.id, 'needs']);
   }
 
+  goPhotos(row: CourseRow): void {
+    this.router.navigate(['/courses', row.id, 'photos']);
+  }
+
   viewCover(row: CourseRow): void {
     if (row.imageUrl) this.imageViewer.open(row.imageUrl);
   }

@@ -1,0 +1,33 @@
+<button type="button" class="link-muted back-link" (click)="goEvents()">← All events</button>
+
+<div class="card summary-card">
+  @if (event(); as ev) {
+    <div>
+      <h2 class="summary-title">{{ ev.title }}</h2>
+      <div class="muted-label">{{ dateFull() }}</div>
+    </div>
+  } @else {
+    <div class="muted-label">Loading event…</div>
+  }
+  <button type="button" class="btn btn-outline" (click)="addPhoto()">+ Add Photo</button>
+</div>
+
+@if (error()) {
+  <div class="state-error card">{{ error() }}</div>
+} @else if (loading()) {
+  <div class="state-loading card">Loading photos…</div>
+} @else {
+  <div class="photo-grid">
+    @for (row of rows(); track row.id) {
+      <div class="photo-card" (click)="editPhoto(row)">
+        <img class="photo-thumb" [src]="row.imageUrl" [alt]="row.caption ?? ''" />
+        @if (row.caption) {
+          <div class="photo-caption">{{ row.caption }}</div>
+        }
+      </div>
+    }
+    @if (!rows().length) {
+      <div class="card state-empty">No photos added yet — click "+ Add Photo" to showcase the atmosphere of this event.</div>
+    }
+  </div>
+}

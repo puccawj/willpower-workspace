@@ -29,6 +29,7 @@
                   <button type="button" class="icon-btn icon-btn-accent" (click)="goSchedule()" title="View offerings">▦</button>
                   @if (!roleService.isInstructor()) {
                     <button type="button" class="icon-btn" (click)="goNeeds(c)" title="Donation needs">🎁</button>
+                    <button type="button" class="icon-btn" (click)="goPhotos(c)" title="Photos">🖼</button>
                     <button type="button" class="icon-btn" (click)="editCourse(c)" title="Edit">✎</button>
                   }
                 </div>
@@ -62,6 +63,7 @@
             <button type="button" class="icon-btn icon-btn-accent" (click)="goSchedule()" title="View offerings">▦</button>
             @if (!roleService.isInstructor()) {
               <button type="button" class="icon-btn" (click)="goNeeds(c)" title="Donation needs">🎁</button>
+              <button type="button" class="icon-btn" (click)="goPhotos(c)" title="Photos">🖼</button>
               <button type="button" class="icon-btn" (click)="editCourse(c)" title="Edit">✎</button>
             }
           </div>

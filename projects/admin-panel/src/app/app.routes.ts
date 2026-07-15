@@ -3,6 +3,7 @@ import { Login } from './pages/login/login';
 import { Dashboard } from './pages/dashboard/dashboard';
 import { EventList } from './pages/events/event-list/event-list';
 import { EventNeeds } from './pages/events/event-needs/event-needs';
+import { EventPhotos } from './pages/events/event-photos/event-photos';
 import { Rsvp } from './pages/events/rsvp/rsvp';
 import { RsvpOverview } from './pages/events/rsvp-overview/rsvp-overview';
 import { Donations } from './pages/donations/donations';
@@ -10,9 +11,11 @@ import { Users } from './pages/users/users';
 import { Branches } from './pages/branches/branches';
 import { Courses } from './pages/courses/courses';
 import { CourseNeeds } from './pages/courses/course-needs/course-needs';
+import { CoursePhotos } from './pages/courses/course-photos/course-photos';
 import { Schedule } from './pages/schedule/schedule';
 import { Enrollment } from './pages/enrollment/enrollment';
 import { Certificates } from './pages/certificates/certificates';
+import { CertificateRegistry } from './pages/certificate-registry/certificate-registry';
 import { Templates } from './pages/templates/templates';
 import { Team } from './pages/team/team';
 import { Reports } from './pages/reports/reports';
@@ -51,6 +54,12 @@ export const routes: Routes = [
         data: { title: 'Donation Needs', subtitle: 'Wishlist items for this event', allow: ['superadmin', 'admin'] },
       },
       {
+        path: 'events/:id/photos',
+        component: EventPhotos,
+        canActivate: [roleAccessGuard],
+        data: { title: 'Event Photos', subtitle: 'Atmosphere photos for this event', allow: ['superadmin', 'admin'] },
+      },
+      {
         path: 'rsvp',
         component: RsvpOverview,
         canActivate: [roleAccessGuard],
@@ -87,6 +96,12 @@ export const routes: Routes = [
         data: { title: 'Donation Needs', subtitle: 'Wishlist items for this course', allow: ['superadmin', 'admin'] },
       },
       {
+        path: 'courses/:id/photos',
+        component: CoursePhotos,
+        canActivate: [roleAccessGuard],
+        data: { title: 'Course Photos', subtitle: 'Atmosphere photos for this course', allow: ['superadmin', 'admin'] },
+      },
+      {
         path: 'schedule',
         component: Schedule,
         canActivate: [roleAccessGuard],
@@ -103,6 +118,12 @@ export const routes: Routes = [
         component: Certificates,
         canActivate: [roleAccessGuard],
         data: { title: 'Certificate Management', subtitle: 'Issue certificates to students who met the criteria', allow: ['superadmin', 'admin'] },
+      },
+      {
+        path: 'certificate-registry',
+        component: CertificateRegistry,
+        canActivate: [roleAccessGuard],
+        data: { title: 'Certificate Registry', subtitle: 'Every certificate number issued, to whom, and its status', allow: ['superadmin', 'admin'] },
       },
       {
         path: 'templates',

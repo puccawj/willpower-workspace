@@ -70,6 +70,12 @@ export interface PublicDonationRow {
   createdAt: string;
 }
 
+export interface PublicCoursePhoto {
+  id: string;
+  imageUrl: string;
+  caption: string | null;
+}
+
 const FALLBACK_IMAGES = [
   'https://images.unsplash.com/photo-1772034292097-447be2dd32ea?q=80&w=1200&auto=format&fit=crop',
   'https://images.unsplash.com/photo-1589862607042-7e09233f593b?q=80&w=1200&auto=format&fit=crop',
@@ -154,5 +160,9 @@ export class PublicCourseApiService {
 
   loadDonations(courseId: string): Observable<PublicDonationRow[]> {
     return this.http.get<PublicDonationRow[]>(`${environment.apiUrl}/public/courses/${courseId}/donations`);
+  }
+
+  loadPhotos(courseId: string): Observable<PublicCoursePhoto[]> {
+    return this.http.get<PublicCoursePhoto[]>(`${environment.apiUrl}/public/courses/${courseId}/photos`);
   }
 }

@@ -76,4 +76,8 @@ export class CertificateTemplateApiService {
     if (branchId) params.set('branchId', branchId);
     return this.http.get<ApiCertificateTemplate | null>(`${this.baseUrl}/active/lookup?${params.toString()}`);
   }
+
+  getOne(id: string): Observable<ApiCertificateTemplate> {
+    return this.http.get<ApiCertificateTemplate>(`${this.baseUrl}/${id}`);
+  }
 }

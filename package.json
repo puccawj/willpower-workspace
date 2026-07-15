@@ -9,7 +9,10 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "build:pages": "node scripts/build-pages.js",
-    "deploy": "node scripts/build-pages.js && npx angular-cli-ghpages --dir=dist/gh-pages"
+    "deploy": "node scripts/build-pages.js && npx angular-cli-ghpages --dir=dist/gh-pages",
+    "write-prod-env": "node scripts/write-prod-env.js",
+    "build:public-site": "npm run write-prod-env && ng build public-site --configuration production",
+    "build:admin-panel": "npm run write-prod-env && ng build admin-panel --configuration production"
   },
   "private": true,
   "packageManager": "npm@11.5.2",

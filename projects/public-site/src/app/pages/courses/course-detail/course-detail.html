@@ -32,6 +32,22 @@
             </div>
           }
 
+          @if (photos().length) {
+            <div class="photo-gallery">
+              <div class="aside-heading gold">Atmosphere</div>
+              <div class="photo-gallery-grid">
+                @for (photo of photos(); track photo.id) {
+                  <figure class="gallery-item" (click)="openPhoto(photo)">
+                    <img [src]="photo.imageUrl" [alt]="photo.caption ?? ''" />
+                    @if (photo.caption) {
+                      <figcaption>{{ photo.caption }}</figcaption>
+                    }
+                  </figure>
+                }
+              </div>
+            </div>
+          }
+
           @if (isLoggedIn()) {
             <div class="donor-section">
               <div class="aside-heading gold">Donors</div>

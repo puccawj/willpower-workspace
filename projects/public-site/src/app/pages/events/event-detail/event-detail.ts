@@ -9,11 +9,13 @@ import {
   PublicDonationRow,
   PublicEventApiService,
   PublicEventNeed,
+  PublicEventPhoto,
 } from '../../../core/services/public-event-api.service';
 import { PublicEvent } from '../../../core/models/public-event.models';
 import { DonateType, RsvpChoice } from '../../../core/models/willpower.models';
 import { AuthService } from '../../../core/services/auth.service';
 import { ConfirmService } from '../../../core/services/confirm.service';
+import { ImageViewerService } from '../../../core/services/image-viewer.service';
 import { MeApiService } from '../../../core/services/me-api.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { UploadApiService } from '../../../core/services/upload-api.service';
@@ -34,6 +36,7 @@ export class EventDetail {
   private readonly uploads = inject(UploadApiService);
   private readonly toast = inject(ToastService);
   private readonly confirmService = inject(ConfirmService);
+  private readonly imageViewer = inject(ImageViewerService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
@@ -105,6 +108,15 @@ export class EventDetail {
   readonly donations = signal<PublicDonationRow[]>([]);
   readonly donationsLoading = signal(false);
 
+  // ---- Atmosphere photos ----
+
+  readonly photos = signal<PublicEventPhoto[]>([]);
+  readonly photosLoading = signal(false);
+
+  openPhoto(photo: PublicEventPhoto): void {
+    this.imageViewer.open(photo.imageUrl);
+  }
+
   readonly formatMoney = (value: string | null): string => {
     const n = Number(value ?? 0);
     return `$${n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
@@ -175,6 +187,7 @@ export class EventDetail {
       this.checkedIn.set(false);
       this.needs.set([]);
       this.donations.set([]);
+      this.photos.set([]);
       this.activeTab.set('give');
       this.activeTarget.set(null);
       this.donateThanks.set(false);
@@ -215,6 +228,15 @@ export class EventDetail {
           this.needsLoading.set(false);
         },
         error: () => this.needsLoading.set(false),
+      });
+
+      this.photosLoading.set(true);
+      this.api.loadPhotos(id).subscribe({
+        next: (rows) => {
+          this.photos.set(rows);
+          this.photosLoading.set(false);
+        },
+        error: () => this.photosLoading.set(false),
       });
 
       if (this.auth.isLoggedIn()) {

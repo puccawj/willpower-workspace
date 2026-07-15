@@ -97,4 +97,12 @@ export class DonationApiService {
   issueCertificate(id: string, payload: IssueDonationCertificatePayload) {
     return this.http.patch<ApiDonation>(`${this.baseUrl}/${id}/certificate`, payload);
   }
+
+  voidCertificate(id: string) {
+    return this.http.delete<ApiDonation>(`${this.baseUrl}/${id}/certificate`).pipe(switchMap(() => this.load()));
+  }
+
+  nextCertificateNumber() {
+    return this.http.get<{ certificateNo: string }>(`${this.baseUrl}/next-certificate-number`);
+  }
 }

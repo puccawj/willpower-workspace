@@ -1,0 +1,33 @@
+<button type="button" class="link-muted back-link" (click)="goCourses()">← All courses</button>
+
+<div class="card summary-card">
+  @if (course(); as c) {
+    <div>
+      <h2 class="summary-title">{{ c.title }}</h2>
+      <div class="muted-label">{{ c.category }}</div>
+    </div>
+  } @else {
+    <div class="muted-label">Loading course…</div>
+  }
+  <button type="button" class="btn btn-outline" (click)="addPhoto()">+ Add Photo</button>
+</div>
+
+@if (error()) {
+  <div class="state-error card">{{ error() }}</div>
+} @else if (loading()) {
+  <div class="state-loading card">Loading photos…</div>
+} @else {
+  <div class="photo-grid">
+    @for (row of rows(); track row.id) {
+      <div class="photo-card" (click)="editPhoto(row)">
+        <img class="photo-thumb" [src]="row.imageUrl" [alt]="row.caption ?? ''" />
+        @if (row.caption) {
+          <div class="photo-caption">{{ row.caption }}</div>
+        }
+      </div>
+    }
+    @if (!rows().length) {
+      <div class="card state-empty">No photos added yet — click "+ Add Photo" to showcase the atmosphere of this course.</div>
+    }
+  </div>
+}

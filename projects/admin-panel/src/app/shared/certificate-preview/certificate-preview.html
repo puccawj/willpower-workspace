@@ -30,7 +30,9 @@
       </div>
 
       <div class="cert-preview-actions">
-        <button type="button" class="cancel-btn" (click)="respond(false)">Cancel</button>
+        @if (!req.viewOnly) {
+          <button type="button" class="cancel-btn" (click)="respond(false)">Cancel</button>
+        }
         <button type="button" class="btn btn-solid" (click)="respond(true)">{{ req.confirmLabel }}</button>
       </div>
     </div>

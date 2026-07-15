@@ -5,10 +5,11 @@ import { Footer } from './layout/footer/footer';
 import { InAppBrowserNotice } from './shared/in-app-browser-notice/in-app-browser-notice';
 import { ToastHost } from './shared/toast-host/toast-host';
 import { ConfirmDialog } from './shared/confirm-dialog/confirm-dialog';
+import { ImageViewer } from './shared/image-viewer/image-viewer';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Header, Footer, InAppBrowserNotice, ToastHost, ConfirmDialog],
+  imports: [RouterOutlet, Header, Footer, InAppBrowserNotice, ToastHost, ConfirmDialog, ImageViewer],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })

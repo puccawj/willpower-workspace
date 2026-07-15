@@ -60,6 +60,7 @@ export class Sidebar {
       header: 'Certificates',
       items: [
         { path: 'certificates', label: 'Certificate Management', icon: '◈', allow: ALL_STAFF },
+        { path: 'certificate-registry', label: 'Certificate Registry', icon: '☰', allow: ALL_STAFF },
         { path: 'templates', label: 'Certificate Templates', icon: '▧', allow: ['superadmin'] },
       ],
     },

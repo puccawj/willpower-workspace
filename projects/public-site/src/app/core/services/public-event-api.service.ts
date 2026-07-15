@@ -29,6 +29,12 @@ export interface PublicEventNeed {
   receivedQuantity: string;
 }
 
+export interface PublicEventPhoto {
+  id: string;
+  imageUrl: string;
+  caption: string | null;
+}
+
 export interface PublicDonationRow {
   id: string;
   donorName: string;
@@ -119,5 +125,9 @@ export class PublicEventApiService {
 
   loadDonations(eventId: string): Observable<PublicDonationRow[]> {
     return this.http.get<PublicDonationRow[]>(`${environment.apiUrl}/public/events/${eventId}/donations`);
+  }
+
+  loadPhotos(eventId: string): Observable<PublicEventPhoto[]> {
+    return this.http.get<PublicEventPhoto[]>(`${environment.apiUrl}/public/events/${eventId}/photos`);
   }
 }

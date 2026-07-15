@@ -95,7 +95,12 @@
               <td [style.color]="d.certColor" style="font-weight:500">{{ d.certLabel }}</td>
               <td>
                 <div class="action-group">
-                  <button type="button" class="icon-btn icon-btn-accent" (click)="action(d)" [title]="d.actionLabel">{{ d.actionIcon }}</button>
+                  @if (d.isIssued) {
+                    <button type="button" class="icon-btn icon-btn-accent" (click)="viewCertificate(d)" title="View certificate">👁</button>
+                    <button type="button" class="icon-btn icon-btn-danger" (click)="voidCertificate(d)" title="Void certificate">↺</button>
+                  } @else {
+                    <button type="button" class="icon-btn icon-btn-accent" (click)="action(d)" [title]="d.actionLabel">{{ d.actionIcon }}</button>
+                  }
                   <button type="button" class="icon-btn" (click)="editDonation(d)" title="Edit">✎</button>
                 </div>
               </td>
@@ -122,7 +127,12 @@
           <div class="mcard-row">
             <span [style.color]="d.certColor" style="font-weight:500">{{ d.certLabel }}</span>
             <div class="mcard-actions action-group">
-              <button type="button" class="icon-btn icon-btn-accent" (click)="action(d)" [title]="d.actionLabel">{{ d.actionIcon }}</button>
+              @if (d.isIssued) {
+                <button type="button" class="icon-btn icon-btn-accent" (click)="viewCertificate(d)" title="View certificate">👁</button>
+                <button type="button" class="icon-btn icon-btn-danger" (click)="voidCertificate(d)" title="Void certificate">↺</button>
+              } @else {
+                <button type="button" class="icon-btn icon-btn-accent" (click)="action(d)" [title]="d.actionLabel">{{ d.actionIcon }}</button>
+              }
               <button type="button" class="icon-btn" (click)="editDonation(d)" title="Edit">✎</button>
             </div>
           </div>

@@ -1,0 +1,77 @@
+<app-stat-cards [stats]="stats()"></app-stat-cards>
+
+<div class="page-toolbar">
+  <app-filter-tabs [options]="statusFilterOptions" [active]="statusFilter()" [select]="setStatusFilter"></app-filter-tabs>
+</div>
+
+<div class="filters-row">
+  <div class="field-inline">
+    <label class="muted-label">Type</label>
+    <select class="form-input" [ngModel]="typeFilter()" (ngModelChange)="setTypeFilter($event)">
+      <option value="all">All types</option>
+      <option value="course">Course</option>
+      <option value="donation">Donation</option>
+    </select>
+  </div>
+</div>
+
+@if (error()) {
+  <div class="state-error card">{{ error() }}</div>
+} @else if (loading()) {
+  <div class="state-loading card">Loading registry…</div>
+} @else {
+  <app-table-toolbar [controller]="ctrl" slot="top"></app-table-toolbar>
+
+  @if (ctrl.effectiveView() === 'table') {
+    <div class="card" style="padding:0;overflow:hidden">
+      <table>
+        <thead>
+          <tr>
+            <th>Cert No.</th>
+            <th>Recipient</th>
+            <th>Type</th>
+            <th>Detail</th>
+            <th>Issued</th>
+            <th>Issued by</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (r of ctrl.pageItems(); track r.certificateNo) {
+            <tr class="row">
+              <td class="muted-cell" style="font-weight:600">{{ r.certificateNo }}</td>
+              <td>
+                <div style="font-weight:500">{{ r.recipientName }}</div>
+                <div class="muted-label">{{ r.recipientEmail }}</div>
+              </td>
+              <td><span class="badge badge-sm" style="background:var(--w-muted)">{{ r.typeLabel }}</span></td>
+              <td>{{ r.detail }}</td>
+              <td>{{ r.issuedAtLabel }}</td>
+              <td class="muted-cell">{{ r.issuedByName }}</td>
+              <td><span class="badge" [style.background]="r.statusColor">{{ r.statusLabel }}</span></td>
+            </tr>
+          }
+          @if (!ctrl.pageItems().length) {
+            <tr><td colspan="7" class="muted-cell" style="text-align:center;padding:20px">No certificates match these filters.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <div class="cardgrid">
+      @for (r of ctrl.pageItems(); track r.certificateNo) {
+        <div class="mcard">
+          <div class="mcard-head">
+            <h4 class="mcard-title mcard-title-sans">{{ r.recipientName }}</h4>
+            <span class="badge badge-sm" [style.background]="r.statusColor">{{ r.statusLabel }}</span>
+          </div>
+          <div class="muted-label">{{ r.certificateNo }}</div>
+          <div class="muted-label mcard-meta">{{ r.typeLabel }} · {{ r.detail }}</div>
+          <div class="muted-label">Issued {{ r.issuedAtLabel }} by {{ r.issuedByName }}</div>
+        </div>
+      }
+    </div>
+  }
+
+  <app-table-toolbar [controller]="ctrl" slot="bottom"></app-table-toolbar>
+}

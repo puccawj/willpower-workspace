@@ -179,6 +179,10 @@ export class EventList {
     this.router.navigate(['/events', ev.id, 'needs']);
   }
 
+  openPhotos(ev: EventRow): void {
+    this.router.navigate(['/events', ev.id, 'photos']);
+  }
+
   viewCover(ev: EventRow): void {
     if (ev.coverImageUrl) this.imageViewer.open(ev.coverImageUrl);
   }
