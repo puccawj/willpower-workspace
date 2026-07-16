@@ -25,7 +25,6 @@ for (const project of PROJECTS) {
 
   const contents = `export const environment = {
   production: true,
-  // AWS server (no HTTPS yet, causes mixed-content errors from this HTTPS site): http://47.130.132.126:3000
   apiUrl: '${apiUrl}',
   googleClientId: '${googleClientId}',
   facebookAppId: '${facebookAppId}',
