@@ -71,10 +71,46 @@
   margin-bottom: 18px;
 }
 
-.forgot-row {
-  text-align: right;
+.password-wrap {
+  position: relative;
+
+  .login-input {
+    padding-right: 56px;
+  }
+}
+
+.password-toggle {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font: 600 11.5px var(--w-font-sans);
+  color: var(--w-accent);
+  padding: 4px;
+}
+
+.remember-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin-top: -10px;
   margin-bottom: 20px;
+}
+
+.remember-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font: 500 12.5px var(--w-font-sans);
+  color: var(--w-muted);
+  cursor: pointer;
+
+  input {
+    accent-color: var(--w-accent);
+  }
 }
 
 .login-error {

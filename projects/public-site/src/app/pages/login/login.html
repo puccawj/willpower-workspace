@@ -11,9 +11,22 @@
       <input id="email" class="login-input" placeholder="you@email.com" [ngModel]="email()" (ngModelChange)="email.set($event)" name="email" />
 
       <label class="login-label" for="password">Password</label>
-      <input id="password" type="password" class="login-input" placeholder="••••••••" [ngModel]="password()" (ngModelChange)="password.set($event)" name="password" />
+      <div class="password-wrap">
+        <input id="password" [type]="showPassword() ? 'text' : 'password'" class="login-input" placeholder="••••••••" [ngModel]="password()" (ngModelChange)="password.set($event)" name="password" />
+        <button type="button" class="password-toggle" (click)="showPassword.set(!showPassword())">
+          {{ showPassword() ? 'Hide' : 'Show' }}
+        </button>
+      </div>
 
-      <div class="forgot-row"><a href="#" class="forgot-link">Forgot password?</a></div>
+      <div class="remember-row">
+        <label class="remember-label">
+          <input type="checkbox" [ngModel]="rememberMe()" (ngModelChange)="rememberMe.set($event)" name="rememberMe" />
+          Keep me signed in
+        </label>
+        <a href="#" class="forgot-link">Forgot password?</a>
+      </div>
+
+      <app-turnstile-widget (tokenChange)="onTurnstileToken($event)"></app-turnstile-widget>
 
       @if (error()) {
         <div class="login-error">{{ error() }}</div>

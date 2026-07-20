@@ -53,8 +53,12 @@ export class AuthService {
   readonly currentUser = computed(() => this.session()?.user ?? null);
   readonly isLoggedIn = computed(() => this.session() !== null);
 
-  login(email: string, password: string): Observable<AuthOutcome> {
-    return this.callAndPersist(`${environment.apiUrl}/auth/login`, { email, password }, 'Invalid email or password.');
+  login(email: string, password: string, rememberMe: boolean, turnstileToken?: string): Observable<AuthOutcome> {
+    return this.callAndPersist(
+      `${environment.apiUrl}/auth/login`,
+      { email, password, rememberMe, turnstileToken },
+      'Invalid email or password.',
+    );
   }
 
   register(firstName: string, lastName: string, email: string, password: string): Observable<AuthOutcome> {

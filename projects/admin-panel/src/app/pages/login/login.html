@@ -21,8 +21,8 @@
       <input
         id="email"
         type="email"
-        class="form-input"
-        placeholder="you@willpower.org"
+        class="form-input login-input"
+        placeholder="your@email.com"
         autocomplete="username"
         [ngModel]="email()"
         (ngModelChange)="email.set($event)"
@@ -34,7 +34,7 @@
         <input
           id="password"
           [type]="showPassword() ? 'text' : 'password'"
-          class="form-input"
+          class="form-input login-input"
           placeholder="••••••••"
           autocomplete="current-password"
           [ngModel]="password()"
@@ -46,11 +46,21 @@
         </button>
       </div>
 
+      <div class="remember-row">
+        <label class="remember-label">
+          <input type="checkbox" [ngModel]="rememberMe()" (ngModelChange)="rememberMe.set($event)" name="rememberMe" />
+          Keep me signed in
+        </label>
+        <a href="#" class="forgot-link">Forgot password?</a>
+      </div>
+
+      <app-turnstile-widget (tokenChange)="onTurnstileToken($event)"></app-turnstile-widget>
+
       <button type="submit" class="btn btn-solid login-submit" [disabled]="loading()">
         {{ loading() ? 'Signing in…' : 'Sign in' }}
       </button>
     </form>
-
-    <app-sso-buttons (success)="onSsoSuccess()" (failure)="onSsoFailure($event)"></app-sso-buttons>
   </div>
+
+  <app-sso-buttons (success)="onSsoSuccess()" (failure)="onSsoFailure($event)"></app-sso-buttons>
 </div>

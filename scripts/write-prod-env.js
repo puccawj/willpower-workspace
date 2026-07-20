@@ -22,12 +22,14 @@ for (const project of PROJECTS) {
   const apiUrl = process.env.API_URL || readCurrent(filePath, 'apiUrl');
   const googleClientId = process.env.GOOGLE_CLIENT_ID || readCurrent(filePath, 'googleClientId');
   const facebookAppId = process.env.FACEBOOK_APP_ID || readCurrent(filePath, 'facebookAppId');
+  const turnstileSiteKey = process.env.TURNSTILE_SITE_KEY || readCurrent(filePath, 'turnstileSiteKey');
 
   const contents = `export const environment = {
   production: true,
   apiUrl: '${apiUrl}',
   googleClientId: '${googleClientId}',
   facebookAppId: '${facebookAppId}',
+  turnstileSiteKey: '${turnstileSiteKey}',
 };
 `;
 

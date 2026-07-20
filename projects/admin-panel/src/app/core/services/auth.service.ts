@@ -35,8 +35,12 @@ export class AuthService {
     if (session) this.roleService.setRole(session.role);
   }
 
-  login(email: string, password: string): Observable<AuthOutcome> {
-    return this.callAndPersist(`${environment.apiUrl}/auth/login`, { email, password }, 'Invalid email or password.');
+  login(email: string, password: string, rememberMe: boolean, turnstileToken?: string): Observable<AuthOutcome> {
+    return this.callAndPersist(
+      `${environment.apiUrl}/auth/login`,
+      { email, password, rememberMe, turnstileToken },
+      'Invalid email or password.',
+    );
   }
 
   /** allowCreate is always false here — admin/staff accounts must already exist (created via Manage User), SSO only logs in, never auto-creates one. */

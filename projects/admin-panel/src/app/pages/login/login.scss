@@ -4,9 +4,18 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 28px;
   padding: 24px;
   background: var(--w-bg);
+}
+
+.login-input {
+  background: var(--w-bg);
+  border: 1px solid var(--w-border-strong);
+}
+
+app-sso-buttons {
+  width: 100%;
+  max-width: 380px;
 }
 
 .login-brand {
@@ -15,6 +24,7 @@
   align-items: center;
   text-align: center;
   gap: 6px;
+  margin-bottom: 30px;
 }
 
 .brand-mark {
@@ -57,7 +67,12 @@
 .login-card {
   width: 100%;
   max-width: 380px;
-  padding: 32px;
+  background: var(--w-bg-alt);
+  border: 1px solid var(--w-border-strong);
+  border-radius: 14px;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
 }
 
 .login-title {
@@ -85,11 +100,11 @@
   display: block;
   font: 600 12px var(--w-font-sans);
   color: var(--w-ink-soft);
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .form-input {
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
 .password-wrap {
@@ -98,6 +113,32 @@
   .form-input {
     padding-right: 56px;
   }
+}
+
+.remember-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: -10px;
+  margin-bottom: 20px;
+}
+
+.remember-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font: 500 12.5px var(--w-font-sans);
+  color: var(--w-muted);
+  cursor: pointer;
+
+  input {
+    accent-color: var(--w-accent);
+  }
+}
+
+.forgot-link {
+  font: 500 12.5px var(--w-font-sans);
+  color: var(--w-accent);
 }
 
 .password-toggle {
@@ -115,7 +156,6 @@
 
 .login-submit {
   width: 100%;
-  margin-top: 4px;
   text-align: center;
 
   &:disabled {

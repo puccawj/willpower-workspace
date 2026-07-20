@@ -5,4 +5,5 @@ export const environment = {
   // Leave blank to hide the corresponding "Continue with..." button.
   googleClientId: '',
   facebookAppId: '',
+  turnstileSiteKey: '',
 };
