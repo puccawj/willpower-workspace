@@ -1,7 +1,7 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { PublicEventApiService } from '../../core/services/public-event-api.service';
-import { PublicCourseApiService } from '../../core/services/public-course-api.service';
+import { PublicCourseApiService, PublicCourseOfferingCard } from '../../core/services/public-course-api.service';
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
@@ -23,10 +23,11 @@ export class Home {
       .filter((ev) => ev.when === 'upcoming' || ev.when === 'live')
       .slice(0, 3),
   );
-  readonly homeCourses = computed(() => this.coursesApi.courses().slice(0, 3));
+  readonly homeOfferings = computed(() => this.offerings().slice(0, 3));
+  private readonly offerings = signal<PublicCourseOfferingCard[]>([]);
 
   constructor() {
     this.eventsApi.load().subscribe();
-    this.coursesApi.load().subscribe();
+    this.coursesApi.loadAllOfferings().subscribe((rows) => this.offerings.set(rows));
   }
 }

@@ -4,16 +4,20 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { map, tap, throwError } from 'rxjs';
 import { ApiCourse, CourseApiService } from '../../../core/services/course-api.service';
 import { ApiCourseNeed, ApiCourseNeedType, CourseNeedApiService } from '../../../core/services/course-need-api.service';
+import { ApiOffering, OfferingApiService } from '../../../core/services/offering-api.service';
 import { CrudModalService } from '../../../core/services/crud-modal.service';
 import { ToastService } from '../../../core/services/toast.service';
 
 const WHOLE_COURSE = 'Whole course';
+const ANY_OFFERING = 'Any offering (whole course)';
 
 interface NeedRow {
   id: string;
   title: string;
   sessionNumber: number | null;
   sessionLabel: string;
+  offeringId: string | null;
+  offeringLabel: string;
   type: ApiCourseNeedType;
   unit: string | null;
   target: number;
@@ -22,7 +26,7 @@ interface NeedRow {
   progressLabel: string;
 }
 
-function toRow(n: ApiCourseNeed): NeedRow {
+function toRow(n: ApiCourseNeed, offeringLabelById: Map<string, string>): NeedRow {
   const target = Number(n.targetQuantity);
   const received = Number(n.receivedQuantity);
   const pct = target > 0 ? Math.min(100, Math.round((received / target) * 100)) : 0;
@@ -32,6 +36,8 @@ function toRow(n: ApiCourseNeed): NeedRow {
     title: n.title,
     sessionNumber: n.sessionNumber,
     sessionLabel: n.sessionNumber ? `Session ${n.sessionNumber}` : WHOLE_COURSE,
+    offeringId: n.offeringId,
+    offeringLabel: n.offeringId ? offeringLabelById.get(n.offeringId) ?? 'Offering' : ANY_OFFERING,
     type: n.type,
     unit: n.unit,
     target,
@@ -50,6 +56,7 @@ function toRow(n: ApiCourseNeed): NeedRow {
 export class CourseNeeds {
   private readonly courseApi = inject(CourseApiService);
   private readonly needApi = inject(CourseNeedApiService);
+  private readonly offeringApi = inject(OfferingApiService);
   private readonly modal = inject(CrudModalService);
   private readonly toast = inject(ToastService);
   private readonly route = inject(ActivatedRoute);
@@ -63,18 +70,35 @@ export class CourseNeeds {
   });
 
   readonly course = signal<ApiCourse | null>(null);
-  readonly rows = computed<NeedRow[]>(() => this.needApi.needs().map(toRow));
+
+  private readonly courseOfferings = computed<ApiOffering[]>(() =>
+    this.offeringApi.offerings().filter((o) => o.courseId === this.courseId()),
+  );
+
+  private readonly offeringLabel = (o: ApiOffering): string => `${o.branchName} · ${o.mode} · ${o.startDate}`;
+
+  private readonly offeringLabelById = computed(() => new Map(this.courseOfferings().map((o) => [o.id, this.offeringLabel(o)])));
+
+  readonly rows = computed<NeedRow[]>(() => this.needApi.needs().map((n) => toRow(n, this.offeringLabelById())));
 
   private readonly sessionOptions = computed(() => {
     const total = this.course()?.totalSessions ?? 0;
     return [WHOLE_COURSE, ...Array.from({ length: total }, (_, i) => `Session ${i + 1}`)];
   });
 
+  private readonly offeringOptions = computed(() => [ANY_OFFERING, ...this.courseOfferings().map((o) => this.offeringLabel(o))]);
+
   private parseSessionNumber(value: string | number): number | undefined {
     const label = String(value ?? '').trim();
     if (!label || label === WHOLE_COURSE) return undefined;
     const match = /^Session (\d+)$/.exec(label);
     return match ? Number(match[1]) : undefined;
+  }
+
+  private parseOfferingId(value: string): string | undefined {
+    const label = String(value ?? '').trim();
+    if (!label || label === ANY_OFFERING) return undefined;
+    return this.courseOfferings().find((o) => this.offeringLabel(o) === label)?.id;
   }
 
   constructor() {
@@ -85,6 +109,7 @@ export class CourseNeeds {
         error: (err) => this.showError(err, 'Failed to load course.'),
       });
       this.needApi.load(id).subscribe();
+      this.offeringApi.load().subscribe();
     }
   }
 
@@ -103,13 +128,14 @@ export class CourseNeeds {
       title: 'Add Need',
       fields: [
         { key: 'title', label: 'Title', type: 'text' },
+        { key: 'offering', label: 'Offering', type: 'select', options: this.offeringOptions() },
         { key: 'session', label: 'Session', type: 'select', options: this.sessionOptions() },
         { key: 'type', label: 'Type', type: 'select', options: ['Goods', 'Money'] },
         { key: 'unit', label: 'Unit (e.g. bags, pieces) — goods only', type: 'text' },
         { key: 'targetQuantity', label: 'Target quantity', type: 'number', min: 0 },
       ],
       isEdit: false,
-      values: { title: '', session: WHOLE_COURSE, type: 'Goods', unit: '', targetQuantity: 1 },
+      values: { title: '', offering: ANY_OFFERING, session: WHOLE_COURSE, type: 'Goods', unit: '', targetQuantity: 1 },
       onSave: (values) => {
         const type: ApiCourseNeedType = String(values['type']).toLowerCase() === 'money' ? 'money' : 'goods';
         const title = String(values['title'] ?? '').trim();
@@ -126,6 +152,7 @@ export class CourseNeeds {
           .create(courseId, {
             title,
             sessionNumber: this.parseSessionNumber(values['session']),
+            offeringId: this.parseOfferingId(String(values['offering'])),
             type,
             unit: type === 'goods' ? String(values['unit'] ?? '').trim() || undefined : undefined,
             targetQuantity,
@@ -141,6 +168,7 @@ export class CourseNeeds {
       title: 'Edit Need',
       fields: [
         { key: 'title', label: 'Title', type: 'text' },
+        { key: 'offering', label: 'Offering', type: 'select', options: this.offeringOptions() },
         { key: 'session', label: 'Session', type: 'select', options: this.sessionOptions() },
         { key: 'type', label: 'Type', type: 'select', options: ['Goods', 'Money'] },
         { key: 'unit', label: 'Unit (e.g. bags, pieces) — goods only', type: 'text' },
@@ -149,6 +177,7 @@ export class CourseNeeds {
       isEdit: true,
       values: {
         title: row.title,
+        offering: row.offeringLabel,
         session: row.sessionLabel,
         type: row.type === 'money' ? 'Money' : 'Goods',
         unit: row.unit ?? '',
@@ -170,6 +199,7 @@ export class CourseNeeds {
           .update(courseId, row.id, {
             title,
             sessionNumber: this.parseSessionNumber(values['session']),
+            offeringId: this.parseOfferingId(String(values['offering'])),
             type,
             unit: type === 'goods' ? String(values['unit'] ?? '').trim() || undefined : undefined,
             targetQuantity,

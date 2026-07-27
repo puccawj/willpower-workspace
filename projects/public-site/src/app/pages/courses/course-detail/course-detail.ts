@@ -11,6 +11,8 @@ import {
   PublicCoursePhoto,
   PublicDonationRow,
   PublicOffering,
+  formatSchedule,
+  shortDate,
 } from '../../../core/services/public-course-api.service';
 import { DonateType } from '../../../core/models/willpower.models';
 import { AuthService } from '../../../core/services/auth.service';
@@ -19,8 +21,6 @@ import { ImageViewerService } from '../../../core/services/image-viewer.service'
 import { MeApiService } from '../../../core/services/me-api.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { UploadApiService } from '../../../core/services/upload-api.service';
-
-const GENERAL = 'general';
 
 @Component({
   selector: 'app-course-detail',
@@ -46,6 +46,12 @@ export class CourseDetail {
     initialValue: '',
   });
 
+  /** Which offering the visitor arrived to view (via Home/Courses list) — null shows every offering. */
+  private readonly offeringIdParam = toSignal(
+    this.route.queryParamMap.pipe(map((params) => params.get('offering'))),
+    { initialValue: null as string | null },
+  );
+
   readonly course = signal<PublicCourseDetail | null>(null);
   readonly loading = signal(true);
   readonly error = signal('');
@@ -58,8 +64,25 @@ export class CourseDetail {
   readonly enrollingOfferingId = signal<string | null>(null);
   readonly enrolledOfferingIds = signal<Set<string>>(new Set());
   readonly enrollError = signal('');
+  readonly expandedOfferingId = signal<string | null>(null);
 
+  readonly formatSchedule = formatSchedule;
+  readonly shortDate = shortDate;
+
+  /** Only the offering the visitor arrived to view, if any — otherwise every open offering. */
+  readonly visibleOfferings = computed(() => {
+    const target = this.offeringIdParam();
+    if (!target) return this.offerings();
+    const match = this.offerings().filter((o) => o.id === target);
+    return match.length ? match : this.offerings();
+  });
+
+  /** Fallback branch for whole-course (no specific offering) needs/general donations. */
   private readonly donationBranchId = computed(() => this.offerings()[0]?.branchId ?? null);
+
+  toggleOfferingDetails(offeringId: string): void {
+    this.expandedOfferingId.set(this.expandedOfferingId() === offeringId ? null : offeringId);
+  }
 
   enrollIn(offeringId: string): void {
     if (!this.auth.isLoggedIn()) {
@@ -80,25 +103,25 @@ export class CourseDetail {
     });
   }
 
-  // ---- Donation wishlist (needs) ----
+  // ---- Donation wishlist (needs), scoped per offering + whole course ----
 
   readonly needs = signal<PublicCourseNeed[]>([]);
   readonly needsLoading = signal(false);
 
-  readonly needGroups = computed<{ label: string; items: PublicCourseNeed[] }[]>(() => {
-    const groups = new Map<number | null, PublicCourseNeed[]>();
+  readonly needsByOffering = computed(() => {
+    const map = new Map<string, PublicCourseNeed[]>();
     for (const n of this.needs()) {
-      const list = groups.get(n.sessionNumber) ?? [];
+      if (!n.offeringId) continue;
+      const list = map.get(n.offeringId) ?? [];
       list.push(n);
-      groups.set(n.sessionNumber, list);
+      map.set(n.offeringId, list);
     }
-    const keys = [...groups.keys()].sort((a, b) => {
-      if (a === null) return 1;
-      if (b === null) return -1;
-      return a - b;
-    });
-    return keys.map((k) => ({ label: k === null ? 'Whole course' : `Session ${k}`, items: groups.get(k)! }));
+    return map;
   });
+
+  needsForOffering(offeringId: string): PublicCourseNeed[] {
+    return this.needsByOffering().get(offeringId) ?? [];
+  }
 
   readonly needProgress = (need: PublicCourseNeed) => {
     const target = Number(need.targetQuantity);
@@ -110,6 +133,10 @@ export class CourseDetail {
 
   readonly donations = signal<PublicDonationRow[]>([]);
   readonly donationsLoading = signal(false);
+
+  donationsForOffering(offeringId: string): PublicDonationRow[] {
+    return this.donations().filter((d) => d.offeringId === offeringId);
+  }
 
   // ---- Atmosphere photos ----
 
@@ -125,8 +152,6 @@ export class CourseDetail {
     return `$${n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
   };
 
-  readonly activeTab = signal<'give' | 'donors'>('give');
-
   readonly donateOptions: { key: DonateType; label: string }[] = [
     { key: 'money', label: 'Funds' },
     { key: 'goods', label: 'Goods' },
@@ -134,12 +159,29 @@ export class CourseDetail {
 
   readonly donateType = signal<DonateType>('money');
 
-  /** null = no donate form open; 'general' = untargeted donation; otherwise a CourseNeed id. */
+  /** null = no donate form open; 'general:<offeringId>' = untargeted donation to that offering; otherwise a CourseNeed id. */
   readonly activeTarget = signal<string | null>(null);
   readonly activeNeed = computed(() => {
     const t = this.activeTarget();
-    return t && t !== GENERAL ? this.needs().find((n) => n.id === t) ?? null : null;
+    return t && !t.startsWith('general:') ? this.needs().find((n) => n.id === t) ?? null : null;
   });
+
+  /** The offering a general-donation target refers to. */
+  private readonly generalTargetOffering = computed<PublicOffering | null>(() => {
+    const t = this.activeTarget();
+    if (!t?.startsWith('general:')) return null;
+    const offeringId = t.slice('general:'.length);
+    return this.offerings().find((o) => o.id === offeringId) ?? null;
+  });
+
+  /** The offering backing the currently active target, whether via a need or a general donation. */
+  readonly activeOffering = computed<PublicOffering | null>(() => {
+    const need = this.activeNeed();
+    if (need) return need.offeringId ? this.offerings().find((o) => o.id === need.offeringId) ?? null : null;
+    return this.generalTargetOffering();
+  });
+
+  private readonly targetBranchId = computed<string | null>(() => this.activeOffering()?.branchId ?? this.donationBranchId());
 
   readonly donateAmount = signal('');
   readonly donatePhone = signal('');
@@ -186,10 +228,10 @@ export class CourseDetail {
       this.offerings.set([]);
       this.enrolledOfferingIds.set(new Set());
       this.enrollError.set('');
+      this.expandedOfferingId.set(null);
       this.needs.set([]);
       this.donations.set([]);
       this.photos.set([]);
-      this.activeTab.set('give');
       this.activeTarget.set(null);
       this.donateThanks.set(false);
       this.donateAmount.set('');
@@ -213,11 +255,19 @@ export class CourseDetail {
         },
       });
 
+      const targetOfferingId = this.route.snapshot.queryParamMap.get('offering');
+      if (targetOfferingId) this.expandedOfferingId.set(targetOfferingId);
+
       this.offeringsLoading.set(true);
       this.api.loadOfferings(id).subscribe({
         next: (rows) => {
           this.offerings.set(rows);
           this.offeringsLoading.set(false);
+          if (targetOfferingId) {
+            setTimeout(() => {
+              document.getElementById('offering-' + targetOfferingId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+          }
         },
         error: () => {
           this.offeringsError.set('Could not load available class times.');
@@ -260,10 +310,6 @@ export class CourseDetail {
     });
   }
 
-  setActiveTab(tab: 'give' | 'donors'): void {
-    this.activeTab.set(tab);
-  }
-
   setDonateType(type: DonateType): void {
     this.donateType.set(type);
   }
@@ -292,7 +338,7 @@ export class CourseDetail {
 
     const course = this.course();
     const user = this.auth.currentUser();
-    const branchId = this.donationBranchId();
+    const branchId = this.targetBranchId();
     if (!course || !user) return;
 
     this.donateError.set('');
@@ -321,7 +367,8 @@ export class CourseDetail {
 
     const need = this.activeNeed();
     const type = this.effectiveDonateType();
-    const target = need ? need.title : isGeneralGoods ? itemName : 'this course';
+    const offering = this.activeOffering();
+    const target = need ? need.title : isGeneralGoods ? itemName : offering ? `this course (${offering.branchName})` : 'this course';
     const unit = need?.unit ?? (isGeneralGoods ? this.donateUnit() : '');
     const amountLabel = type === 'money' ? this.formatMoney(amountText) : `${amountText}${unit ? ' ' + unit : ''}`;
 
@@ -351,6 +398,7 @@ export class CourseDetail {
             branchId,
             courseId: course.id,
             courseNeedId: need?.id,
+            offeringId: offering?.id,
             quantity: type === 'goods' ? Number(amountText) : undefined,
             proofImage,
           }),
@@ -362,6 +410,8 @@ export class CourseDetail {
           this.activeTarget.set(null);
           this.donateSubmitting.set(false);
           this.toast.show('Thank you! Your donation has been submitted for approval.', 'success');
+          this.api.loadNeeds(course.id).subscribe((rows) => this.needs.set(rows));
+          if (this.auth.isLoggedIn()) this.refreshDonations(course.id);
         },
         error: (err) => {
           const message = err?.error?.message ?? 'Could not process your donation right now.';

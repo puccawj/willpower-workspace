@@ -23,7 +23,7 @@
         <div class="need-row-head">
           <div>
             <div class="need-title">{{ row.title }}</div>
-            <div class="muted-label">{{ row.sessionLabel }} · {{ row.type === 'money' ? 'Funds' : 'Goods' }}</div>
+            <div class="muted-label">{{ row.offeringLabel }} · {{ row.sessionLabel }} · {{ row.type === 'money' ? 'Funds' : 'Goods' }}</div>
           </div>
           <div class="action-group">
             <button type="button" class="icon-btn" (click)="editNeed(row)" title="Edit">✎</button>

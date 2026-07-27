@@ -21,6 +21,7 @@
 }
 
 .course-img {
+  position: relative;
   height: 150px;
   overflow: hidden;
 
@@ -29,6 +30,33 @@
     height: 100%;
     object-fit: cover;
   }
+}
+
+.img-ribbon-corner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 108px;
+  height: 108px;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.img-ribbon {
+  position: absolute;
+  top: 20px;
+  left: -30px;
+  width: 140px;
+  transform: rotate(-45deg);
+  background: var(--w-accent);
+  color: #fff;
+  text-align: center;
+  font: 700 10px/1.4 var(--w-font-sans);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 5px 0;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
 }
 
 .course-body {

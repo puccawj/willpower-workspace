@@ -55,14 +55,19 @@
     <h2 class="section-title">Courses &amp; programs</h2>
     <p class="section-lead">Structured paths of study, from introductory practice to certified completion.</p>
     <div class="grid-3 g3 text-left">
-      @for (c of homeCourses(); track c.id) {
-        <div class="course-card">
-          <div class="eyebrow small">{{ c.level }}</div>
-          <h3 class="course-title">{{ c.title }}</h3>
-          <p class="course-desc">{{ c.desc }}</p>
+      @for (o of homeOfferings(); track o.offeringId) {
+        <div class="course-card ribbon-card">
+          <div class="card-ribbon-corner">
+            <div class="card-ribbon">{{ o.branchName }}<br />{{ o.shortStartDate }}</div>
+          </div>
+          <div class="card-ribbon-clear">
+            <div class="eyebrow small">{{ o.level }}</div>
+            <h3 class="course-title">{{ o.title }}</h3>
+          </div>
+          <p class="course-desc">{{ o.format }} · {{ o.shortStartDate }}</p>
           <div class="course-foot">
-            <span class="muted-label">{{ c.sessions }} sessions · {{ c.format }}</span>
-            <a routerLink="/courses" class="link-cta">Enroll →</a>
+            <span class="muted-label">{{ o.open }}</span>
+            <a [routerLink]="['/courses', o.courseId]" [queryParams]="{ offering: o.offeringId }" class="link-cta">Enroll →</a>
           </div>
         </div>
       } @empty {

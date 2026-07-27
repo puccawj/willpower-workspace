@@ -15,6 +15,7 @@ export interface ApiDonation {
   eventTitle: string | null;
   courseTitle: string | null;
   sessionNumber: number | null;
+  offeringLabel: string | null;
   donorName: string;
   isAnonymous: boolean;
   donorPhoneCountryCode: string | null;

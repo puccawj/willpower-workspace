@@ -38,6 +38,12 @@ export interface PublicCourseDetail extends PublicCourse {
   syllabusTopics: string[];
 }
 
+export interface PublicOfferingScheduleSlot {
+  dow: number;
+  startTime: string;
+  endTime: string;
+}
+
 export interface PublicOffering {
   id: string;
   branchId: string;
@@ -47,11 +53,45 @@ export interface PublicOffering {
   startDate: string;
   endDate: string;
   spotsLeft: number | null;
+  scheduleSummary: PublicOfferingScheduleSlot[];
+}
+
+interface ApiPublicCourseOfferingCard {
+  courseId: string;
+  offeringId: string;
+  title: string;
+  category: string | null;
+  imageUrl: string | null;
+  branchId: string;
+  branchName: string;
+  mode: 'online' | 'onsite';
+  startDate: string;
+  endDate: string;
+  spotsLeft: number | null;
+  scheduleSummary: PublicOfferingScheduleSlot[];
+}
+
+export interface PublicCourseOfferingCard {
+  courseId: string;
+  offeringId: string;
+  title: string;
+  level: string;
+  img: string;
+  branchName: string;
+  mode: 'online' | 'onsite';
+  format: string;
+  startDate: string;
+  endDate: string;
+  shortStartDate: string;
+  spotsLeft: number | null;
+  open: string;
+  scheduleSummary: PublicOfferingScheduleSlot[];
 }
 
 export interface PublicCourseNeed {
   id: string;
   sessionNumber: number | null;
+  offeringId: string | null;
   title: string;
   type: 'money' | 'goods';
   unit: string | null;
@@ -67,6 +107,8 @@ export interface PublicDonationRow {
   itemDescription: string | null;
   quantity: string | null;
   needTitle: string | null;
+  offeringId: string | null;
+  offeringLabel: string | null;
   createdAt: string;
 }
 
@@ -82,6 +124,38 @@ const FALLBACK_IMAGES = [
   'https://images.unsplash.com/photo-1505191419261-8ccbb5ac8f93?q=80&w=1200&auto=format&fit=crop',
   'https://images.unsplash.com/photo-1566499175117-c78fabf20b7d?q=80&w=1200&auto=format&fit=crop',
 ];
+
+const DOW_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+function formatTime(t: string): string {
+  const [h, m] = t.split(':').map(Number);
+  const d = new Date();
+  d.setHours(h, m, 0, 0);
+  return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+}
+
+export function formatSchedule(slots: PublicOfferingScheduleSlot[]): string {
+  if (!slots?.length) return '';
+  const groups = new Map<string, number[]>();
+  for (const s of slots) {
+    const key = `${s.startTime}|${s.endTime}`;
+    const list = groups.get(key) ?? [];
+    list.push(s.dow);
+    groups.set(key, list);
+  }
+  const parts: string[] = [];
+  for (const [key, dows] of groups) {
+    const [start, end] = key.split('|');
+    const dayLabel = [...dows].sort((a, b) => a - b).map((d) => DOW_NAMES[d]).join(' & ');
+    parts.push(`${dayLabel}, ${formatTime(start)} – ${formatTime(end)}`);
+  }
+  return parts.join('; ');
+}
+
+export function shortDate(dateStr: string): string {
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
 
 function formatLabel(modes: ('online' | 'onsite')[]): string {
   const has = new Set(modes);
@@ -105,6 +179,25 @@ function toPublicCourse(row: ApiPublicCourseRow, index: number): PublicCourse {
     pass: `${Number.isInteger(pass) ? pass : pass.toFixed(1)}%`,
     open: row.isOpenForEnrollment ? 'Open for enrollment' : 'New sessions coming soon',
     isOpenForEnrollment: row.isOpenForEnrollment,
+  };
+}
+
+function toPublicCourseOfferingCard(row: ApiPublicCourseOfferingCard, index: number): PublicCourseOfferingCard {
+  return {
+    courseId: row.courseId,
+    offeringId: row.offeringId,
+    title: row.title,
+    level: row.category ?? 'Course',
+    img: row.imageUrl ?? FALLBACK_IMAGES[index % FALLBACK_IMAGES.length],
+    branchName: row.branchName,
+    mode: row.mode,
+    format: row.mode === 'online' ? 'Online' : 'Onsite',
+    startDate: row.startDate,
+    endDate: row.endDate,
+    shortStartDate: shortDate(row.startDate),
+    spotsLeft: row.spotsLeft,
+    open: row.spotsLeft === null || row.spotsLeft > 0 ? 'Open for enrollment' : 'Full',
+    scheduleSummary: row.scheduleSummary,
   };
 }
 
@@ -148,6 +241,12 @@ export class PublicCourseApiService {
     return this.http
       .get<ApiPublicCourseDetailRow>(`${environment.apiUrl}/public/courses/${id}`)
       .pipe(map(toPublicCourseDetail));
+  }
+
+  loadAllOfferings(): Observable<PublicCourseOfferingCard[]> {
+    return this.http
+      .get<ApiPublicCourseOfferingCard[]>(`${environment.apiUrl}/public/courses/offerings`)
+      .pipe(map((rows) => rows.map(toPublicCourseOfferingCard)));
   }
 
   loadOfferings(courseId: string): Observable<PublicOffering[]> {

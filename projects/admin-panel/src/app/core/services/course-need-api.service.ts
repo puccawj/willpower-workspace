@@ -9,6 +9,7 @@ export interface ApiCourseNeed {
   id: string;
   courseId: string;
   sessionNumber: number | null;
+  offeringId: string | null;
   title: string;
   type: ApiCourseNeedType;
   unit: string | null;
@@ -19,6 +20,7 @@ export interface ApiCourseNeed {
 export interface CourseNeedPayload {
   title: string;
   sessionNumber?: number;
+  offeringId?: string;
   type: ApiCourseNeedType;
   unit?: string;
   targetQuantity: number;

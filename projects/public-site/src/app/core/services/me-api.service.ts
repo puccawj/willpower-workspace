@@ -71,6 +71,7 @@ export interface DonateRequest {
   needId?: string;
   courseId?: string;
   courseNeedId?: string;
+  offeringId?: string;
   quantity?: number;
   proofImage?: string;
 }

@@ -46,6 +46,7 @@ interface DonationRow {
   courseId: string | null;
   courseTitle: string;
   sessionNumber: number | null;
+  offeringLabel: string | null;
   targetType: TargetType;
   targetTypeLabel: string;
   targetLabel: string;
@@ -90,7 +91,7 @@ function toRow(d: ApiDonation): DonationRow {
     targetType === 'event'
       ? d.eventTitle ?? NO_EVENT
       : targetType === 'course'
-        ? `${d.courseTitle ?? NO_EVENT}${d.sessionNumber ? ` · Session ${d.sessionNumber}` : ''}`
+        ? `${d.courseTitle ?? NO_EVENT}${d.offeringLabel ? ` · ${d.offeringLabel}` : ''}${d.sessionNumber ? ` · Session ${d.sessionNumber}` : ''}`
         : NO_EVENT;
   return {
     id: d.id,
@@ -110,6 +111,7 @@ function toRow(d: ApiDonation): DonationRow {
     courseId: d.courseId,
     courseTitle: d.courseTitle ?? NO_EVENT,
     sessionNumber: d.sessionNumber,
+    offeringLabel: d.offeringLabel,
     targetType,
     targetTypeLabel,
     targetLabel,
