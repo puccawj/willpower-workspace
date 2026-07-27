@@ -1,0 +1,29 @@
+<div class="scan-page" [class.native]="isNative">
+  <div class="scan-header">
+    <span class="back-icon" (click)="goBack()">‹</span>
+    <span class="scan-title">Scan to check in</span>
+    <span class="spacer"></span>
+  </div>
+
+  <div class="scan-frame-wrap">
+    @if (!isNative) {
+      <app-qr-camera class="camera-bg" [enabled]="true" (detected)="onWebDetected($event)"></app-qr-camera>
+    }
+    <div class="scan-frame">
+      <div class="corner tl"></div>
+      <div class="corner tr"></div>
+      <div class="corner bl"></div>
+      <div class="corner br"></div>
+    </div>
+  </div>
+
+  <div class="scan-footer">
+    @if (error()) {
+      <p class="scan-error">{{ error() }}</p>
+    } @else if (checking()) {
+      <p class="scan-hint">Checking you in…</p>
+    } @else {
+      <p class="scan-hint">Point your camera at the QR code posted at the venue entrance</p>
+    }
+  </div>
+</div>

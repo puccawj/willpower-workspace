@@ -1,0 +1,27 @@
+<div class="list-page">
+  <h1 class="page-title">Courses</h1>
+
+  @if (loading()) {
+    <p class="empty-note">Loading courses…</p>
+  } @else if (offerings().length === 0) {
+    <p class="empty-note">No courses to show right now.</p>
+  } @else {
+    <div class="course-col">
+      @for (o of offerings(); track o.offeringId) {
+        <a [routerLink]="['/courses', o.courseId]" [queryParams]="{ offering: o.offeringId }" class="course-card">
+          <div class="course-card-img">
+            <img [src]="o.img" alt="" />
+            <div class="img-ribbon-corner">
+              <div class="img-ribbon">{{ o.branchName }}<br />{{ o.shortStartDate }}</div>
+            </div>
+          </div>
+          <div class="course-card-body">
+            <div class="course-level">{{ o.branchName }} · {{ o.format }}</div>
+            <div class="course-title">{{ o.title }}</div>
+            <div class="course-open">{{ o.shortStartDate }} · {{ o.open }}</div>
+          </div>
+        </a>
+      }
+    </div>
+  }
+</div>

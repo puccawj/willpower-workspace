@@ -1,0 +1,117 @@
+:host {
+  display: block;
+}
+
+.login-wrap {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 36px 24px;
+  display: flex;
+  align-items: center;
+}
+
+.login-box {
+  width: 100%;
+}
+
+.login-head {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.login-mark {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 1.5px solid var(--w-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--w-gold);
+  font-size: 19px;
+  margin: 0 auto 16px;
+}
+
+.login-title {
+  font: 400 26px var(--w-font-serif);
+  margin: 0 0 6px;
+}
+
+.login-sub {
+  font: 400 13px/1.5 var(--w-font-sans);
+  color: var(--w-muted);
+  margin: 0;
+}
+
+.login-card {
+  background: var(--w-bg-alt);
+  border: 1px solid var(--w-border-strong);
+  border-radius: 14px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.name-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.login-label {
+  font: 600 11px var(--w-font-sans);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--w-muted-2);
+  display: block;
+  margin-bottom: 7px;
+}
+
+.login-input {
+  width: 100%;
+  font: 400 14px var(--w-font-sans);
+  padding: 13px 14px;
+  border-radius: 9px;
+  border: 1px solid var(--w-border-strong);
+  background: #fff;
+  margin-bottom: 16px;
+}
+
+.login-error {
+  font: 500 12.5px var(--w-font-sans);
+  color: var(--w-red);
+  background: rgba(156, 74, 58, 0.1);
+  border: 1px solid rgba(156, 74, 58, 0.25);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 16px;
+}
+
+.signin-btn {
+  width: 100%;
+  text-align: center;
+  font: 600 14px var(--w-font-sans);
+  color: #fff;
+  background: var(--w-accent);
+  border: none;
+  padding: 14px;
+  border-radius: 9px;
+  cursor: pointer;
+  margin-bottom: 16px;
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: default;
+  }
+}
+
+.signup-row {
+  text-align: center;
+  font: 400 13px var(--w-font-sans);
+  color: var(--w-muted);
+}
+
+.signup-link {
+  color: var(--w-accent);
+  font-weight: 600;
+}

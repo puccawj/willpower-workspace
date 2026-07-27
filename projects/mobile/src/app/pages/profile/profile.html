@@ -1,0 +1,42 @@
+<div class="profile-page">
+  <div class="profile-head">
+    <div class="avatar-lg">{{ auth.currentUser()?.initials }}</div>
+    <div class="name">{{ auth.currentUser()?.name }}</div>
+    <div class="email">{{ auth.currentUser()?.email }}</div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-value">{{ meApi.enrollments().length }}</div>
+      <div class="stat-label">Courses</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">{{ meApi.certificates().length }}</div>
+      <div class="stat-label">Certificates</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">{{ meApi.events().length }}</div>
+      <div class="stat-label">Events</div>
+    </div>
+  </div>
+
+  <div class="menu">
+    <a routerLink="/profile/courses" class="menu-row"><span>My courses</span><span class="chev">›</span></a>
+    <a routerLink="/profile/certificates" class="menu-row"><span>My certificates</span><span class="chev">›</span></a>
+    <a routerLink="/profile/rsvps" class="menu-row"><span>My RSVPs</span><span class="chev">›</span></a>
+    <a routerLink="/profile/donations" class="menu-row"><span>Donation history</span><span class="chev">›</span></a>
+  </div>
+
+  <div class="menu-group-title">About Willpower Institute</div>
+  <div class="menu">
+    <button type="button" class="menu-row" (click)="openAbout()"><span>About</span><span class="chev">›</span></button>
+    <button type="button" class="menu-row" (click)="openTeam()"><span>Team</span><span class="chev">›</span></button>
+    <div class="menu-row static">
+      <span>Branches</span>
+      <span class="menu-row-sub">United States · Canada · Australia</span>
+    </div>
+    <button type="button" class="menu-row" (click)="openPrivacyPolicy()"><span>Privacy Policy</span><span class="chev">›</span></button>
+  </div>
+
+  <button type="button" class="logout-btn" (click)="logout()">Log out</button>
+</div>

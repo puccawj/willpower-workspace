@@ -1,0 +1,14 @@
+<app-back-button /><h1 class="page-title">My courses</h1>
+
+@if (meApi.enrollments().length === 0) {
+  <p class="empty-note">You haven't enrolled in any courses yet.</p>
+} @else {
+  <div class="row-list">
+    @for (e of meApi.enrollments(); track e.offeringId) {
+      <a [routerLink]="['/attendance', e.offeringId]" class="row">
+        <div class="row-title">{{ e.courseTitle }}</div>
+        <div class="row-meta">{{ e.branchName }} · {{ e.attendancePercent }}% attendance</div>
+      </a>
+    }
+  </div>
+}

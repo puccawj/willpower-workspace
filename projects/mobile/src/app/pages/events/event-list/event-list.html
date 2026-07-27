@@ -1,0 +1,33 @@
+<div class="list-page">
+  <h1 class="page-title">Events</h1>
+
+  <div class="filter-row">
+    @for (f of filterOptions; track f.key) {
+      <button type="button" class="filter-btn" [class.active]="filter() === f.key" (click)="setFilter(f.key)">
+        {{ f.label }}
+      </button>
+    }
+  </div>
+
+  @if (api.loading()) {
+    <p class="empty-note">Loading events…</p>
+  } @else if (events().length === 0) {
+    <p class="empty-note">No events to show right now.</p>
+  } @else {
+    <div class="event-col">
+      @for (e of events(); track e.id) {
+        <a [routerLink]="['/events', e.id]" class="event-card">
+          <div class="event-card-img"><img [src]="e.img" alt="" /></div>
+          <div class="event-card-body">
+            <span class="branch-pill">{{ e.branch }}</span>
+            @if (e.when === 'live') {
+              <span class="live-pill">Live</span>
+            }
+            <div class="event-card-title">{{ e.title }}</div>
+            <div class="event-card-meta">{{ e.dateFull }} · {{ e.time }}</div>
+          </div>
+        </a>
+      }
+    </div>
+  }
+</div>

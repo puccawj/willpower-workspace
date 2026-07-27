@@ -1,0 +1,17 @@
+<app-back-button /><h1 class="page-title">My RSVPs</h1>
+
+@if (meApi.events().length === 0) {
+  <p class="empty-note">You haven't RSVP'd to any events yet.</p>
+} @else {
+  <div class="row-list">
+    @for (e of meApi.events(); track e.eventId) {
+      <div class="row">
+        <div class="row-top">
+          <div class="row-title">{{ e.title }}</div>
+          <span class="pill" [class]="e.rsvpStatus">{{ e.rsvpStatus }}</span>
+        </div>
+        <div class="row-meta">{{ formatDate(e.startAt) }} · {{ e.branchName }}</div>
+      </div>
+    }
+  </div>
+}

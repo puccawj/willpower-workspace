@@ -1,0 +1,233 @@
+@if (event(); as e) {
+  <div class="detail">
+    <div class="hero">
+      <app-back-button variant="overlay" />
+      <img [src]="e.img" alt="" />
+    </div>
+    <div class="body">
+      <span class="branch-pill">{{ e.branch }}</span>
+      <h1 class="title">{{ e.title }}</h1>
+
+      <div class="stats">
+        <div class="stat"><div class="stat-label">Date</div><div class="stat-value">{{ e.day }} {{ e.mon }}</div></div>
+        <div class="stat"><div class="stat-label">Time</div><div class="stat-value">{{ e.time }}</div></div>
+        <div class="stat"><div class="stat-label">Location</div><div class="stat-value">{{ e.location }}</div></div>
+      </div>
+
+      <p class="desc">{{ e.blurb }}</p>
+
+      <div class="rsvp-card">
+        <div class="seats-row">
+          <span class="seats-label">Seats reserved</span>
+          <span class="seats-value">{{ e.going }} / {{ e.capacity }}</span>
+        </div>
+        <div class="seats-bar"><div class="seats-fill" [style.width.%]="percentFull()"></div></div>
+
+        <div class="section-heading rsvp-heading">Will you attend?</div>
+        @if (rsvpClosed()) {
+          <p class="rsvp-closed-note">
+            {{ eventEnded() ? 'This event has already ended.' : 'RSVPs closed on ' + rsvpCutoffLabel() + '.' }}
+          </p>
+        } @else {
+          <div class="rsvp-list">
+            @for (r of rsvpOptions; track r.key) {
+              <button
+                type="button"
+                [class]="'rsvp-choice-btn rsvp-' + r.key"
+                [class.active]="rsvpStatus() === r.key"
+                [disabled]="rsvpSaving()"
+                (click)="setRsvp(r.key)"
+              >
+                {{ r.label }}
+              </button>
+            }
+          </div>
+        }
+        @if (rsvpError()) {
+          <div class="rsvp-error">{{ rsvpError() }}</div>
+        }
+        @if (rsvpStatus()) {
+          <div class="rsvp-msg">{{ rsvpMessage() }}</div>
+        }
+        @if (rsvpStatus() === 'confirm') {
+          @if (checkedIn()) {
+            <p class="checkin-qr-hint">You're checked in ✓</p>
+          } @else {
+            <a routerLink="/checkin/scan" class="checkin-qr-btn">Scan to check in</a>
+          }
+        }
+      </div>
+
+      @if (photos().length) {
+        <div class="photo-section">
+          <div class="section-heading">Atmosphere</div>
+          <div class="photo-scroll">
+            @for (photo of photos(); track photo.id) {
+              <div class="photo-item" (click)="openPhoto(photo)">
+                <img [src]="photo.imageUrl" [alt]="photo.caption ?? ''" />
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      @if (isLoggedIn()) {
+        <div class="donor-section">
+          <div class="section-heading">Donors</div>
+
+          <div class="donor-tabs">
+            <button type="button" class="donor-tab-btn" [class.active]="activeTab() === 'give'" (click)="setActiveTab('give')">
+              Give
+            </button>
+            <button type="button" class="donor-tab-btn" [class.active]="activeTab() === 'donors'" (click)="setActiveTab('donors')">
+              Donors
+              @if (donations().length) {
+                <span class="donor-tab-count">{{ donations().length }}</span>
+              }
+            </button>
+          </div>
+
+          @if (activeTab() === 'give') {
+            @if (donateThanks()) {
+              <div class="donate-thanks">
+                Thank you for your generosity. Your donation will appear in the Donors tab once an admin reviews and approves it.
+              </div>
+            }
+
+            @if (needs().length) {
+              <div class="need-list">
+                @for (n of needs(); track n.id) {
+                  <div class="need-card" [class.active]="activeTarget() === n.id">
+                    <div class="need-card-head">
+                      <div class="need-card-info">
+                        <span class="need-title">{{ n.title }}</span>
+                        <div class="need-bar"><div class="need-fill" [style.width.%]="needProgress(n).pct"></div></div>
+                        <span class="need-meta">{{ needProgress(n).label }}</span>
+                      </div>
+                      <button type="button" class="need-donate-btn" (click)="openDonate(n.id)">
+                        {{ activeTarget() === n.id ? 'Cancel' : 'Donate this' }}
+                      </button>
+                    </div>
+
+                    @if (activeTarget() === n.id) {
+                      <div class="donate-form">
+                        <input
+                          #needAmountInput
+                          class="donate-input"
+                          [placeholder]="donatePlaceholder()"
+                          [value]="donateAmount()"
+                          (input)="onDonateAmountInput(needAmountInput)"
+                          name="donateAmount"
+                          inputmode="decimal"
+                        />
+                        <input class="donate-input" placeholder="Phone number" [(ngModel)]="donatePhone" name="donatePhone" />
+                        <label class="donate-file-label">
+                          Payment slip (optional)
+                          <input type="file" accept="image/*,.pdf" #proofInput (change)="onProofFileSelected(proofInput)" />
+                        </label>
+                        @if (donateError()) {
+                          <p class="donate-error">{{ donateError() }}</p>
+                        }
+                        <button type="button" class="donate-submit-btn" [disabled]="donateSubmitting()" (click)="submitDonate()">
+                          {{ donateSubmitting() ? 'Submitting…' : 'Submit donation' }}
+                        </button>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            }
+
+            <div class="need-card general-need-card" [class.active]="activeTarget() === 'general'">
+              <div class="need-card-head">
+                <span class="need-title">General donation</span>
+                <button type="button" class="need-donate-btn" (click)="openDonate('general')">
+                  {{ activeTarget() === 'general' ? 'Cancel' : 'Donate' }}
+                </button>
+              </div>
+
+              @if (activeTarget() === 'general') {
+                <div class="donate-form">
+                  <div class="donate-type-row">
+                    @for (d of donateOptions; track d.key) {
+                      <button
+                        type="button"
+                        class="donate-type-btn"
+                        [class.active]="donateType() === d.key"
+                        (click)="setDonateType(d.key)"
+                      >
+                        {{ d.label }}
+                      </button>
+                    }
+                  </div>
+                  @if (isGeneralGoods()) {
+                    <input class="donate-input" placeholder="Item name (e.g. Rice)" [(ngModel)]="donateItemName" name="donateItemName" />
+                    <div class="donate-quantity-row">
+                      <input
+                        #generalQtyInput
+                        class="donate-input"
+                        placeholder="Quantity"
+                        [value]="donateAmount()"
+                        (input)="onDonateAmountInput(generalQtyInput)"
+                        name="donateAmountGeneral"
+                        inputmode="decimal"
+                      />
+                      <select class="donate-input" [(ngModel)]="donateUnit" name="donateUnitGeneral">
+                        @for (u of donateUnitOptions; track u) {
+                          <option [value]="u">{{ u }}</option>
+                        }
+                      </select>
+                    </div>
+                  } @else {
+                    <input
+                      #generalAmountInput
+                      class="donate-input"
+                      [placeholder]="donatePlaceholder()"
+                      [value]="donateAmount()"
+                      (input)="onDonateAmountInput(generalAmountInput)"
+                      name="donateAmountGeneral"
+                      inputmode="decimal"
+                    />
+                  }
+                  <input class="donate-input" placeholder="Phone number" [(ngModel)]="donatePhone" name="donatePhoneGeneral" />
+                  <label class="donate-file-label">
+                    Payment slip (optional)
+                    <input type="file" accept="image/*,.pdf" #proofInput2 (change)="onProofFileSelected(proofInput2)" />
+                  </label>
+                  @if (donateError()) {
+                    <p class="donate-error">{{ donateError() }}</p>
+                  }
+                  <button type="button" class="donate-submit-btn" [disabled]="donateSubmitting()" (click)="submitDonate()">
+                    {{ donateSubmitting() ? 'Submitting…' : 'Submit donation' }}
+                  </button>
+                </div>
+              }
+            </div>
+          } @else {
+            @if (donations().length) {
+              <div class="donor-list">
+                @for (d of donations(); track d.id) {
+                  <div class="donor-row">
+                    <div class="donor-top">
+                      <span class="donor-item">
+                        <span class="donor-type-badge">{{ d.type === 'money' ? 'Money' : 'Goods' }}</span>
+                        {{ d.type === 'money' ? formatMoney(d.amount) : ((d.quantity ?? '') + ' ' + (d.itemDescription ?? '')) }}
+                        @if (d.needTitle) {
+                          <span class="donor-need"> · {{ d.needTitle }}</span>
+                        }
+                      </span>
+                      <span class="donor-name">{{ d.donorName }}</span>
+                    </div>
+                    <span class="donor-date">{{ d.createdAt | date: 'mediumDate' }}</span>
+                  </div>
+                }
+              </div>
+            } @else {
+              <p class="donor-empty">No donors yet — be the first to give!</p>
+            }
+          }
+        </div>
+      }
+    </div>
+  </div>
+}

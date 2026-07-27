@@ -1,0 +1,16 @@
+@if (googleConfigured || facebookConfigured) {
+  <div class="sso-divider"><span>or continue with</span></div>
+
+  <div class="sso-row">
+    @if (googleConfigured) {
+      <button type="button" class="google-icon-btn" (click)="continueWithGoogle()" aria-label="Continue with Google" title="Continue with Google">
+        <span class="google-icon">G</span>
+      </button>
+    }
+    @if (facebookConfigured) {
+      <button type="button" class="fb-icon-btn" (click)="continueWithFacebook()" aria-label="Continue with Facebook" title="Continue with Facebook">
+        <span class="fb-icon">f</span>
+      </button>
+    }
+  </div>
+}

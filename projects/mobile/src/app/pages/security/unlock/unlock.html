@@ -1,0 +1,23 @@
+<div class="unlock-page">
+  <div class="mark">◈</div>
+  <div class="title">Confirm it's you</div>
+  <div class="subtitle">Use Face ID or your fingerprint to sign in to Willpower Institute</div>
+
+  <button type="button" class="bio-btn" (click)="tryBiometric()" aria-label="Use biometric unlock">◎</button>
+
+  <div class="pin-label">
+    @if (error()) {
+      <span class="error-text">{{ error() }}</span>
+    } @else {
+      or enter your passcode
+    }
+  </div>
+
+  <div class="dots">
+    @for (d of dots; track $index) {
+      <div class="dot" [class.filled]="$index < digits().length"></div>
+    }
+  </div>
+
+  <app-pin-pad (digit)="onDigit($event)" (backspace)="onBackspace()"></app-pin-pad>
+</div>

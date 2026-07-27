@@ -1,0 +1,27 @@
+.back-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--w-border);
+  background: #fff;
+  color: var(--w-ink);
+  font-size: 20px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-bottom: 12px;
+
+  &.overlay {
+    position: absolute;
+    top: max(16px, env(safe-area-inset-top));
+    left: 16px;
+    z-index: 2;
+    margin-bottom: 0;
+    background: rgba(36, 28, 21, 0.45);
+    border-color: transparent;
+    color: #fff;
+    backdrop-filter: blur(2px);
+  }
+}

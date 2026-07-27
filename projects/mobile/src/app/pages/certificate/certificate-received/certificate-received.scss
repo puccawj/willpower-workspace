@@ -1,0 +1,101 @@
+.cert-page {
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.empty-note {
+  padding: 24px 20px;
+  font: 400 13px var(--w-font-sans);
+  color: var(--w-muted);
+}
+
+.cert-head {
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.cert-congrats {
+  font: 400 22px var(--w-font-serif);
+}
+
+.cert-sub {
+  font: 400 12.5px var(--w-font-sans);
+  color: var(--w-muted);
+  margin-top: 4px;
+}
+
+.cert-preview {
+  aspect-ratio: 1.42 / 1;
+  background: linear-gradient(135deg, var(--w-gold-deep), #8a5a2e);
+  border-radius: 10px;
+  position: relative;
+  box-shadow: 0 20px 40px -20px rgba(36, 28, 21, 0.4);
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 20px;
+  color: #fff;
+}
+
+.cert-border {
+  position: absolute;
+  inset: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 4px;
+}
+
+.cert-label {
+  font: 400 9px var(--w-font-sans);
+  letter-spacing: 0.18em;
+  margin-bottom: 14px;
+}
+
+.cert-name {
+  font: 500 19px var(--w-font-serif);
+  font-style: italic;
+  margin-bottom: 10px;
+}
+
+.cert-course {
+  font: 400 11px var(--w-font-sans);
+  margin-bottom: 16px;
+}
+
+.cert-number {
+  font: 400 8px var(--w-font-sans);
+  position: absolute;
+  left: 20px;
+  bottom: 14px;
+}
+
+.download-btn {
+  width: 100%;
+  text-align: center;
+  font: 600 14px var(--w-font-sans);
+  color: #fff;
+  background: var(--w-accent);
+  border: none;
+  padding: 14px;
+  border-radius: 9px;
+  cursor: pointer;
+  margin-bottom: 10px;
+
+  &:disabled {
+    opacity: 0.7;
+  }
+}
+
+.share-btn {
+  width: 100%;
+  text-align: center;
+  font: 600 13px var(--w-font-sans);
+  color: var(--w-ink);
+  background: none;
+  border: none;
+  padding: 13px;
+  cursor: pointer;
+}

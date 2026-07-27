@@ -8,7 +8,7 @@ const path = require('node:path');
 
 const root = path.resolve(__dirname, '..');
 
-const PROJECTS = ['public-site', 'admin-panel'];
+const PROJECTS = ['public-site', 'admin-panel', 'mobile'];
 
 function readCurrent(filePath, key) {
   const src = fs.readFileSync(filePath, 'utf8');
@@ -24,11 +24,17 @@ for (const project of PROJECTS) {
   const facebookAppId = process.env.FACEBOOK_APP_ID || readCurrent(filePath, 'facebookAppId');
   const turnstileSiteKey = process.env.TURNSTILE_SITE_KEY || readCurrent(filePath, 'turnstileSiteKey');
 
+  // mobile-only: required by @capgo/capacitor-social-login's native Facebook SDK init.
+  const extraLines =
+    project === 'mobile'
+      ? `\n  facebookClientToken: '${process.env.FACEBOOK_CLIENT_TOKEN || readCurrent(filePath, 'facebookClientToken')}',`
+      : '';
+
   const contents = `export const environment = {
   production: true,
   apiUrl: '${apiUrl}',
   googleClientId: '${googleClientId}',
-  facebookAppId: '${facebookAppId}',
+  facebookAppId: '${facebookAppId}',${extraLines}
   turnstileSiteKey: '${turnstileSiteKey}',
 };
 `;

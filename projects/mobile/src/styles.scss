@@ -1,0 +1,61 @@
+@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Archivo:wght@400;500;600;700&display=swap');
+
+:root {
+  // Brand palette — cream / terracotta / gold (Willpower Institute)
+  --w-bg: #f4eddd;
+  --w-bg-alt: #f7f1e4;
+  --w-ink: #241c15;
+  --w-ink-soft: #5a5044;
+  --w-muted: #7a6f60;
+  --w-muted-2: #8a7d6a;
+  --w-accent: #a94b2c;
+  --w-gold: #b98a32;
+  --w-gold-deep: #c6a24a;
+  --w-dark: #241c15;
+  --w-dark-2: #1c150f;
+  --w-border: rgba(36, 28, 21, 0.12);
+  --w-border-strong: rgba(36, 28, 21, 0.28);
+  --w-green: #7c9068;
+  --w-red: #9c4a3a;
+
+  --w-font-serif: 'Newsreader', serif;
+  --w-font-sans: 'Archivo', system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--w-bg);
+  color: var(--w-ink);
+  font-family: var(--w-font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+// Native QR scan (@capacitor-mlkit/barcode-scanning): the camera preview renders behind
+// the WebView, so the page must go transparent for it to show through. The scan page's own
+// root re-asserts visibility so its corner-bracket overlay still renders on top.
+body.scanner-active {
+  visibility: hidden;
+  background: transparent;
+
+  app-qr-scan {
+    visibility: visible;
+  }
+}

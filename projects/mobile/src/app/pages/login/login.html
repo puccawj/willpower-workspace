@@ -1,0 +1,40 @@
+<div class="login-wrap">
+  <div class="login-box">
+    <div class="login-head">
+      <div class="login-mark">◈</div>
+      <h1 class="login-title">Welcome back</h1>
+      <p class="login-sub">Sign in to continue your practice</p>
+    </div>
+
+    <form class="login-card" (ngSubmit)="submit()">
+      <label class="login-label" for="email">Email</label>
+      <input id="email" class="login-input" placeholder="you@email.com" [ngModel]="email()" (ngModelChange)="email.set($event)" name="email" />
+
+      <label class="login-label" for="password">Password</label>
+      <div class="password-wrap">
+        <input id="password" [type]="showPassword() ? 'text' : 'password'" class="login-input" placeholder="••••••••" [ngModel]="password()" (ngModelChange)="password.set($event)" name="password" />
+        <button type="button" class="password-toggle" (click)="showPassword.set(!showPassword())">
+          {{ showPassword() ? 'Hide' : 'Show' }}
+        </button>
+      </div>
+
+      <div class="forgot-row">
+        <a href="#" class="forgot-link">Forgot password?</a>
+      </div>
+
+      <app-turnstile-widget (tokenChange)="onTurnstileToken($event)"></app-turnstile-widget>
+
+      @if (error()) {
+        <div class="login-error">{{ error() }}</div>
+      }
+
+      <button type="submit" class="signin-btn" [disabled]="loading()">
+        {{ loading() ? 'Signing in…' : 'Sign in' }}
+      </button>
+
+      <div class="signup-row">New here? <a routerLink="/register" class="signup-link">Create an account</a></div>
+    </form>
+
+    <app-sso-buttons mode="login" (success)="onSsoSuccess()" (failure)="onSsoFailure($event)"></app-sso-buttons>
+  </div>
+</div>

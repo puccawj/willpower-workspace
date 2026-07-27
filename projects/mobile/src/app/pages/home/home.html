@@ -1,0 +1,96 @@
+<div class="home">
+  <div class="home-head">
+    <div>
+      <div class="greeting">{{ greeting() }}</div>
+      <div class="name">{{ auth.currentUser()?.name }}</div>
+    </div>
+    <div class="head-actions">
+      <a routerLink="/checkin/scan" class="scan-btn" aria-label="Scan QR to check in" title="Scan QR to check in">▣</a>
+      <div class="avatar">{{ auth.currentUser()?.initials }}</div>
+    </div>
+  </div>
+
+  @if (nextUp(); as next) {
+    <a [routerLink]="['/events', next.eventId]" class="next-card">
+      <div class="next-ring"></div>
+      <div class="next-eyebrow">Next up</div>
+      <div class="next-title">{{ next.title }}</div>
+      <div class="next-meta">{{ formatNextUpMeta(next.startAt) }}</div>
+    </a>
+  }
+
+  <div class="section-head">
+    <div class="section-title">Upcoming events</div>
+    <div class="view-toggle">
+      <span class="toggle-btn" [class.active]="view() === 'list'" (click)="view.set('list')">☰</span>
+      <span class="toggle-btn" [class.active]="view() === 'card'" (click)="view.set('card')">▦</span>
+    </div>
+  </div>
+
+  @if (upcoming().length === 0) {
+    <p class="empty-note">No upcoming events right now — check back soon.</p>
+  } @else if (view() === 'list') {
+    <div class="event-list">
+      @for (e of upcoming(); track e.id) {
+        <a [routerLink]="['/events', e.id]" class="event-row">
+          <div class="event-date"><div class="event-day">{{ e.day }}</div><div class="event-mon">{{ e.mon }}</div></div>
+          <div class="event-info">
+            <div class="event-title">{{ e.title }}</div>
+            <div class="event-meta">{{ e.branch }} · {{ e.time }}</div>
+          </div>
+        </a>
+      }
+    </div>
+  } @else {
+    <div class="event-grid">
+      @for (e of upcoming(); track e.id) {
+        <a [routerLink]="['/events', e.id]" class="event-card">
+          <div class="event-card-img"><img [src]="e.img" alt="" /></div>
+          <div class="event-card-body">
+            <div class="event-card-date">{{ e.mon }} {{ e.day }}</div>
+            <div class="event-card-title">{{ e.title }}</div>
+          </div>
+        </a>
+      }
+    </div>
+  }
+
+  <div class="section-head courses-head">
+    <div class="section-title">Courses &amp; programs</div>
+    <a routerLink="/courses" class="view-all-link">View all →</a>
+  </div>
+
+  @if (offerings().length === 0) {
+    <p class="empty-note">New courses are being scheduled — check back soon.</p>
+  } @else if (view() === 'list') {
+    <div class="course-list">
+      @for (o of offerings(); track o.offeringId) {
+        <a [routerLink]="['/courses', o.courseId]" [queryParams]="{ offering: o.offeringId }" class="course-row">
+          <div class="course-row-info">
+            <div class="course-row-title">{{ o.title }}</div>
+            <div class="course-row-meta">{{ o.branchName }} · {{ o.format }} · {{ o.shortStartDate }}</div>
+          </div>
+          <div class="course-row-open">{{ o.open }}</div>
+        </a>
+      }
+    </div>
+  } @else {
+    <div class="course-scroll">
+      @for (o of offerings(); track o.offeringId) {
+        <a [routerLink]="['/courses', o.courseId]" [queryParams]="{ offering: o.offeringId }" class="course-card">
+          <div class="course-card-img">
+            <img [src]="o.img" alt="" />
+            <div class="img-ribbon-corner">
+              <div class="img-ribbon">{{ o.branchName }}<br />{{ o.shortStartDate }}</div>
+            </div>
+          </div>
+          <div class="course-card-body">
+            <div class="course-level">{{ o.branchName }} · {{ o.format }}</div>
+            <div class="course-title">{{ o.title }}</div>
+            <div class="course-open">{{ o.shortStartDate }} · {{ o.open }}</div>
+          </div>
+        </a>
+      }
+    </div>
+  }
+</div>

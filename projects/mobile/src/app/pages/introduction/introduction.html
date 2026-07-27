@@ -1,0 +1,18 @@
+<div class="intro">
+  <div class="intro-img"><img [src]="steps[stepIndex()].img" alt="" /></div>
+  <div class="intro-body">
+    <div class="eyebrow">Step {{ stepIndex() + 1 }} of {{ steps.length }}</div>
+    <h1 class="headline">{{ steps[stepIndex()].headline }}</h1>
+    <p class="body-text">{{ steps[stepIndex()].body }}</p>
+
+    <div class="dots">
+      @for (s of steps; track $index) {
+        <div class="dot" [class.active]="$index === stepIndex()"></div>
+      }
+    </div>
+
+    <button type="button" class="next-btn" (click)="next()">
+      {{ isLast() ? 'Get Started' : 'Next' }}
+    </button>
+  </div>
+</div>

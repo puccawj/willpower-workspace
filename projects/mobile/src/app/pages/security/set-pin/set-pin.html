@@ -1,0 +1,23 @@
+<div class="set-pin-page">
+  <div class="mark">◈</div>
+  <div class="title">{{ stage() === 'enter' ? 'Set a PIN' : 'Confirm your PIN' }}</div>
+  <div class="subtitle">
+    @if (error()) {
+      <span class="error-text">{{ error() }}</span>
+    } @else {
+      Used as a quick way back in on this device
+    }
+  </div>
+
+  <div class="dots">
+    @for (d of dots; track $index) {
+      <div class="dot" [class.filled]="$index < digits().length"></div>
+    }
+  </div>
+
+  <app-pin-pad (digit)="onDigit($event)" (backspace)="onBackspace()"></app-pin-pad>
+
+  @if (stage() === 'enter') {
+    <button type="button" class="skip-link" (click)="skip()">Skip for now</button>
+  }
+</div>

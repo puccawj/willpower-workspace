@@ -1,0 +1,18 @@
+:host {
+  display: block;
+}
+
+.qr-camera-video {
+  width: 100%;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  background: #000;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+.qr-camera-error {
+  font: 500 12.5px var(--w-font-sans);
+  color: var(--w-accent);
+  margin: 0 0 12px;
+}

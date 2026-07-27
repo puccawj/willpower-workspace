@@ -1,0 +1,25 @@
+.pad-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  width: 100%;
+  max-width: 260px;
+}
+
+.pad-key {
+  text-align: center;
+  font: 500 20px var(--w-font-serif);
+  color: #f4eddd;
+  background: none;
+  border: none;
+  padding: 12px 0;
+  cursor: pointer;
+
+  &.empty {
+    cursor: default;
+  }
+
+  &:disabled {
+    visibility: hidden;
+  }
+}

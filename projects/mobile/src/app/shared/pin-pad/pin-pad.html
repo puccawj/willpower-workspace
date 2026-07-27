@@ -1,0 +1,5 @@
+<div class="pad-grid">
+  @for (k of keys; track $index) {
+    <button type="button" class="pad-key" [class.empty]="!k" [disabled]="!k" (click)="press(k)">{{ k }}</button>
+  }
+</div>

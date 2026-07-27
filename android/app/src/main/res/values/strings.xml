@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Willpower Institute</string>
+    <string name="title_activity_main">Willpower Institute</string>
+    <string name="package_name">org.willpowerinstitute.app</string>
+    <string name="custom_url_scheme">org.willpowerinstitute.app</string>
+</resources>

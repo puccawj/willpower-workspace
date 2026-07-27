@@ -1,0 +1,35 @@
+<div class="tab-shell">
+  <div
+    class="tab-content"
+    #tabContent
+    (touchstart)="onTouchStart($event)"
+    (touchmove)="onTouchMove($event)"
+    (touchend)="onTouchEnd()"
+    (touchcancel)="onTouchEnd()"
+  >
+    <div class="pull-indicator" [style.height.px]="pullDistance()">
+      <span class="pull-spinner" [class.spinning]="refreshing()">↻</span>
+    </div>
+    <div class="pull-body" [class.dragging]="dragging()" [style.transform]="'translateY(' + pullDistance() + 'px)'">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+  <nav class="tab-bar">
+    <a routerLink="/home" routerLinkActive="active" class="tab-item">
+      <span class="tab-icon">⌂</span>
+      <span class="tab-label">Home</span>
+    </a>
+    <a routerLink="/events" routerLinkActive="active" class="tab-item">
+      <span class="tab-icon">▤</span>
+      <span class="tab-label">Events</span>
+    </a>
+    <a routerLink="/courses" routerLinkActive="active" class="tab-item">
+      <span class="tab-icon">▣</span>
+      <span class="tab-label">Courses</span>
+    </a>
+    <a routerLink="/profile" routerLinkActive="active" class="tab-item">
+      <span class="tab-icon">◐</span>
+      <span class="tab-label">Profile</span>
+    </a>
+  </nav>
+</div>

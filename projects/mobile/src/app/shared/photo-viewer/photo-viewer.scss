@@ -1,0 +1,30 @@
+.viewer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 15, 10, 0.9);
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.viewer-close {
+  position: absolute;
+  top: max(16px, env(safe-area-inset-top));
+  right: 16px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.viewer-image {
+  max-width: 92vw;
+  max-height: 85vh;
+  object-fit: contain;
+}

@@ -1,0 +1,24 @@
+@if (certificate(); as cert) {
+  <div class="cert-page">
+    <app-back-button />
+    <div class="cert-head">
+      <div class="cert-congrats">Congratulations 🎉</div>
+      <div class="cert-sub">You've earned your certificate</div>
+    </div>
+
+    <div class="cert-preview">
+      <div class="cert-border"></div>
+      <div class="cert-label">CERTIFICATE OF COMPLETION</div>
+      <div class="cert-name">{{ auth.currentUser()?.name }}</div>
+      <div class="cert-course">{{ cert.courseTitle }}</div>
+      <div class="cert-number">{{ cert.certificateNo }}</div>
+    </div>
+
+    <button type="button" class="download-btn" [disabled]="downloading()" (click)="downloadPdf()">
+      {{ downloading() ? 'Opening…' : 'Download PDF' }}
+    </button>
+    <button type="button" class="share-btn" (click)="share()">Share</button>
+  </div>
+} @else {
+  <p class="empty-note">Certificate not found.</p>
+}

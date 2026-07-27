@@ -1,0 +1,14 @@
+<app-back-button /><h1 class="page-title">My certificates</h1>
+
+@if (meApi.certificates().length === 0) {
+  <p class="empty-note">You haven't earned any certificates yet.</p>
+} @else {
+  <div class="row-list">
+    @for (c of meApi.certificates(); track c.id) {
+      <a [routerLink]="['/certificate', c.id]" class="row">
+        <div class="row-title">{{ c.courseTitle }}</div>
+        <div class="row-meta">{{ c.certificateNo }}</div>
+      </a>
+    }
+  </div>
+}

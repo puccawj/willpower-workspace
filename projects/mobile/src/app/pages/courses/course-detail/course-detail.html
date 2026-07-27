@@ -1,0 +1,271 @@
+@if (course(); as c) {
+  <div class="detail">
+    <div class="body">
+      <app-back-button />
+      <div class="level">{{ c.level }} · {{ c.format }}</div>
+      <h1 class="title">{{ c.title }}</h1>
+
+      <div class="hero"><img [src]="c.img" alt="" /></div>
+
+      <div class="stats">
+        <div class="stat"><div class="stat-value">{{ c.sessions }}</div><div class="stat-label">Sessions</div></div>
+        <div class="stat"><div class="stat-value">{{ c.pass }}</div><div class="stat-label">To pass</div></div>
+      </div>
+
+      <p class="desc">{{ c.desc }}</p>
+
+      <div class="offerings-section">
+        @if (myEnrollment(); as en) {
+          <div class="enrolled-banner">
+            <span>You're enrolled ✓</span>
+            <a [routerLink]="['/attendance', en.offeringId]" class="attendance-link">View my attendance</a>
+          </div>
+        }
+
+        <div class="section-heading offerings-heading">Class offerings</div>
+
+        @if (!isLoggedIn()) {
+          <p class="offerings-note">
+            <a routerLink="/login" [queryParams]="{ returnUrl: '/courses/' + c.id }">Log in</a> to enroll or donate.
+          </p>
+        } @else if (!isStudent()) {
+          <p class="offerings-note">Only student accounts can enroll.</p>
+        }
+
+        @if (offeringsLoading()) {
+          <p class="offerings-note">Loading class times…</p>
+        } @else if (offeringsError()) {
+          <p class="offerings-note">{{ offeringsError() }}</p>
+        } @else if (!visibleOfferings().length) {
+          <p class="offerings-note">No open class times right now.</p>
+        } @else {
+          <div class="offering-list">
+            @for (o of visibleOfferings(); track o.id) {
+              <div class="offering-card" [id]="'offering-' + o.id">
+                <div class="offering-ribbon-corner">
+                  <div class="offering-ribbon">{{ o.branchName }}<br />{{ shortDate(o.startDate) }}</div>
+                </div>
+                <div class="offering-card-head">
+                  <div class="offering-info">
+                    <div class="offering-branch">{{ o.branchName }} · {{ o.mode }}</div>
+                    <div class="offering-dates">{{ o.startDate }} – {{ o.endDate }}</div>
+                    @if (formatSchedule(o.scheduleSummary); as schedule) {
+                      <div class="offering-schedule">{{ schedule }}</div>
+                    }
+                    <div class="offering-seats">{{ o.spotsLeft === null ? 'Open enrollment' : o.spotsLeft + ' seats left' }}</div>
+                  </div>
+                  <div class="offering-actions">
+                    @if (isLoggedIn() && isStudent()) {
+                      @if (enrolledOfferingIds().has(o.id)) {
+                        <span class="offering-enrolled">Enrolled ✓</span>
+                      } @else {
+                        <button
+                          type="button"
+                          class="offering-enroll-btn"
+                          [disabled]="enrollingOfferingId() === o.id"
+                          (click)="enrollIn(o.id)"
+                        >
+                          {{ enrollingOfferingId() === o.id ? 'Enrolling…' : 'Enroll' }}
+                        </button>
+                      }
+                    }
+                    <button type="button" class="details-toggle-btn" (click)="toggleOfferingDetails(o.id)">
+                      {{ expandedOfferingId() === o.id ? 'Hide ▴' : 'Details ▾' }}
+                    </button>
+                  </div>
+                </div>
+
+                @if (expandedOfferingId() === o.id) {
+                  <div class="offering-card-body">
+                    @if (isLoggedIn()) {
+                      @if (donateThanks()) {
+                        <div class="donate-thanks">
+                          Thank you for your generosity. Your donation will appear in the Donors list below once approved.
+                        </div>
+                      }
+
+                      @for (n of needsForOffering(o.id); track n.id) {
+                        <div class="need-card" [class.active]="activeTarget() === n.id">
+                          <div class="need-card-head">
+                            <div class="need-card-info">
+                              <span class="need-title">{{ n.title }}</span>
+                              <div class="need-bar"><div class="need-fill" [style.width.%]="needProgress(n).pct"></div></div>
+                              <span class="need-meta">{{ needProgress(n).label }}</span>
+                            </div>
+                            <button type="button" class="need-donate-btn" (click)="openDonate(n.id)">
+                              {{ activeTarget() === n.id ? 'Cancel' : 'Donate this' }}
+                            </button>
+                          </div>
+
+                          @if (activeTarget() === n.id) {
+                            <div class="donate-form">
+                              <input
+                                #needAmountInput
+                                class="donate-input"
+                                [placeholder]="donatePlaceholder()"
+                                [value]="donateAmount()"
+                                (input)="onDonateAmountInput(needAmountInput)"
+                                name="donateAmount"
+                                inputmode="decimal"
+                              />
+                              <input class="donate-input" placeholder="Phone number" [(ngModel)]="donatePhone" name="donatePhone" />
+                              <label class="donate-file-label">
+                                Payment slip (optional)
+                                <input type="file" accept="image/*,.pdf" #proofInput (change)="onProofFileSelected(proofInput)" />
+                              </label>
+                              @if (donateError()) {
+                                <p class="donate-error">{{ donateError() }}</p>
+                              }
+                              <button type="button" class="donate-submit-btn" [disabled]="donateSubmitting()" (click)="submitDonate()">
+                                {{ donateSubmitting() ? 'Submitting…' : 'Submit donation' }}
+                              </button>
+                            </div>
+                          }
+                        </div>
+                      }
+
+                      <div class="need-card general-need-card" [class.active]="activeTarget() === 'general:' + o.id">
+                        <div class="need-card-head">
+                          <span class="need-title">General donation to this offering</span>
+                          <button type="button" class="need-donate-btn" (click)="openDonate('general:' + o.id)">
+                            {{ activeTarget() === 'general:' + o.id ? 'Cancel' : 'Donate' }}
+                          </button>
+                        </div>
+
+                        @if (activeTarget() === 'general:' + o.id) {
+                          <div class="donate-form">
+                            <div class="donate-type-row">
+                              @for (d of donateOptions; track d.key) {
+                                <button
+                                  type="button"
+                                  class="donate-type-btn"
+                                  [class.active]="donateType() === d.key"
+                                  (click)="setDonateType(d.key)"
+                                >
+                                  {{ d.label }}
+                                </button>
+                              }
+                            </div>
+                            @if (isGeneralGoods()) {
+                              <input
+                                class="donate-input"
+                                placeholder="Item name (e.g. Rice)"
+                                [(ngModel)]="donateItemName"
+                                name="donateItemName"
+                              />
+                              <div class="donate-quantity-row">
+                                <input
+                                  #offeringQtyInput
+                                  class="donate-input"
+                                  placeholder="Quantity"
+                                  [value]="donateAmount()"
+                                  (input)="onDonateAmountInput(offeringQtyInput)"
+                                  name="donateAmountOffering"
+                                  inputmode="decimal"
+                                />
+                                <select class="donate-input" [(ngModel)]="donateUnit" name="donateUnitOffering">
+                                  @for (u of donateUnitOptions; track u) {
+                                    <option [value]="u">{{ u }}</option>
+                                  }
+                                </select>
+                              </div>
+                            } @else {
+                              <input
+                                #offeringAmountInput
+                                class="donate-input"
+                                [placeholder]="donatePlaceholder()"
+                                [value]="donateAmount()"
+                                (input)="onDonateAmountInput(offeringAmountInput)"
+                                name="donateAmountOffering"
+                                inputmode="decimal"
+                              />
+                            }
+                            <input class="donate-input" placeholder="Phone number" [(ngModel)]="donatePhone" name="donatePhoneOffering" />
+                            <label class="donate-file-label">
+                              Payment slip (optional)
+                              <input type="file" accept="image/*,.pdf" #proofInput2 (change)="onProofFileSelected(proofInput2)" />
+                            </label>
+                            @if (donateError()) {
+                              <p class="donate-error">{{ donateError() }}</p>
+                            }
+                            <button type="button" class="donate-submit-btn" [disabled]="donateSubmitting()" (click)="submitDonate()">
+                              {{ donateSubmitting() ? 'Submitting…' : 'Submit donation' }}
+                            </button>
+                          </div>
+                        }
+                      </div>
+                    } @else {
+                      <p class="offerings-note">
+                        <a routerLink="/login" [queryParams]="{ returnUrl: '/courses/' + c.id }">Log in</a> to donate to this offering.
+                      </p>
+                    }
+
+                    @if (isLoggedIn()) {
+                      <div class="offering-donors">
+                        <div class="section-heading">
+                          Donors
+                          @if (donationsForOffering(o.id).length) {
+                            <span class="donor-tab-count">{{ donationsForOffering(o.id).length }}</span>
+                          }
+                        </div>
+                        @if (donationsForOffering(o.id).length) {
+                          <div class="donor-list">
+                            @for (d of donationsForOffering(o.id); track d.id) {
+                              <div class="donor-row">
+                                <div class="donor-top">
+                                  <span class="donor-item">
+                                    <span class="donor-type-badge">{{ d.type === 'money' ? 'Money' : 'Goods' }}</span>
+                                    {{ d.type === 'money' ? formatMoney(d.amount) : ((d.quantity ?? '') + ' ' + (d.itemDescription ?? '')) }}
+                                    @if (d.needTitle) {
+                                      <span class="donor-need"> · {{ d.needTitle }}</span>
+                                    }
+                                  </span>
+                                  <span class="donor-name">{{ d.donorName }}</span>
+                                </div>
+                                <span class="donor-date">{{ d.createdAt | date: 'mediumDate' }}</span>
+                              </div>
+                            }
+                          </div>
+                        } @else {
+                          <p class="donor-empty">No donors yet for this offering — be the first to give!</p>
+                        }
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          </div>
+          @if (enrollError()) {
+            <p class="offering-error">{{ enrollError() }}</p>
+          }
+        }
+      </div>
+
+      @if (c.syllabusTopics.length > 0) {
+        <div class="syllabus">
+          <div class="syllabus-title">Syllabus</div>
+          <ul>
+            @for (topic of c.syllabusTopics; track topic) {
+              <li>{{ topic }}</li>
+            }
+          </ul>
+        </div>
+      }
+
+      @if (photos().length) {
+        <div class="photo-section">
+          <div class="section-heading">Atmosphere</div>
+          <div class="photo-scroll">
+            @for (photo of photos(); track photo.id) {
+              <div class="photo-item" (click)="openPhoto(photo)">
+                <img [src]="photo.imageUrl" [alt]="photo.caption ?? ''" />
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+    </div>
+  </div>
+}

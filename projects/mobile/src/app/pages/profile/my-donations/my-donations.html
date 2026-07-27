@@ -1,0 +1,14 @@
+<app-back-button /><h1 class="page-title">Donation history</h1>
+
+@if (meApi.donations().length === 0) {
+  <p class="empty-note">No donations yet.</p>
+} @else {
+  <div class="row-list">
+    @for (d of meApi.donations(); track d.id) {
+      <div class="row">
+        <div class="row-title">{{ summarize(d) }}</div>
+        <div class="row-meta">{{ formatDate(d.createdAt) }}{{ d.eventTitle ? ' · ' + d.eventTitle : '' }}</div>
+      </div>
+    }
+  </div>
+}

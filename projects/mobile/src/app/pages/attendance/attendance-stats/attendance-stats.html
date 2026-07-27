@@ -1,0 +1,33 @@
+@if (enrollment(); as e) {
+  <div class="attendance-page">
+    <app-back-button />
+    <div class="course-name">{{ e.courseTitle }}</div>
+    <h1 class="page-title">My attendance</h1>
+
+    <div class="donut-wrap">
+      <div class="donut" [style.background]="donutStyle()">
+        <div class="donut-hole">{{ e.attendancePercent }}%</div>
+      </div>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat"><div class="stat-value">{{ e.sessionsAttended }}</div><div class="stat-label">Attended</div></div>
+      <div class="stat"><div class="stat-value">{{ missedCount() }}</div><div class="stat-label">Missed</div></div>
+      <div class="stat"><div class="stat-value">{{ e.sessionsTotal }}</div><div class="stat-label">Total</div></div>
+    </div>
+
+    <div class="log-title">Session log</div>
+    <div class="log-list">
+      @for (s of sessions(); track s.id) {
+        <div class="log-row">
+          <span class="log-label">{{ formatSessionLabel(s) }}</span>
+          <span class="log-pill" [class.present]="s.checkedIn" [class.absent]="!s.checkedIn">
+            {{ s.checkedIn ? 'Present' : 'Absent' }}
+          </span>
+        </div>
+      }
+    </div>
+  </div>
+} @else {
+  <p class="empty-note">You're not enrolled in this course.</p>
+}
