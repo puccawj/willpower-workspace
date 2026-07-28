@@ -16,19 +16,36 @@
   </div>
   <nav class="tab-bar">
     <a routerLink="/home" routerLinkActive="active" class="tab-item">
-      <span class="tab-icon">⌂</span>
+      <span class="tab-icon-box"><span class="tab-icon">⌂</span></span>
       <span class="tab-label">Home</span>
     </a>
     <a routerLink="/events" routerLinkActive="active" class="tab-item">
-      <span class="tab-icon">▤</span>
+      <span class="tab-icon-box"><span class="tab-icon">▤</span></span>
       <span class="tab-label">Events</span>
     </a>
+    <a routerLink="/checkin/scan" routerLinkActive="active" class="tab-item" aria-label="Scan QR to check in" title="Scan QR to check in">
+      <span class="tab-icon-box">
+        <svg class="tab-icon tab-icon-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2" />
+          <rect x="5.5" y="5.5" width="2" height="2" fill="currentColor" />
+          <rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2" />
+          <rect x="16.5" y="5.5" width="2" height="2" fill="currentColor" />
+          <rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2" />
+          <rect x="5.5" y="16.5" width="2" height="2" fill="currentColor" />
+          <rect x="14" y="14" width="3" height="3" fill="currentColor" />
+          <rect x="18" y="14" width="3" height="3" fill="currentColor" />
+          <rect x="14" y="18" width="3" height="3" fill="currentColor" />
+          <rect x="18" y="18" width="3" height="3" fill="currentColor" />
+        </svg>
+      </span>
+      <span class="tab-label">Scan</span>
+    </a>
     <a routerLink="/courses" routerLinkActive="active" class="tab-item">
-      <span class="tab-icon">▣</span>
+      <span class="tab-icon-box"><span class="tab-icon">▣</span></span>
       <span class="tab-label">Courses</span>
     </a>
     <a routerLink="/profile" routerLinkActive="active" class="tab-item">
-      <span class="tab-icon">◐</span>
+      <span class="tab-icon-box"><span class="tab-icon">◐</span></span>
       <span class="tab-label">Profile</span>
     </a>
   </nav>

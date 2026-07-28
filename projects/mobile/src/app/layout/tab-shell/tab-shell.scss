@@ -66,10 +66,33 @@
   align-items: center;
   gap: 2px;
   color: var(--w-muted-2);
+  transition: transform 0.15s ease, color 0.15s ease;
+
+  &:active {
+    transform: scale(0.88);
+  }
+}
+
+// Fixed-height box, content vertically centered — makes text-glyph icons and
+// the SVG icon line up identically regardless of the font's own line-height
+// quirks (a recurring source of misalignment when mixing the two).
+.tab-icon-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 22px;
 }
 
 .tab-icon {
   font-size: 17px;
+  line-height: 1;
+  transition: transform 0.2s ease;
+}
+
+.tab-icon-svg {
+  display: block;
+  width: 20px;
+  height: 20px;
 }
 
 .tab-label {
@@ -78,6 +101,10 @@
 
 .tab-item.active {
   color: var(--w-accent);
+
+  .tab-icon {
+    transform: translateY(-1px) scale(1.08);
+  }
 
   .tab-label {
     font-weight: 600;

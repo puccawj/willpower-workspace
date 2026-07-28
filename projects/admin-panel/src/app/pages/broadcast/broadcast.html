@@ -1,0 +1,70 @@
+<div class="card pad broadcast-form">
+  <h3 class="section-title">Send an announcement</h3>
+  <p class="muted-label intro">
+    Delivered as an in-app notification to matching users' bell icon on the website and mobile app.
+  </p>
+
+  <label class="field-label">Title</label>
+  <input class="form-input" [(ngModel)]="title" name="title" maxlength="200" placeholder="e.g. Weekend retreat reminder" />
+
+  <label class="field-label">Message</label>
+  <textarea class="form-input" rows="4" [(ngModel)]="message" name="message" placeholder="Write your announcement…"></textarea>
+
+  <label class="field-label">Audience</label>
+  <div class="audience-row">
+    @if (isSuper()) {
+      <label class="radio-label">
+        <input type="radio" name="scope" value="all" [(ngModel)]="scope" />
+        All branches
+      </label>
+      <label class="radio-label">
+        <input type="radio" name="scope" value="branch" [(ngModel)]="scope" />
+        Specific branch
+      </label>
+    }
+    <label class="radio-label checkbox-label">
+      <input type="checkbox" [(ngModel)]="studentsOnly" name="studentsOnly" />
+      Students only
+    </label>
+  </div>
+
+  @if (!isSuper() || scope() === 'branch') {
+    <select class="form-input branch-select" [(ngModel)]="branchId" name="branchId">
+      <option value="" disabled>Choose a branch…</option>
+      @for (b of branches(); track b.id) {
+        <option [value]="b.id">{{ b.name }}</option>
+      }
+    </select>
+  }
+
+  <button type="button" class="btn btn-solid" [disabled]="sending()" (click)="send()">
+    {{ sending() ? 'Sending…' : 'Send announcement' }}
+  </button>
+</div>
+
+<div class="card pad">
+  <h3 class="section-title">Broadcast history</h3>
+
+  @if (error()) {
+    <div class="state-error">{{ error() }}</div>
+  } @else if (loading()) {
+    <div class="muted-label">Loading…</div>
+  } @else if (history().length) {
+    <div class="history-list">
+      @for (h of history(); track h.broadcastId) {
+        <div class="history-row">
+          <div class="history-main">
+            <div class="history-title">{{ h.title }}</div>
+            <p class="history-message">{{ h.message }}</p>
+            <div class="muted-label history-meta">
+              {{ h.targetBranchName ?? 'All branches' }} · {{ h.recipientCount }} recipient(s) · sent by {{ h.sentByName ?? '—' }}
+            </div>
+          </div>
+          <div class="muted-label history-date">{{ h.sentAt | date: 'medium' }}</div>
+        </div>
+      }
+    </div>
+  } @else {
+    <p class="muted-label">No broadcasts sent yet.</p>
+  }
+</div>

@@ -5,6 +5,7 @@ import { EventDetail } from './pages/events/event-detail/event-detail';
 import { Courses } from './pages/courses/courses';
 import { CourseDetail } from './pages/courses/course-detail/course-detail';
 import { About } from './pages/about/about';
+import { BranchDetail } from './pages/branches/branch-detail/branch-detail';
 import { Team } from './pages/team/team';
 import { Policy } from './pages/policy/policy';
 import { Login } from './pages/login/login';
@@ -24,6 +25,7 @@ export const routes: Routes = [
   { path: 'courses', component: Courses },
   { path: 'courses/:id', component: CourseDetail },
   { path: 'about', component: About },
+  { path: 'branches/:id', component: BranchDetail },
   { path: 'team', component: Team },
   { path: 'policy', component: Policy },
   { path: 'login', component: Login },

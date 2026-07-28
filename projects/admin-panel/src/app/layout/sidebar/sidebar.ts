@@ -45,7 +45,7 @@ export class Sidebar {
       header: 'People',
       items: [
         { path: 'users', label: 'Manage User', icon: '◐', allow: ALL_STAFF },
-        { path: 'branches', label: 'Manage Branch', icon: '⬢', allow: ['superadmin'] },
+        { path: 'branches', label: 'Manage Branch', icon: '⬢', allow: ALL_STAFF },
       ],
     },
     {
@@ -64,7 +64,13 @@ export class Sidebar {
         { path: 'templates', label: 'Certificate Templates', icon: '▧', allow: ['superadmin'] },
       ],
     },
-    { header: 'Site', items: [{ path: 'team', label: 'Team Management', icon: '◍', allow: ALL_STAFF }] },
+    {
+      header: 'Site',
+      items: [
+        { path: 'team', label: 'Team Management', icon: '◍', allow: ALL_STAFF },
+        { path: 'broadcast', label: 'Broadcast', icon: '◉', allow: ALL_STAFF },
+      ],
+    },
     { header: 'Insights', items: [{ path: 'reports', label: 'Reports', icon: '▥', allow: ALL_STAFF }] },
   ];
 

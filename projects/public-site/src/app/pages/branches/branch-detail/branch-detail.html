@@ -1,0 +1,65 @@
+<div class="pad page-wrap">
+  <div class="detail-inner">
+    <a routerLink="/about" class="back-link">← All branches</a>
+
+    @if (error()) {
+      <p class="section-lead">{{ error() }}</p>
+    } @else if (loading()) {
+      <p class="section-lead">Loading branch…</p>
+    } @else if (branch(); as b) {
+      <div class="hero-img"><img [src]="b.img" alt="" /></div>
+
+      <div class="detail-main">
+        <span class="branch-pill">{{ b.country }}</span>
+        <h1 class="detail-title">{{ b.name }}</h1>
+        <p class="detail-city">{{ b.city }} · {{ b.timezone }}</p>
+        <p class="detail-body">{{ b.desc }}</p>
+
+        <div class="info-section">
+          <div class="aside-heading gold">Location</div>
+          <div class="info-grid">
+            <div class="info-item">
+              <div class="info-label">Country</div>
+              <div class="info-value">{{ b.country }}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">City</div>
+              <div class="info-value">{{ b.city }}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Timezone</div>
+              <div class="info-value">{{ b.timezone }}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Address</div>
+              <div class="info-value" [class.muted]="!b.address">{{ b.address ?? 'Not provided' }}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Zip / Postal code</div>
+              <div class="info-value" [class.muted]="!b.zipCode">{{ b.zipCode ?? 'Not provided' }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-section">
+          <div class="aside-heading gold">Contact</div>
+          <div class="info-grid">
+            <div class="info-item">
+              <div class="info-label">Phone Number</div>
+              <div class="info-value" [class.muted]="!b.phone">{{ b.phone ?? 'Not provided' }}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Branch email</div>
+              <div class="info-value" [class.muted]="!b.email">{{ b.email ?? 'Not provided' }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-actions">
+          <a routerLink="/events" class="btn btn-outline">View events</a>
+          <a routerLink="/courses" class="btn btn-solid">View courses</a>
+        </div>
+      </div>
+    }
+  </div>
+</div>

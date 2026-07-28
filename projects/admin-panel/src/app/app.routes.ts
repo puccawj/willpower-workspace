@@ -19,6 +19,7 @@ import { CertificateRegistry } from './pages/certificate-registry/certificate-re
 import { Templates } from './pages/templates/templates';
 import { Team } from './pages/team/team';
 import { Reports } from './pages/reports/reports';
+import { Broadcast } from './pages/broadcast/broadcast';
 import { roleAccessGuard } from './core/guards/role-access.guard';
 import { authGuard } from './core/guards/auth.guard';
 
@@ -34,6 +35,12 @@ export const routes: Routes = [
         component: Dashboard,
         canActivate: [roleAccessGuard],
         data: { title: 'Dashboard', subtitle: 'Overview of institute activity', allow: ['superadmin', 'admin'] },
+      },
+      {
+        path: 'broadcast',
+        component: Broadcast,
+        canActivate: [roleAccessGuard],
+        data: { title: 'Broadcast', subtitle: 'Send announcements as in-app notifications', allow: ['superadmin', 'admin'] },
       },
       {
         path: 'events',
@@ -81,7 +88,7 @@ export const routes: Routes = [
         path: 'branches',
         component: Branches,
         canActivate: [roleAccessGuard],
-        data: { title: 'Manage Branch', subtitle: 'Institute locations and their status', allow: ['superadmin'] },
+        data: { title: 'Manage Branch', subtitle: 'Institute locations and their status', allow: ['superadmin', 'admin'] },
       },
       {
         path: 'courses',

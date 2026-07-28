@@ -24,6 +24,12 @@
 
 * {
   box-sizing: border-box;
+  // The WebView's default tap flash is a plain gray rectangle matching the
+  // tapped element's bounding box — it ignores border-radius, so it shows as
+  // a square behind rounded buttons/pills/circles. Every interactive element
+  // in this app has its own :active state, so disable the built-in one
+  // everywhere rather than patching it component by component.
+  -webkit-tap-highlight-color: transparent;
 }
 
 html {

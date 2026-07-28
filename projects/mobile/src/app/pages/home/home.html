@@ -5,7 +5,12 @@
       <div class="name">{{ auth.currentUser()?.name }}</div>
     </div>
     <div class="head-actions">
-      <a routerLink="/checkin/scan" class="scan-btn" aria-label="Scan QR to check in" title="Scan QR to check in">▣</a>
+      <a routerLink="/notifications" class="bell-btn" aria-label="Notifications" title="Notifications">
+        🔔
+        @if (notificationApi.unreadCount() > 0) {
+          <span class="bell-badge">{{ notificationApi.unreadCount() > 9 ? '9+' : notificationApi.unreadCount() }}</span>
+        }
+      </a>
       <div class="avatar">{{ auth.currentUser()?.initials }}</div>
     </div>
   </div>

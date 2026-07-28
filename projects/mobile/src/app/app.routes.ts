@@ -65,6 +65,11 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/attendance/attendance-stats/attendance-stats').then((m) => m.AttendanceStats),
   },
   {
+    path: 'notifications',
+    canActivate: [authGuard, securityGateGuard],
+    loadComponent: () => import('./pages/notifications/notifications').then((m) => m.Notifications),
+  },
+  {
     path: 'certificate/:id',
     canActivate: [authGuard, securityGateGuard],
     loadComponent: () =>

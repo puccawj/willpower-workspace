@@ -1,6 +1,8 @@
-<div class="page-toolbar toolbar-end">
-  <button type="button" class="btn btn-solid" (click)="addBranch()">+ Add Branch</button>
-</div>
+@if (isSuper()) {
+  <div class="page-toolbar toolbar-end">
+    <button type="button" class="btn btn-solid" (click)="addBranch()">+ Add Branch</button>
+  </div>
+}
 
 @if (error()) {
   <div class="state-error card">{{ error() }}</div>
@@ -35,7 +37,9 @@
               <td>
                 <div class="action-group">
                   <button type="button" class="icon-btn icon-btn-accent" (click)="editBranch(b)" title="Edit">✎</button>
-                  <button type="button" class="icon-btn" [style.color]="b.toggleColor" (click)="toggleStatus(b)" [title]="b.toggleLabel">⏻</button>
+                  @if (isSuper()) {
+                    <button type="button" class="icon-btn" [style.color]="b.toggleColor" (click)="toggleStatus(b)" [title]="b.toggleLabel">⏻</button>
+                  }
                 </div>
               </td>
             </tr>
@@ -68,7 +72,9 @@
           </div>
           <div class="mcard-actions action-group">
             <button type="button" class="icon-btn icon-btn-accent" (click)="editBranch(b)" title="Edit">✎</button>
-            <button type="button" class="icon-btn" [style.color]="b.toggleColor" (click)="toggleStatus(b)" [title]="b.toggleLabel">⏻</button>
+            @if (isSuper()) {
+              <button type="button" class="icon-btn" [style.color]="b.toggleColor" (click)="toggleStatus(b)" [title]="b.toggleLabel">⏻</button>
+            }
           </div>
         </div>
       }

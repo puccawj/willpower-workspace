@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- Cleartext HTTP allowed only for local dev testing against a machine reachable via
+         adb reverse (localhost) or the emulator host loopback (10.0.2.2). Production traffic
+         goes to https://api.wpusa.online, which is HTTPS and unaffected by this exception. -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">localhost</domain>
+        <domain includeSubdomains="false">10.0.2.2</domain>
+    </domain-config>
+</network-security-config>

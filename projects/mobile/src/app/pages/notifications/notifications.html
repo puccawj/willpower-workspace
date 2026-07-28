@@ -1,0 +1,35 @@
+<app-back-button />
+<div class="notif-page-head">
+  <h1 class="page-title">Notifications</h1>
+  @if (api.unreadCount() > 0) {
+    <button type="button" class="mark-all-btn" (click)="markAllRead()">Mark all read</button>
+  }
+</div>
+
+@if (api.notifications().length === 0) {
+  <div class="empty-state">
+    <span class="empty-icon">🔔</span>
+    <p class="empty-note">You're all caught up — no notifications yet.</p>
+  </div>
+} @else {
+  <div class="row-list">
+    @for (n of api.notifications(); track n.id) {
+      <div class="notif-row" [class.unread]="!n.isRead" (click)="markRead(n.id)">
+        <div class="row-icon">{{ iconFor(n.type) }}</div>
+        <div class="row-body">
+          <div class="row-top">
+            <div class="row-title">{{ n.title }}</div>
+            @if (!n.isRead) {
+              <span class="unread-dot"></span>
+            }
+          </div>
+          <p class="notif-message">{{ n.message }}</p>
+          <div class="row-meta">{{ formatDate(n.createdAt) }}</div>
+        </div>
+        <button type="button" class="notif-delete" (click)="deleteNotification(n.id, $event)" aria-label="Delete notification">
+          ×
+        </button>
+      </div>
+    }
+  </div>
+}

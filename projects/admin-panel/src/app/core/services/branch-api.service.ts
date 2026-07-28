@@ -6,6 +6,7 @@ import { environment } from '../../../environments/environment';
 export interface ApiBranch {
   id: string;
   name: string;
+  description: string | null;
   city: string | null;
   country: string;
   timezone: string;
@@ -23,6 +24,7 @@ export interface ApiBranch {
 
 export interface BranchPayload {
   name: string;
+  description?: string;
   city?: string;
   country?: string;
   timezone?: string;

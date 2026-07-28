@@ -34,19 +34,21 @@
   </div>
 </section>
 
-<section class="pad about-branches">
+<section class="pad about-branches" id="branches">
   <div class="branches-inner">
     <h2 class="branches-heading">Our branches</h2>
     <div class="grid-3 g3">
-      @for (b of branches; track b.name) {
-        <div class="branch-card">
+      @for (b of branches(); track b.id) {
+        <a [routerLink]="['/branches', b.id]" class="branch-card">
           <div class="branch-img"><img [src]="b.img" alt="" /></div>
           <div class="branch-body">
             <h3 class="branch-name">{{ b.name }}</h3>
             <div class="branch-city">{{ b.city }}</div>
             <p class="branch-desc">{{ b.desc }}</p>
           </div>
-        </div>
+        </a>
+      } @empty {
+        <p class="muted-label">Branch information is loading…</p>
       }
     </div>
   </div>

@@ -4,6 +4,7 @@ import { Browser } from '@capacitor/browser';
 import { AuthService } from '../../core/services/auth.service';
 import { MeApiService } from '../../core/services/me-api.service';
 import { PullToRefreshService } from '../../core/services/pull-to-refresh.service';
+import { PushRegistrationService } from '../../core/services/push-registration.service';
 
 const PUBLIC_SITE_URL = 'https://www.wpusa.online';
 
@@ -18,6 +19,7 @@ export class Profile {
   protected readonly meApi = inject(MeApiService);
   private readonly router = inject(Router);
   private readonly pullToRefresh = inject(PullToRefreshService);
+  private readonly pushRegistration = inject(PushRegistrationService);
 
   constructor() {
     this.meApi.loadAll();
@@ -34,11 +36,16 @@ export class Profile {
     void Browser.open({ url: `${PUBLIC_SITE_URL}/#/team` });
   }
 
+  openBranches(): void {
+    void Browser.open({ url: `${PUBLIC_SITE_URL}/#/about#branches` });
+  }
+
   openPrivacyPolicy(): void {
     void Browser.open({ url: `${PUBLIC_SITE_URL}/#/policy` });
   }
 
   logout(): void {
+    void this.pushRegistration.unregister();
     this.auth.logout();
     this.router.navigateByUrl('/login');
   }

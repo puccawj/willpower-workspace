@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "639634356309",
+    "project_id": "willpower-institute-usa",
+    "storage_bucket": "willpower-institute-usa.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:639634356309:android:c20f8bf0078c9039413cdc",
+        "android_client_info": {
+          "package_name": "org.willpowerinstitute.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDkljTGXp0Pz6O64D6sZ43ACtk4Vpg5n1o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

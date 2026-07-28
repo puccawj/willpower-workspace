@@ -101,10 +101,17 @@
 }
 
 .branch-card {
+  display: block;
   background: var(--w-bg-alt);
   border: 1px solid var(--w-border);
   border-radius: 12px;
   overflow: hidden;
+  transition: transform 0.15s, box-shadow 0.15s;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 34px -20px rgba(36, 28, 21, 0.45);
+  }
 }
 
 .branch-img {

@@ -1,22 +1,38 @@
 .pad-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
+  gap: 8px 28px;
   width: 100%;
-  max-width: 260px;
+  max-width: 340px;
 }
 
 .pad-key {
+  justify-self: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   text-align: center;
-  font: 500 20px var(--w-font-serif);
+  font: 500 24px var(--w-font-serif);
   color: #f4eddd;
   background: none;
-  border: none;
-  padding: 12px 0;
+  border: 1px solid rgba(244, 237, 221, 0.28);
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  padding: 0;
   cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+  outline: none;
+  overflow: hidden;
+
+  &:not(.empty):active {
+    background: rgba(244, 237, 221, 0.12);
+    border-color: rgba(244, 237, 221, 0.5);
+  }
 
   &.empty {
     cursor: default;
+    border-color: transparent;
   }
 
   &:disabled {

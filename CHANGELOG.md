@@ -2,6 +2,177 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-07-28 (4) — Mobile: removed square tap-flash app-wide
+
+- **Tapping any button/link no longer flashes a gray square** — Chrome
+  WebView's default tap-highlight draws as a plain rectangular bounding box
+  regardless of the element's own border-radius, so it showed as a square
+  behind the round PIN-pad keys and bottom tab bar items. Disabled
+  `-webkit-tap-highlight-color` globally (every interactive element already
+  has its own `:active` state — the bottom tab bar scales down slightly,
+  the PIN pad shows a circular tint contained within its own border) rather
+  than patching each component individually.
+
+## 2026-07-28 (3) — Mobile: widened the passcode/PIN pad
+
+- **The number pad on the "Confirm it's you" unlock screen and the "Set a
+  PIN" screen is noticeably wider and less cramped** — the shared PIN-pad
+  component was capped at 260px wide regardless of screen size, leaving
+  large empty margins on a normal phone width. Widened to 340px, and each
+  key is now a visible circle sized to fit snugly around its digit
+  (previously plain text glyphs floating in empty space with no visible tap
+  boundary), with a subtle press state.
+
+## 2026-07-28 (2) — Mobile: back button now requires a second press to exit
+
+- **Pressing back from the app's root screen (Home, or any tab with no
+  further history) no longer exits immediately.** First press shows a
+  "Press back again to exit" toast at the bottom of the screen; a second
+  press within 2 seconds actually exits, matching the standard Android
+  double-back-to-exit pattern. A press that comes later than 2 seconds after
+  the first is treated as a fresh first press (shows the toast again) rather
+  than exiting.
+  - Verified on-device: two back presses ~0.8s apart correctly exits to the
+    launcher; a single press leaves the app in the foreground with the
+    toast showing.
+
+## 2026-07-28 (1) — Mobile: fixed hardware/gesture back button not navigating correctly
+
+- **Android's back button (hardware key or gesture) now properly steps back
+  through the app's screens.** The app never had a
+  `@capacitor/app` `backButton` listener registered, so Capacitor's default
+  behavior applied — undefined/inconsistent, and in practice often skipped
+  screens or exited the app entirely instead of popping one level of the
+  router history, matching the reported "some menus don't pop back
+  correctly."
+  - Added a listener in the root component that calls `window.history.back()`
+    when `canGoBack` is true, or exits the app when at the root.
+  - Also debounced it (400ms) after discovering a single physical back press
+    triggers the native `backButton` event multiple times in rapid
+    succession on this Samsung device — without the guard, one press could
+    cascade through several screens at once. Verified on-device via logcat:
+    before the fix, one back press logged 5 separate `backButton` events and
+    exited the app from a one-level-deep screen; after, exactly 1 event and
+    a correct single-level pop.
+
+## 2026-07-27 (5) — Mobile: delete notifications, modernized notification cards, scan button moved to tab bar
+
+- **Users can now delete their own notifications** (in-app bell/list, all
+  platforms). New `DELETE /me/notifications/:id` endpoint, scoped to the
+  owning user. A "×" button on each notification row/card removes it
+  immediately without marking it read first.
+- **Mobile's Notifications page redesigned**: each row now shows a rounded
+  icon avatar (varies by notification type — event, reminder, certificate,
+  donation, etc.), an unread dot next to the title instead of a full
+  background tint, relative "Today · 3:28 PM" timestamps, and a friendlier
+  empty state. Public-site's header notification dropdown also gained the
+  delete button.
+- **Mobile's QR scan button moved from the Home header into the bottom tab
+  bar** as a normal tab item between Events and Courses (Home / Events /
+  Scan / Courses / Profile), styled identically to the other tabs (same
+  icon size, label, active-state color) with a QR-code glyph instead of a
+  generic icon. (Tried a raised floating/notch style first per an early
+  request — reverted to a plain uniform tab item after visual feedback.)
+  Tab bar taps now have a subtle press/scale animation for better feedback.
+
+## 2026-07-27 (4) — Native push notifications (Phase 3)
+
+- **Broadcasts now also arrive as real OS push notifications on the mobile
+  app**, not just the in-app bell from Phase 1. Backend sends via Firebase
+  Cloud Messaging (FCM) when a broadcast is created; the mobile app registers
+  for push on login (Capacitor `@capacitor/push-notifications`) and posts its
+  device token to a new `POST /me/devices` endpoint (`user_devices` table,
+  previously unused). Tapping a push opens the Notifications page; logging
+  out unregisters the device.
+  - Push sending is a graceful no-op if Firebase credentials aren't configured
+    (same pattern as `TURNSTILE_SECRET_KEY`) — set
+    `FIREBASE_SERVICE_ACCOUNT_JSON` or `FIREBASE_SERVICE_ACCOUNT_PATH`, plus
+    `android/app/google-services.json`, to enable it. Verified end-to-end on
+    a physical Android device: token registers on login, a broadcast triggers
+    a real notification in the system shade.
+  - Android's manifest now references a `network_security_config.xml` that
+    permits cleartext HTTP only to `localhost`/`10.0.2.2` — needed so a debug
+    build can reach a local dev API via `adb reverse` during testing;
+    production traffic (HTTPS to `api.wpusa.online`) is unaffected.
+
+## 2026-07-27 (3) — Broadcast announcements (Phase 1: in-app, no native push yet)
+
+- **Superadmin and admin can now send announcements as in-app notifications**,
+  viewable via a new bell icon on the public-site header and a new
+  Notifications page on mobile (added to Home's header). New "Broadcast" page
+  in admin-panel (Site section) with a compose form (title, message, audience,
+  optional students-only filter) and a send history below. Admin's audience is
+  restricted to their own branch (reuses the branch-scoping work from earlier
+  today); superadmin can target a specific branch or everyone.
+  - This is **Phase 1 only** — notifications appear in-app (bell icon, polled
+    every 60s), not as native OS push notifications. That requires a Firebase
+    project + `@capacitor/push-notifications` and is a separate follow-up.
+  - Also **Phase 1 only** covers manual admin broadcasts — automatic system
+    notifications (new event published, new course, RSVP/class reminders,
+    certificate issued) are not wired up yet, though the underlying
+    `notifications` table and `notification_type` enum already support them
+    (they existed unused in the schema before this change).
+  - Backend: new `notifications` module (`POST /notifications/broadcast`,
+    `GET /notifications/broadcasts` for history, `GET/PATCH /me/notifications*`
+    for self-service). `notifications` table gained `broadcast_id` (groups the
+    per-recipient rows from one send), `target_branch_id`, and `created_by`.
+
+## 2026-07-27 (2)
+
+- **Admin and instructor roles are now scoped to their assigned branch(es)
+  across the whole admin panel — superadmin still sees/edits everything.**
+  Previously only Donations, Users, Team Members, and Course Offerings/Class
+  Schedule enforced this; Events (+ needs/photos/attendance), Enrollment,
+  Certificates (issuance + registry), Manage Branch, and Reports did not —
+  an admin or instructor could see and modify every branch's data through
+  those pages. Fixed by adding a shared `BranchAccessService` and applying
+  it consistently: list endpoints filter to the actor's branches, single-item
+  endpoints 404 (not 403, so a locked-out actor can't tell the row exists)
+  when the target is outside the actor's branches, and create/update reject
+  attempts to target a branch the actor isn't assigned to.
+  - Instructors were previously scoped by "offerings you personally teach"
+    (an `instructorId` match) rather than by branch — changed to match
+    admin's branch-based scoping instead, per this request. **Every
+    instructor account now needs at least one `user_branches` row** for
+    this to work; one seed instructor account was missing this and has
+    been fixed locally — check production for the same gap before deploying.
+  - Manage Branch (`/branches` in admin-panel) is no longer superadmin-only:
+    admin can now view and edit their own branch's info (name, address,
+    description, photo, etc.), but changing a branch's active/inactive
+    status, and creating or deleting branches, still require superadmin.
+
+## 2026-07-27
+
+- The public branch detail page now lists every field an admin can set on
+  a branch — Country, City, Timezone, Address, Zip/Postal code, Phone
+  Number, Branch email — not just address/phone/email, grouped into
+  "Location" and "Contact" sections with a cleaner two-column layout
+  matching the rest of the site's editorial style (gold section labels,
+  italic "Not provided" for empty fields) instead of a plain bordered
+  list. (Branches with no description still show a generic placeholder
+  line until an admin sets one via Manage Branch — that text isn't real
+  data.)
+- **Admin can now set a branch's Description**, shown on the public branch
+  detail page added below. This field existed in the database already but
+  was never exposed in the create/edit branch form (superadmin → Manage
+  Branch) or the API's create/update DTOs — admins had no way to set it.
+  Added a "Description" textarea to the branch form and wired it through
+  to the API and public website.
+- **Branches are now clickable through to a real detail page.** The Home
+  page's "Branches" stat, the "Our branches" cards on the About page, and
+  the footer's branch names all previously did nothing (or were plain
+  text). They now link to a new branch detail page (`/branches/:id`)
+  showing the branch's city/country, description, and contact info, backed
+  by a new `GET /public/branches` and `GET /public/branches/:id` (the
+  existing `branches` endpoints were admin-only). Mobile's Profile →
+  About Willpower Institute → Branches row was static text; it now opens
+  the same About-page branches section like the About/Team rows already
+  did.
+- Fixed public-site's Home "Courses & programs" cards showing no image at
+  all — the card template never had an `<img>` element (unlike the Events
+  cards next to it, or the standalone Courses list page). Added the same
+  image + corner-ribbon treatment used on the Courses list page.
+
 ## 2026-07-24
 
 - **Removed the "Whole course" needs/donations section from Course detail, and

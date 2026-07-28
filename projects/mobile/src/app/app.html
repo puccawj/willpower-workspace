@@ -1,2 +1,5 @@
 <router-outlet></router-outlet>
 <app-photo-viewer />
+@if (showExitHint()) {
+  <div class="exit-hint">Press back again to exit</div>
+}

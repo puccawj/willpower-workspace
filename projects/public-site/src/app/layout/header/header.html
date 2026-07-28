@@ -17,6 +17,43 @@
 
   <div class="header-actions">
     @if (auth.isLoggedIn()) {
+      <div class="notif-wrap">
+        <button type="button" class="bell-btn" (click)="toggleNotifications()" aria-label="Notifications">
+          🔔
+          @if (unreadCount() > 0) {
+            <span class="bell-badge">{{ unreadCount() > 9 ? '9+' : unreadCount() }}</span>
+          }
+        </button>
+        @if (notifOpen()) {
+          <div class="notif-panel">
+            <div class="notif-panel-head">
+              <span>Notifications</span>
+              @if (unreadCount() > 0) {
+                <button type="button" class="link-btn" (click)="markAllRead()">Mark all read</button>
+              }
+            </div>
+            <div class="notif-list">
+              @for (n of notifications(); track n.id) {
+                <div class="notif-item" [class.unread]="!n.isRead" (click)="markRead(n.id)">
+                  <button
+                    type="button"
+                    class="notif-delete"
+                    (click)="deleteNotification(n.id, $event)"
+                    aria-label="Delete notification"
+                  >
+                    ×
+                  </button>
+                  <div class="notif-title">{{ n.title }}</div>
+                  <p class="notif-message">{{ n.message }}</p>
+                  <div class="notif-date">{{ n.createdAt | date: 'medium' }}</div>
+                </div>
+              } @empty {
+                <p class="notif-empty">No notifications yet.</p>
+              }
+            </div>
+          </div>
+        }
+      </div>
       <a routerLink="/my" routerLinkActive="active" class="account-chip">
         <span class="account-avatar">{{ auth.currentUser()?.initials }}</span>
         My Account

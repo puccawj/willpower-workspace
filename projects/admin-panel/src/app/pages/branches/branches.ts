@@ -9,10 +9,12 @@ import { ImageViewerService } from '../../core/services/image-viewer.service';
 import { ToastService } from '../../core/services/toast.service';
 import { UploadApiService } from '../../core/services/upload-api.service';
 import { FieldDef } from '../../core/models/admin.models';
+import { RoleService } from '../../core/services/role.service';
 
 interface BranchRow {
   key: string;
   name: string;
+  description: string;
   city: string;
   country: string;
   timezone: string;
@@ -44,6 +46,7 @@ const FIELDS: FieldDef[] = [
   { key: 'phoneNumber', label: 'Phone Number', type: 'phone', countryKey: 'phoneCountryCode' },
   { key: 'email', label: 'Branch email', type: 'email' },
   { key: 'logo', label: 'Branch photo', type: 'image' },
+  { key: 'description', label: 'Description (shown on the public website)', type: 'textarea' },
 ];
 
 function toRow(b: ApiBranch): BranchRow {
@@ -51,6 +54,7 @@ function toRow(b: ApiBranch): BranchRow {
   return {
     key: b.id,
     name: b.name,
+    description: b.description ?? '',
     city: b.city ?? '',
     country: b.country,
     timezone: b.timezone,
@@ -72,6 +76,7 @@ function toRow(b: ApiBranch): BranchRow {
 }
 
 const OPTIONAL_TEXT_KEYS = [
+  'description',
   'city',
   'country',
   'timezone',
@@ -104,6 +109,9 @@ export class Branches {
   private readonly uploads = inject(UploadApiService);
   private readonly toast = inject(ToastService);
   private readonly imageViewer = inject(ImageViewerService);
+  private readonly roleService = inject(RoleService);
+
+  readonly isSuper = this.roleService.isSuper;
 
   readonly loading = this.api.loading;
   readonly error = this.api.error;
@@ -148,6 +156,7 @@ export class Branches {
       isEdit: false,
       values: {
         name: '',
+        description: '',
         city: '',
         country: '',
         timezone: '',
@@ -173,6 +182,7 @@ export class Branches {
       isEdit: true,
       values: {
         name: row.name,
+        description: row.description,
         city: row.city,
         country: row.country,
         timezone: row.timezone,
@@ -188,8 +198,9 @@ export class Branches {
           switchMap((payload) => this.api.update(row.key, payload)),
           tap({ error: (err) => this.showError(err, 'Failed to update branch.') }),
         ),
-      onDelete: () =>
-        this.api.remove(row.key).pipe(tap({ error: (err) => this.showError(err, 'Failed to delete branch.') })),
+      onDelete: this.isSuper()
+        ? () => this.api.remove(row.key).pipe(tap({ error: (err) => this.showError(err, 'Failed to delete branch.') }))
+        : undefined,
     });
   }
 }

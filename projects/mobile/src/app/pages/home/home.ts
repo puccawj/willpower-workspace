@@ -3,6 +3,8 @@ import { RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { MeApiService, MyEvent } from '../../core/services/me-api.service';
+import { NotificationApiService } from '../../core/services/notification-api.service';
+import { PushRegistrationService } from '../../core/services/push-registration.service';
 import { PublicEventApiService } from '../../core/services/public-event-api.service';
 import { PublicCourseApiService, PublicCourseOfferingCard } from '../../core/services/public-course-api.service';
 import { PullToRefreshService } from '../../core/services/pull-to-refresh.service';
@@ -19,6 +21,8 @@ export class Home {
   private readonly publicEvents = inject(PublicEventApiService);
   private readonly publicCourses = inject(PublicCourseApiService);
   private readonly pullToRefresh = inject(PullToRefreshService);
+  protected readonly notificationApi = inject(NotificationApiService);
+  private readonly pushRegistration = inject(PushRegistrationService);
 
   readonly view = signal<'list' | 'card'>('card');
 
@@ -52,6 +56,8 @@ export class Home {
     this.meApi.loadEvents().subscribe();
     this.publicEvents.load().subscribe();
     this.publicCourses.loadAllOfferings().subscribe((rows) => this.offeringCards.set(rows));
+    this.notificationApi.loadUnreadCount().subscribe();
+    void this.pushRegistration.init();
 
     this.pullToRefresh.register(() =>
       Promise.all([
