@@ -2,6 +2,20 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-07-28 (5) — Mobile: fixed back button jumping between tabs instead of going Home
+
+- **Pressing back while on a bottom-tab screen (Events, Courses, Profile) now
+  always goes to Home**, instead of landing on whichever tab was visited
+  previously. Tapping between tabs pushes a plain history entry each time,
+  so the back stack reflected tap order (e.g. Home → Events → Courses meant
+  back from Courses landed on Events) rather than a sensible "go home"
+  default.
+  - Drilling into a detail page from a tab (e.g. Events → an event's detail
+    page) is unaffected — back from a detail page still returns to that
+    tab's list, since that navigation still pushes normally.
+  - Verified on-device: Home → Events → Courses → back → Home; and
+    Events → event detail → back → Events.
+
 ## 2026-07-28 (4) — Mobile: removed square tap-flash app-wide
 
 - **Tapping any button/link no longer flashes a gray square** — Chrome
