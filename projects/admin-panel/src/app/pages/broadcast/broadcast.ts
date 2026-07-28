@@ -1,14 +1,17 @@
 import { DatePipe } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ListController } from '../../core/list-controller';
 import { BranchApiService } from '../../core/services/branch-api.service';
-import { BroadcastApiService } from '../../core/services/broadcast-api.service';
+import { BroadcastApiService, BroadcastHistoryRow } from '../../core/services/broadcast-api.service';
+import { ConfirmService } from '../../core/services/confirm.service';
 import { RoleService } from '../../core/services/role.service';
 import { ToastService } from '../../core/services/toast.service';
+import { TableToolbar } from '../../shared/table-toolbar/table-toolbar';
 
 @Component({
   selector: 'app-broadcast',
-  imports: [FormsModule, DatePipe],
+  imports: [FormsModule, DatePipe, TableToolbar],
   templateUrl: './broadcast.html',
   styleUrl: './broadcast.scss',
 })
@@ -16,13 +19,15 @@ export class Broadcast {
   private readonly api = inject(BroadcastApiService);
   private readonly branchApi = inject(BranchApiService);
   private readonly roleService = inject(RoleService);
+  private readonly confirmSvc = inject(ConfirmService);
   private readonly toast = inject(ToastService);
 
   readonly isSuper = this.roleService.isSuper;
   readonly branches = this.branchApi.branches;
-  readonly history = this.api.history;
   readonly loading = this.api.loading;
   readonly error = this.api.error;
+
+  readonly ctrl = new ListController<BroadcastHistoryRow>(this.api.history);
 
   readonly title = signal('');
   readonly message = signal('');
@@ -70,5 +75,19 @@ export class Broadcast {
           this.toast.show(err?.error?.message ?? 'Failed to send broadcast.', 'error');
         },
       });
+  }
+
+  async deleteBroadcast(row: BroadcastHistoryRow): Promise<void> {
+    const confirmed = await this.confirmSvc.ask(`Delete the broadcast "${row.title}"? This removes it for every recipient and cannot be undone.`, {
+      title: 'Delete Broadcast',
+      confirmLabel: 'Delete',
+      danger: true,
+    });
+    if (!confirmed) return;
+
+    this.api.deleteBroadcast(row.broadcastId).subscribe({
+      next: () => this.toast.show('Broadcast deleted.', 'success'),
+      error: (err) => this.toast.show(err?.error?.message ?? 'Failed to delete broadcast.', 'error'),
+    });
   }
 }

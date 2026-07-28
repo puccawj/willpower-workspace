@@ -42,29 +42,69 @@
   </button>
 </div>
 
-<div class="card pad">
-  <h3 class="section-title">Broadcast history</h3>
+<h3 class="section-title history-heading">Broadcast history</h3>
 
-  @if (error()) {
-    <div class="state-error">{{ error() }}</div>
-  } @else if (loading()) {
-    <div class="muted-label">Loading…</div>
-  } @else if (history().length) {
-    <div class="history-list">
-      @for (h of history(); track h.broadcastId) {
-        <div class="history-row">
-          <div class="history-main">
-            <div class="history-title">{{ h.title }}</div>
-            <p class="history-message">{{ h.message }}</p>
-            <div class="muted-label history-meta">
-              {{ h.targetBranchName ?? 'All branches' }} · {{ h.recipientCount }} recipient(s) · sent by {{ h.sentByName ?? '—' }}
-            </div>
+@if (error()) {
+  <div class="state-error card">{{ error() }}</div>
+} @else if (loading()) {
+  <div class="state-loading card">Loading…</div>
+} @else {
+  <app-table-toolbar [controller]="ctrl" slot="top"></app-table-toolbar>
+
+  @if (ctrl.effectiveView() === 'table') {
+    <div class="card" style="padding:0;overflow:hidden">
+      <table>
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Audience</th>
+            <th>Recipients</th>
+            <th>Sent by</th>
+            <th>Sent</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (h of ctrl.pageItems(); track h.broadcastId) {
+            <tr class="row">
+              <td>
+                <div style="font-weight:500">{{ h.title }}</div>
+                <div class="muted-label">{{ h.message }}</div>
+              </td>
+              <td class="muted-cell">{{ h.targetBranchName ?? 'All branches' }}</td>
+              <td>{{ h.recipientCount }}</td>
+              <td class="muted-cell">{{ h.sentByName ?? '—' }}</td>
+              <td class="muted-cell">{{ h.sentAt | date: 'medium' }}</td>
+              <td>
+                <div class="action-group">
+                  <button type="button" class="icon-btn" style="color:var(--w-red)" (click)="deleteBroadcast(h)" title="Delete broadcast">✕</button>
+                </div>
+              </td>
+            </tr>
+          }
+          @if (!ctrl.pageItems().length) {
+            <tr><td colspan="6" class="muted-cell" style="text-align:center;padding:20px">No broadcasts sent yet.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <div class="cardgrid">
+      @for (h of ctrl.pageItems(); track h.broadcastId) {
+        <div class="mcard">
+          <div class="mcard-head">
+            <h4 class="mcard-title mcard-title-sans">{{ h.title }}</h4>
+            <button type="button" class="icon-btn" style="color:var(--w-red)" (click)="deleteBroadcast(h)" title="Delete broadcast">✕</button>
           </div>
-          <div class="muted-label history-date">{{ h.sentAt | date: 'medium' }}</div>
+          <p class="muted-label">{{ h.message }}</p>
+          <div class="muted-label mcard-meta">
+            {{ h.targetBranchName ?? 'All branches' }} · {{ h.recipientCount }} recipient(s) · sent by {{ h.sentByName ?? '—' }}
+          </div>
+          <div class="muted-label">{{ h.sentAt | date: 'medium' }}</div>
         </div>
       }
     </div>
-  } @else {
-    <p class="muted-label">No broadcasts sent yet.</p>
   }
-</div>
+
+  <app-table-toolbar [controller]="ctrl" slot="bottom"></app-table-toolbar>
+}

@@ -53,4 +53,10 @@ export class BroadcastApiService {
       .post<{ recipientCount: number }>(`${this.baseUrl}/broadcast`, payload)
       .pipe(tap(() => this.loadHistory().subscribe()));
   }
+
+  deleteBroadcast(broadcastId: string) {
+    return this.http.delete<void>(`${this.baseUrl}/broadcasts/${broadcastId}`).pipe(
+      tap(() => this.history.update((rows) => rows.filter((r) => r.broadcastId !== broadcastId))),
+    );
+  }
 }
