@@ -33,7 +33,7 @@ const FIELDS: FieldDef[] = [
   { key: 'category', label: 'Category', type: 'text' },
   { key: 'totalSessions', label: 'Total sessions', type: 'number' },
   { key: 'passingAttendancePercent', label: 'Passing % (attendance)', type: 'number' },
-  { key: 'image', label: 'Cover image', type: 'image' },
+  { key: 'image', label: 'Cover image', type: 'image', hint: 'Recommended 800×600px or larger, landscape (4:3) — shown as a cropped card thumbnail.' },
 ];
 
 function toRow(c: ApiCourse): CourseRow {
@@ -94,6 +94,10 @@ export class Courses {
 
   goPhotos(row: CourseRow): void {
     this.router.navigate(['/courses', row.id, 'photos']);
+  }
+
+  goFeedback(row: CourseRow): void {
+    this.router.navigate(['/courses', row.id, 'feedback']);
   }
 
   viewCover(row: CourseRow): void {

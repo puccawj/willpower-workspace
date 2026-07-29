@@ -51,6 +51,14 @@
                         <div class="offering-schedule">{{ schedule }}</div>
                       }
                       <div class="offering-seats">{{ o.spotsLeft === null ? 'Open enrollment' : o.spotsLeft + ' seats left' }}</div>
+                      @if (ratingSummaryFor(o.id).count) {
+                        <div class="rating-summary">
+                          @for (s of ratingStars; track s) {
+                            <span class="star" [class.filled]="s <= filledStarsFor(o.id)">★</span>
+                          }
+                          <span class="muted-label rating-summary-text">{{ ratingSummaryFor(o.id).average }} ({{ ratingSummaryFor(o.id).count }})</span>
+                        </div>
+                      }
                     </div>
                     <div class="offering-actions">
                       @if (isLoggedIn() && isStudent()) {
@@ -79,7 +87,9 @@
 
                   @if (expandedOfferingId() === o.id) {
                     <div class="offering-card-body">
-                      @if (isLoggedIn()) {
+                      @if (offeringEnded(o)) {
+                        <p class="rsvp-closed-note">This class has already ended — donations are closed.</p>
+                      } @else if (isLoggedIn()) {
                         @if (donateThanks()) {
                           <div class="donate-thanks-light">
                             Thank you for your generosity. Your donation will appear in the Donors list below once an admin
@@ -231,6 +241,41 @@
                             </div>
                           } @else {
                             <p class="donate-login-note-light">No donors yet for this offering — be the first to give!</p>
+                          }
+                        </div>
+                      }
+
+                      @if (isLoggedIn()) {
+                        <div class="rating-card">
+                          <div class="aside-heading">Rate this class</div>
+                          <div class="rating-input" (mouseleave)="setHoverStars(o.id, 0)">
+                            @for (s of ratingStars; track s) {
+                              <span
+                                class="star star-input"
+                                [class.filled]="s <= (hoverStarsFor(o.id) || myStarsFor(o.id))"
+                                (mouseenter)="setHoverStars(o.id, s)"
+                                (click)="setMyStars(o.id, s)"
+                              >★</span>
+                            }
+                          </div>
+                          <textarea
+                            class="rating-note"
+                            rows="2"
+                            placeholder="Optional note for the admin team (not shown publicly)…"
+                            [ngModel]="myNoteFor(o.id)"
+                            (ngModelChange)="setMyNote(o.id, $event)"
+                            name="ratingNote-{{ o.id }}"
+                          ></textarea>
+                          <button
+                            type="button"
+                            class="btn btn-outline btn-sm"
+                            [disabled]="!myStarsFor(o.id) || ratingSavingOfferingId() === o.id"
+                            (click)="submitOfferingRating(o.id)"
+                          >
+                            {{ ratingSavingOfferingId() === o.id ? 'Saving…' : myRatingIds().has(o.id) ? 'Update rating' : 'Submit rating' }}
+                          </button>
+                          @if (ratingSavedOfferingId() === o.id) {
+                            <p class="rating-saved-note">Thanks for your feedback!</p>
                           }
                         </div>
                       }

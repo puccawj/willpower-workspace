@@ -53,14 +53,14 @@ const STATUS_COLORS: Record<string, string> = {
 function buildFields(branchNames: string[]): FieldDef[] {
   return [
     { key: 'title', label: 'Event title', type: 'text' },
-    { key: 'branch', label: 'Branch', type: 'combobox', options: branchNames },
+    { key: 'branch', label: 'Branch', type: 'select', options: branchNames },
     { key: 'location', label: 'Location', type: 'text' },
     { key: 'description', label: 'Description', type: 'textarea' },
     { key: 'startAt', label: 'Start', type: 'datetime' },
     { key: 'endAt', label: 'End', type: 'datetime' },
     { key: 'capacity', label: 'Capacity', type: 'number' },
     { key: 'status', label: 'Status', type: 'select', options: STATUS_OPTIONS },
-    { key: 'cover', label: 'Cover image', type: 'image' },
+    { key: 'cover', label: 'Cover image', type: 'image', hint: 'Recommended 800×600px or larger, landscape (4:3) — shown as a cropped card thumbnail.' },
   ];
 }
 
@@ -183,6 +183,10 @@ export class EventList {
     this.router.navigate(['/events', ev.id, 'photos']);
   }
 
+  openFeedback(ev: EventRow): void {
+    this.router.navigate(['/events', ev.id, 'feedback']);
+  }
+
   viewCover(ev: EventRow): void {
     if (ev.coverImageUrl) this.imageViewer.open(ev.coverImageUrl);
   }
@@ -197,58 +201,69 @@ export class EventList {
     return of(payload);
   }
 
+  /** The 'branch' select's options are a static snapshot taken when the modal opens — make sure
+   * branches have actually loaded first, so a fast click right after navigating here doesn't open
+   * the modal with an empty branch list. */
+  private ensureBranchesLoaded(): Observable<unknown> {
+    return this.branchApi.branches().length ? of(null) : this.branchApi.load();
+  }
+
   addEvent(): void {
     const start = new Date();
     start.setHours(start.getHours() + 1, 0, 0, 0);
     const end = new Date(start);
     end.setHours(end.getHours() + 1);
 
-    this.modal.open({
-      title: 'Add Event',
-      fields: buildFields(this.branchNames()),
-      isEdit: false,
-      values: {
-        title: '',
-        branch: '',
-        location: '',
-        description: '',
-        startAt: toDateTimeLocalValue(start),
-        endAt: toDateTimeLocalValue(end),
-        capacity: 20,
-        status: 'Draft',
-        cover: '',
-      },
-      onSave: (values) =>
-        this.resolvePayload(values).pipe(
-          switchMap((payload) => this.api.create(payload)),
-          tap({ error: (err) => this.showError(err, 'Failed to create event.') }),
-        ),
+    this.ensureBranchesLoaded().subscribe(() => {
+      this.modal.open({
+        title: 'Add Event',
+        fields: buildFields(this.branchNames()),
+        isEdit: false,
+        values: {
+          title: '',
+          branch: this.branchNames()[0] ?? '',
+          location: '',
+          description: '',
+          startAt: toDateTimeLocalValue(start),
+          endAt: toDateTimeLocalValue(end),
+          capacity: 20,
+          status: 'Draft',
+          cover: '',
+        },
+        onSave: (values) =>
+          this.resolvePayload(values).pipe(
+            switchMap((payload) => this.api.create(payload)),
+            tap({ error: (err) => this.showError(err, 'Failed to create event.') }),
+          ),
+      });
     });
   }
 
   editEvent(row: EventRow): void {
-    this.modal.open({
-      title: 'Edit Event',
-      fields: buildFields(this.branchNames()),
-      isEdit: true,
-      values: {
-        title: row.title,
-        branch: row.branchName === '—' ? '' : row.branchName,
-        location: row.location,
-        description: row.description,
-        startAt: row.startAtLocal,
-        endAt: row.endAtLocal,
-        capacity: row.capacity,
-        status: row.status,
-        cover: row.coverImageUrl,
-      },
-      onSave: (values) =>
-        this.resolvePayload(values).pipe(
-          switchMap((payload) => this.api.update(row.id, payload)),
-          tap({ error: (err) => this.showError(err, 'Failed to update event.') }),
-        ),
-      onDelete: () =>
-        this.api.remove(row.id).pipe(tap({ error: (err) => this.showError(err, 'Failed to delete event.') })),
+    this.ensureBranchesLoaded().subscribe(() => {
+      this.modal.open({
+        title: 'Edit Event',
+        fields: buildFields(this.branchNames()),
+        isEdit: true,
+        values: {
+          title: row.title,
+          branch: row.branchName === '—' ? '' : row.branchName,
+          location: row.location,
+          description: row.description,
+          startAt: row.startAtLocal,
+          endAt: row.endAtLocal,
+          capacity: row.capacity,
+          status: row.status,
+          cover: row.coverImageUrl,
+        },
+        onSave: (values) =>
+          this.resolvePayload(values).pipe(
+            switchMap((payload) => this.api.update(row.id, payload)),
+            tap({ error: (err) => this.showError(err, 'Failed to update event.') }),
+          ),
+        onDelete: () =>
+          this.api.remove(row.id).pipe(tap({ error: (err) => this.showError(err, 'Failed to delete event.') })),
+      });
     });
   }
 }

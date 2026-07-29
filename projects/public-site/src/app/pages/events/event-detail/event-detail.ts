@@ -17,6 +17,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { ConfirmService } from '../../../core/services/confirm.service';
 import { ImageViewerService } from '../../../core/services/image-viewer.service';
 import { MeApiService } from '../../../core/services/me-api.service';
+import { RatingApiService, RatingSummary } from '../../../core/services/rating-api.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { UploadApiService } from '../../../core/services/upload-api.service';
 import { QrCamera } from '../../../shared/qr-camera/qr-camera';
@@ -32,6 +33,7 @@ const GENERAL = 'general';
 export class EventDetail {
   private readonly api = inject(PublicEventApiService);
   private readonly meApi = inject(MeApiService);
+  private readonly ratingApi = inject(RatingApiService);
   private readonly auth = inject(AuthService);
   private readonly uploads = inject(UploadApiService);
   private readonly toast = inject(ToastService);
@@ -117,6 +119,51 @@ export class EventDetail {
     this.imageViewer.open(photo.imageUrl);
   }
 
+  // ---- Star rating ----
+
+  readonly ratingSummary = signal<RatingSummary>({ average: 0, count: 0 });
+  readonly myRatingId = signal<string | null>(null);
+  readonly myStars = signal(0);
+  readonly hoverStars = signal(0);
+  readonly myNote = signal('');
+  readonly ratingSaving = signal(false);
+  readonly ratingSaved = signal(false);
+
+  readonly ratingStars = computed(() => [1, 2, 3, 4, 5]);
+  readonly filledStars = computed(() => Math.round(this.ratingSummary().average));
+
+  setHoverStars(n: number): void {
+    this.hoverStars.set(n);
+  }
+
+  setMyStars(n: number): void {
+    this.myStars.set(n);
+  }
+
+  submitRating(): void {
+    if (!this.auth.isLoggedIn()) {
+      this.router.navigate(['/login'], { queryParams: { returnUrl: `/events/${this.id()}` } });
+      return;
+    }
+    if (!this.myStars()) return;
+
+    this.ratingSaving.set(true);
+    this.ratingSaved.set(false);
+    this.meApi.rateEvent(this.id(), this.myStars(), this.myNote().trim() || undefined).subscribe({
+      next: (row) => {
+        this.myRatingId.set(row.id);
+        this.ratingSaving.set(false);
+        this.ratingSaved.set(true);
+        this.toast.show('Thanks for your feedback!', 'success');
+        this.ratingApi.summary('event', this.id()).subscribe((s) => this.ratingSummary.set(s));
+      },
+      error: (err) => {
+        this.ratingSaving.set(false);
+        this.toast.show(err?.error?.message ?? 'Could not submit your rating right now.', 'error');
+      },
+    });
+  }
+
   readonly formatMoney = (value: string | null): string => {
     const n = Number(value ?? 0);
     return `$${n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
@@ -197,7 +244,24 @@ export class EventDetail {
       this.donateUnit.set(this.donateUnitOptions[0]);
       this.proofFile.set(null);
       this.donateError.set('');
+      this.ratingSummary.set({ average: 0, count: 0 });
+      this.myRatingId.set(null);
+      this.myStars.set(0);
+      this.hoverStars.set(0);
+      this.myNote.set('');
+      this.ratingSaved.set(false);
       if (!id) return;
+
+      this.ratingApi.summary('event', id).subscribe((s) => this.ratingSummary.set(s));
+      if (this.auth.isLoggedIn()) {
+        this.meApi.myEventRating(id).subscribe((r) => {
+          if (r) {
+            this.myRatingId.set(r.id);
+            this.myStars.set(r.stars);
+            this.myNote.set(r.note ?? '');
+          }
+        });
+      }
 
       this.loading.set(true);
       this.error.set('');
@@ -340,6 +404,7 @@ export class EventDetail {
     const ev = this.event();
     const user = this.auth.currentUser();
     if (!ev || !user) return;
+    if (this.eventEnded()) return;
 
     this.donateError.set('');
 

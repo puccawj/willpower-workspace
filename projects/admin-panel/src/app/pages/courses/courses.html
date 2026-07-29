@@ -30,6 +30,7 @@
                   @if (!roleService.isInstructor()) {
                     <button type="button" class="icon-btn" (click)="goNeeds(c)" title="Donation needs">🎁</button>
                     <button type="button" class="icon-btn" (click)="goPhotos(c)" title="Photos">🖼</button>
+                    <button type="button" class="icon-btn" (click)="goFeedback(c)" title="Feedback">★</button>
                     <button type="button" class="icon-btn" (click)="editCourse(c)" title="Edit">✎</button>
                   }
                 </div>
@@ -64,6 +65,7 @@
             @if (!roleService.isInstructor()) {
               <button type="button" class="icon-btn" (click)="goNeeds(c)" title="Donation needs">🎁</button>
               <button type="button" class="icon-btn" (click)="goPhotos(c)" title="Photos">🖼</button>
+              <button type="button" class="icon-btn" (click)="goFeedback(c)" title="Feedback">★</button>
               <button type="button" class="icon-btn" (click)="editCourse(c)" title="Edit">✎</button>
             }
           </div>

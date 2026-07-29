@@ -225,6 +225,33 @@
   margin-top: 2px;
 }
 
+.rating-summary,
+.rating-input {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 4px 0 10px;
+}
+
+.rating-summary-text {
+  font: 400 11px var(--w-font-sans);
+  color: var(--w-muted-2);
+}
+
+.star {
+  color: var(--w-border);
+  font-size: 13px;
+}
+
+.star.filled {
+  color: var(--w-gold);
+}
+
+.rating-saved-note {
+  font: 500 12px var(--w-font-sans);
+  color: var(--w-green);
+}
+
 .offering-enrolled {
   flex-shrink: 0;
   font: 600 11.5px var(--w-font-sans);

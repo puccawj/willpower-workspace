@@ -182,6 +182,55 @@
   padding: 24px;
 }
 
+.rating-summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0 18px;
+}
+
+.rating-summary-text {
+  font-size: 12.5px;
+}
+
+.star {
+  color: var(--w-border-strong);
+  font-size: 16px;
+
+  &.filled {
+    color: var(--w-gold);
+  }
+}
+
+.rating-input {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.star-input {
+  font-size: 24px;
+  cursor: pointer;
+  transition: color 0.1s;
+}
+
+.rating-note {
+  width: 100%;
+  font: 400 13px var(--w-font-sans);
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--w-border-strong);
+  background: #fff;
+  resize: vertical;
+  margin-bottom: 12px;
+}
+
+.rating-saved-note {
+  font: 500 12.5px var(--w-font-sans);
+  color: var(--w-green);
+  margin: 10px 0 0;
+}
+
 .seats-row {
   display: flex;
   align-items: baseline;

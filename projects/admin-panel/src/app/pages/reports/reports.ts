@@ -11,6 +11,7 @@ import { UserApiService } from '../../core/services/user-api.service';
 import { OfferingApiService } from '../../core/services/offering-api.service';
 import { CertificateApiService } from '../../core/services/certificate-api.service';
 import { ReportsApiService } from '../../core/services/reports-api.service';
+import { RatingApiService } from '../../core/services/rating-api.service';
 
 interface ReportBar {
   name: string;
@@ -55,14 +56,17 @@ export class Reports {
   private readonly offeringApi = inject(OfferingApiService);
   private readonly certificateApi = inject(CertificateApiService);
   private readonly reportsApi = inject(ReportsApiService);
+  private readonly ratingApi = inject(RatingApiService);
 
   readonly tab = signal('events');
+  private readonly ratingCount = signal(0);
 
   readonly tabOptions: FilterOption[] = [
     { key: 'events', label: 'Events' },
     { key: 'learning', label: 'Learning' },
     { key: 'donations', label: 'Donations' },
     { key: 'users', label: 'Users' },
+    { key: 'usage', label: 'Module Usage' },
   ];
 
   constructor() {
@@ -73,6 +77,7 @@ export class Reports {
     this.offeringApi.load().subscribe();
     this.certificateApi.load().subscribe();
     this.reportsApi.loadLearningSummary().subscribe();
+    this.ratingApi.countAll().subscribe((r) => this.ratingCount.set(r.count));
   }
 
   private readonly branchNameById = computed(() => {
@@ -181,6 +186,36 @@ export class Reports {
     };
   });
 
+  /** What visitors on the public-site/mobile app actually do — each metric is an action a
+   * logged-in user initiates themselves (RSVP, enroll, donate, rate), not an admin action —
+   * so this reflects which module gets the most real usage from the user side. */
+  private readonly usageTab = computed<ReportTabData>(() => {
+    const totalRsvps = this.eventApi.events().reduce((sum, ev) => sum + ev.going, 0);
+    const totalEnrollments = this.offeringApi.offerings().reduce((sum, o) => sum + o.enrolledCount, 0);
+    const totalDonations = this.donationApi.donations().length;
+    const totalRatings = this.ratingCount();
+
+    const modules = [
+      { name: 'Events (RSVPs)', count: totalRsvps },
+      { name: 'Courses (Enrollments)', count: totalEnrollments },
+      { name: 'Giving (Donations)', count: totalDonations },
+      { name: 'Feedback (Ratings)', count: totalRatings },
+    ];
+    const mostUsed = [...modules].sort((a, b) => b.count - a.count)[0];
+    const leastUsed = [...modules].sort((a, b) => a.count - b.count)[0];
+
+    return {
+      stats: [
+        { label: 'Most used module', value: mostUsed?.name ?? '—' },
+        { label: 'Least used module', value: leastUsed?.name ?? '—' },
+        { label: 'Total actions logged', value: modules.reduce((sum, m) => sum + m.count, 0) },
+        { label: 'Modules tracked', value: modules.length },
+      ],
+      title: 'Module usage on the public site — most to least used',
+      bars: topBars(modules, (m) => m.name, (m) => m.count, (v) => `${v} action${v === 1 ? '' : 's'}`),
+    };
+  });
+
   readonly current = computed<ReportTabData>(() => {
     switch (this.tab()) {
       case 'learning':
@@ -189,6 +224,8 @@ export class Reports {
         return this.donationsTab();
       case 'users':
         return this.usersTab();
+      case 'usage':
+        return this.usageTab();
       default:
         return this.eventsTab();
     }

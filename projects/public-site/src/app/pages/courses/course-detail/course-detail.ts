@@ -19,6 +19,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { ConfirmService } from '../../../core/services/confirm.service';
 import { ImageViewerService } from '../../../core/services/image-viewer.service';
 import { MeApiService } from '../../../core/services/me-api.service';
+import { RatingApiService, RatingSummary } from '../../../core/services/rating-api.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { UploadApiService } from '../../../core/services/upload-api.service';
 
@@ -31,6 +32,7 @@ import { UploadApiService } from '../../../core/services/upload-api.service';
 export class CourseDetail {
   private readonly api = inject(PublicCourseApiService);
   private readonly meApi = inject(MeApiService);
+  private readonly ratingApi = inject(RatingApiService);
   private readonly auth = inject(AuthService);
   private readonly uploads = inject(UploadApiService);
   private readonly toast = inject(ToastService);
@@ -79,6 +81,12 @@ export class CourseDetail {
 
   /** Fallback branch for whole-course (no specific offering) needs/general donations. */
   private readonly donationBranchId = computed(() => this.offerings()[0]?.branchId ?? null);
+
+  offeringEnded(offering: PublicOffering): boolean {
+    const end = new Date(offering.endDate);
+    end.setHours(23, 59, 59, 999);
+    return end.getTime() < Date.now();
+  }
 
   toggleOfferingDetails(offeringId: string): void {
     this.expandedOfferingId.set(this.expandedOfferingId() === offeringId ? null : offeringId);
@@ -145,6 +153,75 @@ export class CourseDetail {
 
   openPhoto(photo: PublicCoursePhoto): void {
     this.imageViewer.open(photo.imageUrl);
+  }
+
+  // ---- Star rating (per offering) ----
+
+  readonly ratingSummaries = signal<Map<string, RatingSummary>>(new Map());
+  readonly myRatingIds = signal<Map<string, string>>(new Map());
+  readonly myStarsByOffering = signal<Map<string, number>>(new Map());
+  readonly myNotesByOffering = signal<Map<string, string>>(new Map());
+  readonly hoverStarsByOffering = signal<Map<string, number>>(new Map());
+  readonly ratingSavingOfferingId = signal<string | null>(null);
+  readonly ratingSavedOfferingId = signal<string | null>(null);
+
+  readonly ratingStars = [1, 2, 3, 4, 5];
+
+  ratingSummaryFor(offeringId: string): RatingSummary {
+    return this.ratingSummaries().get(offeringId) ?? { average: 0, count: 0 };
+  }
+
+  filledStarsFor(offeringId: string): number {
+    return Math.round(this.ratingSummaryFor(offeringId).average);
+  }
+
+  myStarsFor(offeringId: string): number {
+    return this.myStarsByOffering().get(offeringId) ?? 0;
+  }
+
+  hoverStarsFor(offeringId: string): number {
+    return this.hoverStarsByOffering().get(offeringId) ?? 0;
+  }
+
+  myNoteFor(offeringId: string): string {
+    return this.myNotesByOffering().get(offeringId) ?? '';
+  }
+
+  setHoverStars(offeringId: string, n: number): void {
+    this.hoverStarsByOffering.update((m) => new Map(m).set(offeringId, n));
+  }
+
+  setMyStars(offeringId: string, n: number): void {
+    this.myStarsByOffering.update((m) => new Map(m).set(offeringId, n));
+  }
+
+  setMyNote(offeringId: string, note: string): void {
+    this.myNotesByOffering.update((m) => new Map(m).set(offeringId, note));
+  }
+
+  submitOfferingRating(offeringId: string): void {
+    if (!this.auth.isLoggedIn()) {
+      this.router.navigate(['/login'], { queryParams: { returnUrl: `/courses/${this.id()}` } });
+      return;
+    }
+    const stars = this.myStarsFor(offeringId);
+    if (!stars) return;
+
+    this.ratingSavingOfferingId.set(offeringId);
+    this.ratingSavedOfferingId.set(null);
+    this.meApi.rateOffering(offeringId, stars, this.myNoteFor(offeringId).trim() || undefined).subscribe({
+      next: (row) => {
+        this.myRatingIds.update((m) => new Map(m).set(offeringId, row.id));
+        this.ratingSavingOfferingId.set(null);
+        this.ratingSavedOfferingId.set(offeringId);
+        this.toast.show('Thanks for your feedback!', 'success');
+        this.ratingApi.summary('offering', offeringId).subscribe((s) => this.ratingSummaries.update((m) => new Map(m).set(offeringId, s)));
+      },
+      error: (err) => {
+        this.ratingSavingOfferingId.set(null);
+        this.toast.show(err?.error?.message ?? 'Could not submit your rating right now.', 'error');
+      },
+    });
   }
 
   readonly formatMoney = (value: string | null): string => {
@@ -258,6 +335,13 @@ export class CourseDetail {
       const targetOfferingId = this.route.snapshot.queryParamMap.get('offering');
       if (targetOfferingId) this.expandedOfferingId.set(targetOfferingId);
 
+      this.ratingSummaries.set(new Map());
+      this.myRatingIds.set(new Map());
+      this.myStarsByOffering.set(new Map());
+      this.myNotesByOffering.set(new Map());
+      this.hoverStarsByOffering.set(new Map());
+      this.ratingSavedOfferingId.set(null);
+
       this.offeringsLoading.set(true);
       this.api.loadOfferings(id).subscribe({
         next: (rows) => {
@@ -267,6 +351,22 @@ export class CourseDetail {
             setTimeout(() => {
               document.getElementById('offering-' + targetOfferingId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
             });
+          }
+
+          const offeringIds = rows.map((o) => o.id);
+          this.ratingApi.bulkSummary('offering', offeringIds).subscribe((summaries) => {
+            this.ratingSummaries.set(new Map(Object.entries(summaries)));
+          });
+          if (this.auth.isLoggedIn()) {
+            for (const offeringId of offeringIds) {
+              this.meApi.myOfferingRating(offeringId).subscribe((r) => {
+                if (r) {
+                  this.myRatingIds.update((m) => new Map(m).set(offeringId, r.id));
+                  this.myStarsByOffering.update((m) => new Map(m).set(offeringId, r.stars));
+                  this.myNotesByOffering.update((m) => new Map(m).set(offeringId, r.note ?? ''));
+                }
+              });
+            }
           }
         },
         error: () => {
@@ -340,6 +440,9 @@ export class CourseDetail {
     const user = this.auth.currentUser();
     const branchId = this.targetBranchId();
     if (!course || !user) return;
+
+    const activeOffering = this.activeOffering();
+    if (activeOffering && this.offeringEnded(activeOffering)) return;
 
     this.donateError.set('');
 

@@ -33,6 +33,14 @@
               }
             </div>
             <h3 class="event-title event-title-lg">{{ ev.title }}</h3>
+            @if (ratingFor(ev.id).count) {
+              <div class="list-rating">
+                @for (filled of ratingStarsArray(ratingFor(ev.id).average); track $index) {
+                  <span class="list-star" [class.filled]="filled">★</span>
+                }
+                <span class="list-rating-text">{{ ratingFor(ev.id).average }} ({{ ratingFor(ev.id).count }})</span>
+              </div>
+            }
             <p class="event-blurb">{{ ev.blurb }}</p>
             <div class="event-foot">
               <span class="muted-label">{{ ev.time }}</span>

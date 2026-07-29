@@ -13,6 +13,7 @@ import { PublicEvent } from '../../../core/models/public-event.models';
 import { AuthService } from '../../../core/services/auth.service';
 import { ImageViewerService } from '../../../core/services/image-viewer.service';
 import { MeApiService, MyRsvpStatus } from '../../../core/services/me-api.service';
+import { RatingApiService, RatingSummary } from '../../../core/services/rating-api.service';
 import { UploadApiService } from '../../../core/services/upload-api.service';
 import { BackButton } from '../../../shared/back-button/back-button';
 
@@ -29,6 +30,7 @@ export class EventDetail {
   private readonly router = inject(Router);
   private readonly publicApi = inject(PublicEventApiService);
   private readonly meApi = inject(MeApiService);
+  private readonly ratingApi = inject(RatingApiService);
   private readonly auth = inject(AuthService);
   private readonly uploads = inject(UploadApiService);
   private readonly imageViewer = inject(ImageViewerService);
@@ -87,6 +89,49 @@ export class EventDetail {
 
   openPhoto(photo: PublicEventPhoto): void {
     this.imageViewer.open(photo.imageUrl);
+  }
+
+  // ---- Star rating ----
+
+  readonly ratingSummary = signal<RatingSummary>({ average: 0, count: 0 });
+  readonly myRatingId = signal<string | null>(null);
+  readonly myStars = signal(0);
+  readonly hoverStars = signal(0);
+  readonly myNote = signal('');
+  readonly ratingSaving = signal(false);
+  readonly ratingSaved = signal(false);
+
+  readonly ratingStars = [1, 2, 3, 4, 5];
+  readonly filledStars = computed(() => Math.round(this.ratingSummary().average));
+
+  setHoverStars(n: number): void {
+    this.hoverStars.set(n);
+  }
+
+  setMyStars(n: number): void {
+    this.myStars.set(n);
+  }
+
+  submitRating(): void {
+    if (!this.auth.isLoggedIn()) {
+      this.router.navigate(['/login'], { queryParams: { returnUrl: `/events/${this.eventId}` } });
+      return;
+    }
+    if (!this.myStars()) return;
+
+    this.ratingSaving.set(true);
+    this.ratingSaved.set(false);
+    this.meApi.rateEvent(this.eventId, this.myStars(), this.myNote().trim() || undefined).subscribe({
+      next: (row) => {
+        this.myRatingId.set(row.id);
+        this.ratingSaving.set(false);
+        this.ratingSaved.set(true);
+        this.ratingApi.summary('event', this.eventId).subscribe((s) => this.ratingSummary.set(s));
+      },
+      error: () => {
+        this.ratingSaving.set(false);
+      },
+    });
   }
 
   // ---- Donation wishlist (needs) + donors ----
@@ -159,8 +204,16 @@ export class EventDetail {
     this.meApi.loadEvents().subscribe();
     this.publicApi.loadNeeds(this.eventId).subscribe((rows) => this.needs.set(rows));
     this.publicApi.loadPhotos(this.eventId).subscribe((rows) => this.photos.set(rows));
+    this.ratingApi.summary('event', this.eventId).subscribe((s) => this.ratingSummary.set(s));
     if (this.auth.isLoggedIn()) {
       this.refreshDonations();
+      this.meApi.myEventRating(this.eventId).subscribe((r) => {
+        if (r) {
+          this.myRatingId.set(r.id);
+          this.myStars.set(r.stars);
+          this.myNote.set(r.note ?? '');
+        }
+      });
     }
   }
 
@@ -221,6 +274,7 @@ export class EventDetail {
     const ev = this.event();
     const user = this.auth.currentUser();
     if (!ev || !user) return;
+    if (this.eventEnded()) return;
 
     this.donateError.set('');
 

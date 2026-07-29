@@ -25,3 +25,24 @@
 .event-title-lg {
   font: 500 20px/1.28 var(--w-font-serif);
 }
+
+.list-rating {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 4px 0;
+}
+
+.list-star {
+  color: var(--w-border-strong);
+  font-size: 13px;
+}
+
+.list-star.filled {
+  color: var(--w-gold);
+}
+
+.list-rating-text {
+  font: 400 11.5px var(--w-font-sans);
+  color: var(--w-muted-2);
+}

@@ -41,7 +41,12 @@
           <div class="event-date"><div class="event-day">{{ e.day }}</div><div class="event-mon">{{ e.mon }}</div></div>
           <div class="event-info">
             <div class="event-title">{{ e.title }}</div>
-            <div class="event-meta">{{ e.branch }} · {{ e.time }}</div>
+            <div class="event-meta">
+              {{ e.branch }} · {{ e.time }}
+              @if (eventRatingFor(e.id).count) {
+                · ★ {{ eventRatingFor(e.id).average }} ({{ eventRatingFor(e.id).count }})
+              }
+            </div>
           </div>
         </a>
       }
@@ -54,6 +59,14 @@
           <div class="event-card-body">
             <div class="event-card-date">{{ e.mon }} {{ e.day }}</div>
             <div class="event-card-title">{{ e.title }}</div>
+            @if (eventRatingFor(e.id).count) {
+              <div class="home-rating">
+                @for (filled of ratingStarsArray(eventRatingFor(e.id).average); track $index) {
+                  <span class="home-star" [class.filled]="filled">★</span>
+                }
+                <span class="home-rating-text">{{ eventRatingFor(e.id).average }}</span>
+              </div>
+            }
           </div>
         </a>
       }
@@ -73,7 +86,12 @@
         <a [routerLink]="['/courses', o.courseId]" [queryParams]="{ offering: o.offeringId }" class="course-row">
           <div class="course-row-info">
             <div class="course-row-title">{{ o.title }}</div>
-            <div class="course-row-meta">{{ o.branchName }} · {{ o.format }} · {{ o.shortStartDate }}</div>
+            <div class="course-row-meta">
+              {{ o.branchName }} · {{ o.format }} · {{ o.shortStartDate }}
+              @if (offeringRatingFor(o.offeringId).count) {
+                · ★ {{ offeringRatingFor(o.offeringId).average }} ({{ offeringRatingFor(o.offeringId).count }})
+              }
+            </div>
           </div>
           <div class="course-row-open">{{ o.open }}</div>
         </a>
@@ -92,6 +110,14 @@
           <div class="course-card-body">
             <div class="course-level">{{ o.branchName }} · {{ o.format }}</div>
             <div class="course-title">{{ o.title }}</div>
+            @if (offeringRatingFor(o.offeringId).count) {
+              <div class="home-rating">
+                @for (filled of ratingStarsArray(offeringRatingFor(o.offeringId).average); track $index) {
+                  <span class="home-star" [class.filled]="filled">★</span>
+                }
+                <span class="home-rating-text">{{ offeringRatingFor(o.offeringId).average }}</span>
+              </div>
+            }
             <div class="course-open">{{ o.shortStartDate }} · {{ o.open }}</div>
           </div>
         </a>

@@ -24,6 +24,14 @@
             <h3 class="course-title-lg">
               <a [routerLink]="['/courses', o.courseId]" [queryParams]="{ offering: o.offeringId }" class="course-title-link">{{ o.title }}</a>
             </h3>
+            @if (ratingFor(o.offeringId).count) {
+              <div class="list-rating">
+                @for (filled of ratingStarsArray(ratingFor(o.offeringId).average); track $index) {
+                  <span class="list-star" [class.filled]="filled">★</span>
+                }
+                <span class="list-rating-text">{{ ratingFor(o.offeringId).average }} ({{ ratingFor(o.offeringId).count }})</span>
+              </div>
+            }
             <p class="course-desc-lg">{{ o.branchName }} &middot; {{ o.startDate }} – {{ o.endDate }}</p>
             @if (formatSchedule(o.scheduleSummary); as sched) {
               <p class="course-desc-lg">{{ sched }}</p>

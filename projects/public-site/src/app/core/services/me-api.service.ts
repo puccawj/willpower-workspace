@@ -76,6 +76,12 @@ export interface DonateRequest {
   proofImage?: string;
 }
 
+export interface MyRating {
+  id: string;
+  stars: number;
+  note: string | null;
+}
+
 @Injectable({ providedIn: 'root' })
 export class MeApiService {
   private readonly http = inject(HttpClient);
@@ -132,6 +138,22 @@ export class MeApiService {
 
   donate(dto: DonateRequest): Observable<unknown> {
     return this.http.post(`${this.baseUrl}/donations`, dto).pipe(tap(() => this.loadDonations().subscribe()));
+  }
+
+  myEventRating(eventId: string): Observable<MyRating | null> {
+    return this.http.get<MyRating | null>(`${this.baseUrl}/events/${eventId}/rating`);
+  }
+
+  rateEvent(eventId: string, stars: number, note?: string): Observable<MyRating> {
+    return this.http.put<MyRating>(`${this.baseUrl}/events/${eventId}/rating`, { stars, note });
+  }
+
+  myOfferingRating(offeringId: string): Observable<MyRating | null> {
+    return this.http.get<MyRating | null>(`${this.baseUrl}/course-offerings/${offeringId}/rating`);
+  }
+
+  rateOffering(offeringId: string, stars: number, note?: string): Observable<MyRating> {
+    return this.http.put<MyRating>(`${this.baseUrl}/course-offerings/${offeringId}/rating`, { stars, note });
   }
 
   loadAll(): void {

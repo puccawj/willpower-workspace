@@ -24,7 +24,12 @@
               <span class="live-pill">Live</span>
             }
             <div class="event-card-title">{{ e.title }}</div>
-            <div class="event-card-meta">{{ e.dateFull }} · {{ e.time }}</div>
+            <div class="event-card-meta">
+              {{ e.dateFull }} · {{ e.time }}
+              @if (ratingFor(e.id).count) {
+                · ★ {{ ratingFor(e.id).average }} ({{ ratingFor(e.id).count }})
+              }
+            </div>
           </div>
         </a>
       }

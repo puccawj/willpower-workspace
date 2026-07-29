@@ -18,7 +18,12 @@
           <div class="course-card-body">
             <div class="course-level">{{ o.branchName }} · {{ o.format }}</div>
             <div class="course-title">{{ o.title }}</div>
-            <div class="course-open">{{ o.shortStartDate }} · {{ o.open }}</div>
+            <div class="course-open">
+              {{ o.shortStartDate }} · {{ o.open }}
+              @if (ratingFor(o.offeringId).count) {
+                · ★ {{ ratingFor(o.offeringId).average }} ({{ ratingFor(o.offeringId).count }})
+              }
+            </div>
           </div>
         </a>
       }

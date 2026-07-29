@@ -1,0 +1,53 @@
+<button type="button" class="link-muted back-link" (click)="goEvents()">← All events</button>
+
+<div class="card summary-card">
+  @if (event(); as e) {
+    <div>
+      <h2 class="summary-title">{{ e.title }}</h2>
+      <div class="muted-label">Member feedback — notes are admin-only and never shown publicly</div>
+    </div>
+  } @else {
+    <div class="muted-label">Loading event…</div>
+  }
+  <div class="avg-block">
+    <div class="avg-num">{{ average() || '—' }}</div>
+    <div class="muted-label">{{ rows().length }} rating{{ rows().length === 1 ? '' : 's' }}</div>
+  </div>
+</div>
+
+@if (loading()) {
+  <div class="state-loading card">Loading feedback…</div>
+} @else {
+  <div class="card pad breakdown-card">
+    @for (b of starBreakdown(); track b.stars) {
+      <div class="breakdown-row">
+        <span class="breakdown-label">{{ b.stars }} ★</span>
+        <div class="pct-track"><div class="pct-fill" [style.width.%]="b.pct"></div></div>
+        <span class="breakdown-count">{{ b.count }}</span>
+      </div>
+    }
+  </div>
+
+  <div class="feedback-rows">
+    @for (row of rows(); track row.id) {
+      <div class="card feedback-row">
+        <div class="feedback-head">
+          <div>
+            <span class="stars">{{ '★'.repeat(row.stars) }}{{ '☆'.repeat(5 - row.stars) }}</span>
+            <span class="feedback-user">{{ row.userName }}</span>
+            <span class="muted-label">{{ row.userEmail }}</span>
+          </div>
+          <span class="muted-label">{{ formatDate(row.createdAt) }}</span>
+        </div>
+        @if (row.note) {
+          <p class="feedback-note">{{ row.note }}</p>
+        } @else {
+          <p class="feedback-note feedback-note-empty">No note left.</p>
+        }
+      </div>
+    }
+    @if (!rows().length) {
+      <div class="card state-empty">No feedback submitted yet.</div>
+    }
+  </div>
+}
