@@ -2,6 +2,93 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-07-29 (9) — Module Usage report redefined around public-site activity
+
+- The "Module Usage" report tab now measures what public-site/mobile
+  **users** actually do (RSVPs, enrollments, donations, ratings submitted)
+  instead of mixing in admin-only actions (broadcasts sent, certificates
+  issued) — so "most/least used module" reflects real end-user engagement.
+
+## 2026-07-29 (8) — Star ratings now shown on Event/Course list cards
+
+- The Events list page and Courses list page (public-site + mobile) now show
+  the aggregate star rating on every card, same as Home and the detail
+  pages — average + count only, no notes.
+
+## 2026-07-29 (7) — Star ratings now shown on the Home page
+
+- Upcoming event cards and course offering cards on the Home page
+  (public-site + mobile) now show the aggregate star rating (average +
+  count) when at least one rating exists, matching the event/course detail
+  pages — read-only, no notes shown, same as everywhere else public.
+
+## 2026-07-29 (6) — 5-star feedback on Events and Course Offerings
+
+- **Members (public-site + mobile)** can now rate an event or a class
+  offering 1-5 stars, with an optional private note, from the event/course
+  detail page. Submitting again updates their existing rating instead of
+  creating a duplicate. The aggregate average + rating count is shown
+  publicly next to the event/offering — **notes are never shown publicly.**
+- **Admins** get a new "Feedback" action (★ icon) on each event/course row,
+  showing every rating with who gave it, their note, and when — so
+  admin/superadmin can see *why* something was rated the way it was and use
+  it to improve future events/courses. Course feedback groups by which
+  offering the rating belongs to.
+
+## 2026-07-29 (5) — Reports: Module Usage tab
+
+- Added a "Module Usage" tab to Reports, ranking Events/Courses/Giving/
+  Certificates/Broadcast by total activity (RSVPs, enrollments, donations,
+  certificates issued, broadcasts sent) so admins can see which modules are
+  used most vs. least.
+
+## 2026-07-29 (4) — Home page banner carousel (admin-managed)
+
+- **New "Home Banners" page under Site in the admin sidebar.** Admins can
+  add banner images with an optional scheduling window (start date, end
+  date or no end date) and an on/off toggle, and reorder them.
+- Public-site's Home page now shows an auto-advancing carousel (with
+  prev/next buttons and dots) of every banner that is currently on and
+  within its date window, above the hero section. Each banner can
+  optionally link to a page (e.g. `/events`) or an external URL.
+- Seeded with 3 sample banners so the carousel isn't empty by default —
+  replace them from the admin panel.
+
+## 2026-07-29 (3) — Privacy Policy restored to sectioned layout
+
+- Reworked the Privacy Policy content model from one big HTML blob back
+  into a list of numbered sections with a sticky table-of-contents, matching
+  the site's original look — now admin-editable (add/edit/delete/reorder
+  sections) instead of hardcoded.
+
+## 2026-07-29 (2) — Admin-editable About page + Privacy Policy
+
+- **New "About Page" and "Privacy Policy" pages under Site in the admin
+  sidebar.** Admins can now edit the About page's eyebrow/title/lead text, add
+  or remove images in a banner carousel (previously a single hardcoded image),
+  and add/edit/delete "Our journey" timeline entries (year + title +
+  description) — all without a code deploy.
+- The Privacy Policy is now a single admin-editable HTML field (with a "last
+  updated" label) instead of hardcoded markup, edited from its own admin page
+  with a live preview.
+- Public-site's About page now renders the banner as an auto-advancing,
+  swipeable-by-dots carousel when more than one image is configured.
+- Backed by a new generic `site_content` table/API (see api CHANGELOG) —
+  public pages fall back to the original hardcoded content if nothing has
+  been edited yet.
+
+## 2026-07-29 (1) — Donations close on past events and ended course offerings
+
+- **Past events**: the donate tab on an event's detail page (mobile +
+  public-site) now shows "This event has already ended — donations are
+  closed" instead of the donation form, once the event's date has passed.
+- **Ended course offerings**: the donate tab on a course's detail page
+  (mobile + public-site) now closes per-offering once that offering's end
+  date has passed, showing "This class has already ended — donations are
+  closed."
+- **Admin Course donation needs**: removed the "whole course" donation-target
+  option — every new donation need must now target a specific class offering.
+
 ## 2026-07-28 (6) — Mobile: Home never pops into leftover navigation history
 
 - **Pressing back while on Home now always shows the double-back-to-exit
