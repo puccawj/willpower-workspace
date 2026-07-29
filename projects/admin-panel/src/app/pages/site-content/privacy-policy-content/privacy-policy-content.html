@@ -1,0 +1,49 @@
+@if (loading()) {
+  <div class="state-loading card">Loading Privacy Policy content…</div>
+} @else {
+  <div class="card pad">
+    <h3 class="section-title">Header</h3>
+    <div class="field-inline">
+      <label class="muted-label">Last updated (shown to visitors, e.g. "July 14, 2026")</label>
+      <input class="form-input" [ngModel]="content().lastUpdated" (ngModelChange)="updateField('lastUpdated', $event)" />
+    </div>
+    <div class="field-inline">
+      <label class="muted-label">Lead paragraph</label>
+      <textarea
+        class="form-input form-textarea"
+        rows="6"
+        [ngModel]="content().lead"
+        (ngModelChange)="updateField('lead', $event)"
+      ></textarea>
+    </div>
+    <button type="button" class="btn btn-solid" [disabled]="saving()" (click)="saveTop()">
+      {{ saving() ? 'Saving…' : 'Save header' }}
+    </button>
+  </div>
+
+  <div class="card pad">
+    <div class="section-head">
+      <h3 class="section-title">Sections</h3>
+      <button type="button" class="btn btn-outline" (click)="addSection()">+ Add Section</button>
+    </div>
+    <div class="need-rows">
+      @for (s of content().sections; track s.id; let i = $index) {
+        <div class="card need-row">
+          <div class="need-row-head">
+            <div>
+              <div class="need-title">{{ i + 1 }}. {{ s.title }}</div>
+            </div>
+            <div class="action-group">
+              <button type="button" class="icon-btn" [disabled]="i === 0" (click)="moveSection(i, -1)" title="Move up">↑</button>
+              <button type="button" class="icon-btn" [disabled]="i === content().sections.length - 1" (click)="moveSection(i, 1)" title="Move down">↓</button>
+              <button type="button" class="icon-btn" (click)="editSection(i, s)" title="Edit">✎</button>
+            </div>
+          </div>
+        </div>
+      }
+      @if (!content().sections.length) {
+        <div class="state-empty">No sections yet — click "+ Add Section" to create the first one.</div>
+      }
+    </div>
+  </div>
+}

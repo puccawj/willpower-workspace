@@ -1,0 +1,70 @@
+@if (loading()) {
+  <div class="state-loading card">Loading About page content…</div>
+} @else {
+  <div class="card pad">
+    <h3 class="section-title">Hero</h3>
+    <div class="field-inline">
+      <label class="muted-label">Eyebrow</label>
+      <input class="form-input" [ngModel]="content().eyebrow" (ngModelChange)="updateField('eyebrow', $event)" />
+    </div>
+    <div class="field-inline">
+      <label class="muted-label">Title</label>
+      <input class="form-input" [ngModel]="content().heroTitle" (ngModelChange)="updateField('heroTitle', $event)" />
+    </div>
+    <div class="field-inline">
+      <label class="muted-label">Lead paragraph</label>
+      <textarea
+        class="form-input form-textarea"
+        rows="4"
+        [ngModel]="content().heroLead"
+        (ngModelChange)="updateField('heroLead', $event)"
+      ></textarea>
+    </div>
+    <button type="button" class="btn btn-solid" [disabled]="saving()" (click)="saveHero()">
+      {{ saving() ? 'Saving…' : 'Save hero text' }}
+    </button>
+  </div>
+
+  <div class="card pad">
+    <div class="section-head">
+      <h3 class="section-title">Banner carousel</h3>
+      <button type="button" class="btn btn-outline" (click)="addImage()">+ Add Image</button>
+    </div>
+    <div class="carousel-grid">
+      @for (img of content().carouselImages; track img; let i = $index) {
+        <div class="carousel-item">
+          <img [src]="img" alt="" class="carousel-thumb" />
+          <button type="button" class="icon-btn icon-btn-remove" title="Remove" (click)="removeImage(i)">✕</button>
+        </div>
+      }
+      @if (!content().carouselImages.length) {
+        <div class="muted-label">No images yet — add at least one for the banner to display.</div>
+      }
+    </div>
+  </div>
+
+  <div class="card pad">
+    <div class="section-head">
+      <h3 class="section-title">Our journey</h3>
+      <button type="button" class="btn btn-outline" (click)="addTimelineEntry()">+ Add Entry</button>
+    </div>
+    <div class="need-rows">
+      @for (t of content().timeline; track $index; let i = $index) {
+        <div class="card need-row">
+          <div class="need-row-head">
+            <div>
+              <div class="need-title">{{ t.year }} — {{ t.title }}</div>
+              <div class="muted-label">{{ t.desc }}</div>
+            </div>
+            <div class="action-group">
+              <button type="button" class="icon-btn" (click)="editTimelineEntry(i, t)" title="Edit">✎</button>
+            </div>
+          </div>
+        </div>
+      }
+      @if (!content().timeline.length) {
+        <div class="state-empty">No journey entries yet — click "+ Add Entry" to create the first one.</div>
+      }
+    </div>
+  </div>
+}

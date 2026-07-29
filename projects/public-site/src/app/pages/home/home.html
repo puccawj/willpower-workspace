@@ -1,3 +1,35 @@
+@if (banners().length) {
+  <section class="home-banner">
+    <div class="carousel">
+      @for (b of banners(); track b.id; let i = $index) {
+        <img
+          [src]="b.imageUrl"
+          alt=""
+          class="carousel-slide"
+          [class.active]="i === activeSlide()"
+          [class.clickable]="!!b.linkUrl"
+          (click)="onBannerClick(b.linkUrl)"
+        />
+      }
+      @if (banners().length > 1) {
+        <button type="button" class="carousel-nav carousel-prev" (click)="prev()" aria-label="Previous banner">‹</button>
+        <button type="button" class="carousel-nav carousel-next" (click)="next()" aria-label="Next banner">›</button>
+        <div class="carousel-dots">
+          @for (b of banners(); track b.id; let i = $index) {
+            <button
+              type="button"
+              class="carousel-dot"
+              [class.active]="i === activeSlide()"
+              (click)="goToSlide(i)"
+              [attr.aria-label]="'Go to banner ' + (i + 1)"
+            ></button>
+          }
+        </div>
+      }
+    </div>
+  </section>
+}
+
 <section class="hero pad">
   <div class="eyebrow">Established 1932 · USA · Canada · Australia</div>
   <h1 class="heroh1">Training the mind,<br />strengthening the will</h1>
@@ -40,6 +72,14 @@
               }
             </div>
             <h3 class="event-title">{{ ev.title }}</h3>
+            @if (eventRatingFor(ev.id).count) {
+              <div class="home-rating">
+                @for (filled of ratingStarsArray(eventRatingFor(ev.id).average); track $index) {
+                  <span class="home-star" [class.filled]="filled">★</span>
+                }
+                <span class="home-rating-text">{{ eventRatingFor(ev.id).average }} ({{ eventRatingFor(ev.id).count }})</span>
+              </div>
+            }
             <p class="event-blurb">{{ ev.blurb }}</p>
             <span class="link-cta">Details &amp; RSVP →</span>
           </div>
@@ -66,6 +106,14 @@
           <div class="course-card-body">
             <div class="eyebrow small">{{ o.level }}</div>
             <h3 class="course-title">{{ o.title }}</h3>
+            @if (offeringRatingFor(o.offeringId).count) {
+              <div class="home-rating">
+                @for (filled of ratingStarsArray(offeringRatingFor(o.offeringId).average); track $index) {
+                  <span class="home-star" [class.filled]="filled">★</span>
+                }
+                <span class="home-rating-text">{{ offeringRatingFor(o.offeringId).average }} ({{ offeringRatingFor(o.offeringId).count }})</span>
+              </div>
+            }
             <p class="course-desc">{{ o.format }} · {{ o.shortStartDate }}</p>
             <div class="course-foot">
               <span class="muted-label">{{ o.open }}</span>

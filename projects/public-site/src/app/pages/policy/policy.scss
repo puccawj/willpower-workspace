@@ -8,6 +8,7 @@
 }
 
 .policy-hero {
+  padding-top: 64px;
   padding-bottom: 0;
 }
 
@@ -19,7 +20,6 @@
 .policy-lead {
   font: 400 15.5px/1.75 var(--w-font-sans);
   color: #4a4034;
-  max-width: 760px;
   margin: 0 0 10px;
 }
 
@@ -83,34 +83,36 @@
   margin: 0 0 14px;
 }
 
-.policy-p {
-  font: 400 14.5px/1.75 var(--w-font-sans);
-  color: #4a4034;
-  margin: 0 0 14px;
+.policy-body-html {
+  ::ng-deep p {
+    font: 400 14.5px/1.75 var(--w-font-sans);
+    color: #4a4034;
+    margin: 0 0 14px;
 
-  &:last-child {
-    margin-bottom: 0;
+    &:last-child {
+      margin-bottom: 0;
+    }
   }
 
-  a {
+  ::ng-deep a {
     color: var(--w-accent);
     font-weight: 600;
   }
-}
 
-.policy-ul {
-  margin: 0 0 14px;
-  padding-left: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  ::ng-deep ul {
+    margin: 0 0 14px;
+    padding-left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
 
-  li {
+  ::ng-deep li {
     font: 400 14.5px/1.7 var(--w-font-sans);
     color: #4a4034;
   }
 
-  strong {
+  ::ng-deep strong {
     color: var(--w-ink);
   }
 }

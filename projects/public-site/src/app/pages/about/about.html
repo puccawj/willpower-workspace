@@ -1,27 +1,39 @@
 <section class="pad about-hero">
   <div class="about-hero-inner">
-    <div class="eyebrow">Since 1932</div>
-    <h1 class="about-title">A discipline of the heart, carried across generations</h1>
-    <p class="about-lead">
-      The Willpower Institute preserves a lineage of meditation teaching devoted to cultivating willpower — the
-      steady, patient strength that turns intention into daily practice. What began as a single hall now welcomes
-      students on three continents.
-    </p>
+    <div class="eyebrow">{{ content().eyebrow }}</div>
+    <h1 class="about-title">{{ content().heroTitle }}</h1>
+    <p class="about-lead">{{ content().heroLead }}</p>
   </div>
 </section>
 
 <section class="pad about-banner">
-  <img
-    src="https://images.unsplash.com/photo-1665849050332-8d5d7e59afb6?q=80&w=1600&auto=format&fit=crop"
-    alt=""
-  />
+  <div class="carousel">
+    @for (img of content().carouselImages; track img; let i = $index) {
+      <img [src]="img" alt="" class="carousel-slide" [class.active]="i === activeSlide()" />
+    }
+    @if (content().carouselImages.length > 1) {
+      <button type="button" class="carousel-nav carousel-prev" (click)="prev()" aria-label="Previous image">‹</button>
+      <button type="button" class="carousel-nav carousel-next" (click)="next()" aria-label="Next image">›</button>
+      <div class="carousel-dots">
+        @for (img of content().carouselImages; track img; let i = $index) {
+          <button
+            type="button"
+            class="carousel-dot"
+            [class.active]="i === activeSlide()"
+            (click)="goToSlide(i)"
+            [attr.aria-label]="'Go to image ' + (i + 1)"
+          ></button>
+        }
+      </div>
+    }
+  </div>
 </section>
 
 <section class="pad about-journey">
   <div class="journey-grid">
     <div><h2 class="journey-heading">Our journey</h2></div>
     <div class="journey-list">
-      @for (t of timeline; track t.year) {
+      @for (t of content().timeline; track t.year) {
         <div class="journey-item">
           <div class="journey-year">{{ t.year }}</div>
           <div>

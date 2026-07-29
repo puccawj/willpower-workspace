@@ -4,6 +4,7 @@ import { Dashboard } from './pages/dashboard/dashboard';
 import { EventList } from './pages/events/event-list/event-list';
 import { EventNeeds } from './pages/events/event-needs/event-needs';
 import { EventPhotos } from './pages/events/event-photos/event-photos';
+import { EventFeedback } from './pages/events/event-feedback/event-feedback';
 import { Rsvp } from './pages/events/rsvp/rsvp';
 import { RsvpOverview } from './pages/events/rsvp-overview/rsvp-overview';
 import { Donations } from './pages/donations/donations';
@@ -12,6 +13,7 @@ import { Branches } from './pages/branches/branches';
 import { Courses } from './pages/courses/courses';
 import { CourseNeeds } from './pages/courses/course-needs/course-needs';
 import { CoursePhotos } from './pages/courses/course-photos/course-photos';
+import { CourseFeedback } from './pages/courses/course-feedback/course-feedback';
 import { Schedule } from './pages/schedule/schedule';
 import { Enrollment } from './pages/enrollment/enrollment';
 import { Certificates } from './pages/certificates/certificates';
@@ -20,6 +22,9 @@ import { Templates } from './pages/templates/templates';
 import { Team } from './pages/team/team';
 import { Reports } from './pages/reports/reports';
 import { Broadcast } from './pages/broadcast/broadcast';
+import { AboutContentPage } from './pages/site-content/about-content/about-content';
+import { PrivacyPolicyContentPage } from './pages/site-content/privacy-policy-content/privacy-policy-content';
+import { HomeBanners } from './pages/site-content/home-banners/home-banners';
 import { roleAccessGuard } from './core/guards/role-access.guard';
 import { authGuard } from './core/guards/auth.guard';
 
@@ -67,6 +72,12 @@ export const routes: Routes = [
         data: { title: 'Event Photos', subtitle: 'Atmosphere photos for this event', allow: ['superadmin', 'admin'] },
       },
       {
+        path: 'events/:id/feedback',
+        component: EventFeedback,
+        canActivate: [roleAccessGuard],
+        data: { title: 'Event Feedback', subtitle: 'Member star ratings and private notes for this event', allow: ['superadmin', 'admin'] },
+      },
+      {
         path: 'rsvp',
         component: RsvpOverview,
         canActivate: [roleAccessGuard],
@@ -109,6 +120,12 @@ export const routes: Routes = [
         data: { title: 'Course Photos', subtitle: 'Atmosphere photos for this course', allow: ['superadmin', 'admin'] },
       },
       {
+        path: 'courses/:id/feedback',
+        component: CourseFeedback,
+        canActivate: [roleAccessGuard],
+        data: { title: 'Course Feedback', subtitle: 'Member star ratings and private notes across this course\'s offerings', allow: ['superadmin', 'admin'] },
+      },
+      {
         path: 'schedule',
         component: Schedule,
         canActivate: [roleAccessGuard],
@@ -137,6 +154,24 @@ export const routes: Routes = [
         component: Templates,
         canActivate: [roleAccessGuard],
         data: { title: 'Certificate Templates', subtitle: 'Upload backgrounds and design the layout', allow: ['superadmin'] },
+      },
+      {
+        path: 'home-banners',
+        component: HomeBanners,
+        canActivate: [roleAccessGuard],
+        data: { title: 'Home Banners', subtitle: 'Carousel images shown at the top of the public-site Home page', allow: ['superadmin', 'admin'] },
+      },
+      {
+        path: 'about-content',
+        component: AboutContentPage,
+        canActivate: [roleAccessGuard],
+        data: { title: 'About Page', subtitle: 'Edit hero text, banner carousel, and the "Our journey" timeline', allow: ['superadmin', 'admin'] },
+      },
+      {
+        path: 'privacy-policy-content',
+        component: PrivacyPolicyContentPage,
+        canActivate: [roleAccessGuard],
+        data: { title: 'Privacy Policy', subtitle: 'Edit the Privacy Policy shown on the public website', allow: ['superadmin', 'admin'] },
       },
       {
         path: 'team',

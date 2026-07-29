@@ -1,0 +1,39 @@
+<div class="card summary-card">
+  <div>
+    <h2 class="summary-title">Home Banners</h2>
+    <div class="muted-label">Carousel images shown at the top of the public-site Home page</div>
+  </div>
+  <button type="button" class="btn btn-outline" (click)="addBanner()">+ Add Banner</button>
+</div>
+
+@if (error()) {
+  <div class="state-error card">{{ error() }}</div>
+} @else if (loading()) {
+  <div class="state-loading card">Loading banners…</div>
+} @else {
+  <div class="banner-rows">
+    @for (b of rows(); track b.id; let i = $index) {
+      <div class="card banner-row">
+        <img [src]="b.imageUrl" alt="" class="banner-thumb" />
+        <div class="banner-body">
+          <div class="banner-head">
+            <span class="badge" [style.background]="statusOf(b).color">{{ statusOf(b).label }}</span>
+            @if (b.linkUrl) {
+              <span class="muted-label">→ {{ b.linkUrl }}</span>
+            }
+          </div>
+          <div class="muted-label">{{ dateRangeLabel(b) }}</div>
+        </div>
+        <div class="action-group">
+          <button type="button" class="icon-btn" [disabled]="i === 0" (click)="moveBanner(i, -1)" title="Move up">↑</button>
+          <button type="button" class="icon-btn" [disabled]="i === rows().length - 1" (click)="moveBanner(i, 1)" title="Move down">↓</button>
+          <button type="button" class="icon-btn" [style.color]="b.isActive ? 'var(--w-red)' : 'var(--w-green)'" (click)="toggleActive(b)" [title]="b.isActive ? 'Turn off' : 'Turn on'">⏻</button>
+          <button type="button" class="icon-btn" (click)="editBanner(b)" title="Edit">✎</button>
+        </div>
+      </div>
+    }
+    @if (!rows().length) {
+      <div class="card state-empty">No banners yet — click "+ Add Banner" to create the first one.</div>
+    }
+  </div>
+}

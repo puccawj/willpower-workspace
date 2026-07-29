@@ -1,0 +1,54 @@
+:host {
+  display: block;
+}
+
+.card + .card {
+  margin-top: 18px;
+}
+
+.field-inline {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.form-textarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 90px;
+  font-family: var(--w-font-sans);
+}
+
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.need-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.need-row {
+  padding: 16px 18px;
+}
+
+.need-row-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.need-title {
+  font: 500 15px var(--w-font-sans);
+}
+
+.state-empty {
+  text-align: center;
+  color: var(--w-muted);
+  padding: 24px 16px;
+}
