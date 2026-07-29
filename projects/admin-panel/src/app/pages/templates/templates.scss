@@ -2,6 +2,20 @@
   display: block;
 }
 
+.filters-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin: 16px 0;
+}
+
+.field-inline {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 200px;
+}
+
 .template-name-cell {
   display: flex;
   align-items: center;

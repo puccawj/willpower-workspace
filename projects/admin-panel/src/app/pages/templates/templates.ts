@@ -104,7 +104,22 @@ export class Templates {
 
   private readonly rows = computed<TemplateRow[]>(() => this.api.templates().map(toRow));
 
-  readonly ctrl = new ListController<TemplateRow>(this.rows);
+  readonly globalBranchOption = GLOBAL_BRANCH;
+  readonly branchFilter = signal('all');
+  readonly branchFilterOptions = computed(() => this.branchApi.branches().map((b) => ({ id: b.id, label: b.name })));
+
+  private readonly filteredRows = computed(() => {
+    const branch = this.branchFilter();
+    if (branch === 'all') return this.rows();
+    if (branch === GLOBAL_BRANCH) return this.rows().filter((r) => !r.branchId);
+    return this.rows().filter((r) => r.branchId === branch);
+  });
+
+  setBranchFilter(value: string): void {
+    this.branchFilter.set(value);
+  }
+
+  readonly ctrl = new ListController<TemplateRow>(this.filteredRows);
 
   // ---- Layout designer ----
 
@@ -144,8 +159,13 @@ export class Templates {
       { key: 'name', label: 'Template name', type: 'text' },
       { key: 'type', label: 'Type', type: 'select', options: TYPE_OPTIONS },
       { key: 'year', label: 'Year', type: 'number' },
-      { key: 'branch', label: 'Branch', type: 'combobox', options: [GLOBAL_BRANCH, ...this.branchNames()] },
-      { key: 'background', label: 'Background image', type: 'image' },
+      { key: 'branch', label: 'Branch', type: 'select', options: [GLOBAL_BRANCH, ...this.branchNames()] },
+      {
+        key: 'background',
+        label: 'Background image',
+        type: 'image',
+        hint: 'A4 landscape ratio (~1.41:1), e.g. 2000×1414px or larger, for sharp PDF/print output.',
+      },
     ];
   }
 
@@ -260,45 +280,56 @@ export class Templates {
     });
   }
 
+  /** The 'branch' combobox's options are a static snapshot taken when the modal opens — make sure
+   * branches have actually loaded first, so a fast click right after navigating here doesn't open
+   * the modal with an empty branch list. */
+  private ensureBranchesLoaded(): Observable<unknown> {
+    return this.branchApi.branches().length ? of(null) : this.branchApi.load();
+  }
+
   addTemplate(): void {
-    this.modal.open({
-      title: 'Add Certificate Template',
-      fields: this.buildFields(),
-      isEdit: false,
-      values: { name: '', type: 'Certificate', year: new Date().getFullYear(), branch: GLOBAL_BRANCH, background: '' },
-      onSave: (values) =>
-        this.resolvePayload(values).pipe(
-          switchMap((payload) => this.api.create(payload)),
-          tap({
-            next: () => {
-              const created = this.api.templates().find((t) => t.name === String(values['name']));
-              if (created) this.selectForDesign(toRow(created));
-            },
-            error: (err) => this.showError(err, 'Failed to create template.'),
-          }),
-        ),
+    this.ensureBranchesLoaded().subscribe(() => {
+      this.modal.open({
+        title: 'Add Certificate Template',
+        fields: this.buildFields(),
+        isEdit: false,
+        values: { name: '', type: 'Certificate', year: new Date().getFullYear(), branch: GLOBAL_BRANCH, background: '' },
+        onSave: (values) =>
+          this.resolvePayload(values).pipe(
+            switchMap((payload) => this.api.create(payload)),
+            tap({
+              next: () => {
+                const created = this.api.templates().find((t) => t.name === String(values['name']));
+                if (created) this.selectForDesign(toRow(created));
+              },
+              error: (err) => this.showError(err, 'Failed to create template.'),
+            }),
+          ),
+      });
     });
   }
 
   editTemplate(row: TemplateRow): void {
-    this.modal.open({
-      title: 'Edit Certificate Template',
-      fields: this.buildFields(),
-      isEdit: true,
-      values: {
-        name: row.name,
-        type: row.typeLabel,
-        year: row.year === '—' ? new Date().getFullYear() : Number(row.year),
-        branch: row.branchName,
-        background: row.backgroundImageUrl,
-      },
-      onSave: (values) =>
-        this.resolvePayload(values).pipe(
-          switchMap((payload) => this.api.update(row.id, payload)),
-          tap({ error: (err) => this.showError(err, 'Failed to update template.') }),
-        ),
-      onDelete: () =>
-        this.api.remove(row.id).pipe(tap({ error: (err) => this.showError(err, 'Failed to delete template.') })),
+    this.ensureBranchesLoaded().subscribe(() => {
+      this.modal.open({
+        title: 'Edit Certificate Template',
+        fields: this.buildFields(),
+        isEdit: true,
+        values: {
+          name: row.name,
+          type: row.typeLabel,
+          year: row.year === '—' ? new Date().getFullYear() : Number(row.year),
+          branch: row.branchName,
+          background: row.backgroundImageUrl,
+        },
+        onSave: (values) =>
+          this.resolvePayload(values).pipe(
+            switchMap((payload) => this.api.update(row.id, payload)),
+            tap({ error: (err) => this.showError(err, 'Failed to update template.') }),
+          ),
+        onDelete: () =>
+          this.api.remove(row.id).pipe(tap({ error: (err) => this.showError(err, 'Failed to delete template.') })),
+      });
     });
   }
 }

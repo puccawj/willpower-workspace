@@ -11,7 +11,7 @@
           <div class="field" [class.field-full]="f.type === 'image' || f.type === 'textarea'">
             <label class="field-label">
               {{ f.label }}
-              @if (f.hint) {
+              @if (f.hint && f.type !== 'image') {
                 <span class="field-hint-inline">{{ f.hint }}</span>
               }
             </label>
@@ -186,6 +186,9 @@
                 </div>
               }
               @case ('image') {
+                @if (f.hint) {
+                  <div class="image-size-hint"><strong>Recommended size:</strong> {{ f.hint }}</div>
+                }
                 <label class="image-slot" [class.has-image]="cfg.values[f.key]">
                   @if (cfg.values[f.key]) {
                     <img [src]="cfg.values[f.key]" alt="" class="image-slot-preview" />

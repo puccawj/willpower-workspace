@@ -45,7 +45,7 @@ const FIELDS: FieldDef[] = [
   { key: 'zipCode', label: 'Zip / Postal code', type: 'text' },
   { key: 'phoneNumber', label: 'Phone Number', type: 'phone', countryKey: 'phoneCountryCode' },
   { key: 'email', label: 'Branch email', type: 'email' },
-  { key: 'logo', label: 'Branch photo', type: 'image' },
+  { key: 'logo', label: 'Branch photo', type: 'image', hint: 'Recommended 800×600px or larger, landscape — shown as a cropped card thumbnail.' },
   { key: 'description', label: 'Description (shown on the public website)', type: 'textarea' },
 ];
 

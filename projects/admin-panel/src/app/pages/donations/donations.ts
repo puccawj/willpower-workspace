@@ -141,9 +141,9 @@ function buildFields(branchNames: string[], eventTitles: string[]): FieldDef[] {
     { key: 'amountOrItem', label: 'Amount / item', type: 'text' },
     { key: 'donorPhoneNumber', label: 'Donor phone', type: 'phone', countryKey: 'donorPhoneCountryCode' },
     { key: 'donorEmail', label: 'Donor email', type: 'email' },
-    { key: 'branch', label: 'Branch', type: 'combobox', options: branchNames },
+    { key: 'branch', label: 'Branch', type: 'select', options: branchNames },
     { key: 'event', label: 'Related event', type: 'combobox', options: [NO_EVENT, ...eventTitles] },
-    { key: 'proof', label: 'Proof photo', type: 'image' },
+    { key: 'proof', label: 'Proof photo', type: 'image', hint: 'A clear, readable photo of the receipt/slip — any size works.' },
   ];
 }
 
@@ -444,55 +444,66 @@ export class Donations {
     });
   }
 
+  /** The 'branch' select's options are a static snapshot taken when the modal opens — make sure
+   * branches have actually loaded first, so a fast click right after navigating here doesn't open
+   * the modal with an empty branch list. */
+  private ensureBranchesLoaded(): Observable<unknown> {
+    return this.branchApi.branches().length ? of(null) : this.branchApi.load();
+  }
+
   addDonation(): void {
-    this.modal.open({
-      title: 'Log Donation',
-      fields: buildFields(this.branchNames(), this.eventTitles()),
-      isEdit: false,
-      values: {
-        donorName: '',
-        isAnonymous: 'No',
-        type: 'Money',
-        amountOrItem: '',
-        donorPhoneCountryCode: '',
-        donorPhoneNumber: '',
-        donorEmail: '',
-        branch: '',
-        event: NO_EVENT,
-        proof: '',
-      },
-      onSave: (values) =>
-        this.resolvePayload(values).pipe(
-          switchMap((payload) => this.api.create(payload)),
-          tap({ error: (err) => this.showError(err, 'Failed to log donation.') }),
-        ),
+    this.ensureBranchesLoaded().subscribe(() => {
+      this.modal.open({
+        title: 'Log Donation',
+        fields: buildFields(this.branchNames(), this.eventTitles()),
+        isEdit: false,
+        values: {
+          donorName: '',
+          isAnonymous: 'No',
+          type: 'Money',
+          amountOrItem: '',
+          donorPhoneCountryCode: '',
+          donorPhoneNumber: '',
+          donorEmail: '',
+          branch: this.branchNames()[0] ?? '',
+          event: NO_EVENT,
+          proof: '',
+        },
+        onSave: (values) =>
+          this.resolvePayload(values).pipe(
+            switchMap((payload) => this.api.create(payload)),
+            tap({ error: (err) => this.showError(err, 'Failed to log donation.') }),
+          ),
+      });
     });
   }
 
   editDonation(row: DonationRow): void {
-    this.modal.open({
-      title: 'Edit Donation',
-      fields: buildFields(this.branchNames(), this.eventTitles()),
-      isEdit: true,
-      values: {
-        donorName: row.donorName,
-        isAnonymous: row.isAnonymous ? 'Yes' : 'No',
-        type: row.typeLabel,
-        amountOrItem: row.type === 'money' ? row.amountOrItem.replace('$', '') : row.amountOrItem,
-        donorPhoneCountryCode: row.donorPhoneCountryCode,
-        donorPhoneNumber: row.donorPhoneNumber,
-        donorEmail: row.donorEmail,
-        branch: row.branchName === '—' ? '' : row.branchName,
-        event: row.eventTitle,
-        proof: row.proofImageUrl,
-      },
-      onSave: (values) =>
-        this.resolvePayload(values).pipe(
-          switchMap((payload) => this.api.update(row.id, payload)),
-          tap({ error: (err) => this.showError(err, 'Failed to update donation.') }),
-        ),
-      onDelete: () =>
-        this.api.remove(row.id).pipe(tap({ error: (err) => this.showError(err, 'Failed to delete donation.') })),
+    this.ensureBranchesLoaded().subscribe(() => {
+      this.modal.open({
+        title: 'Edit Donation',
+        fields: buildFields(this.branchNames(), this.eventTitles()),
+        isEdit: true,
+        values: {
+          donorName: row.donorName,
+          isAnonymous: row.isAnonymous ? 'Yes' : 'No',
+          type: row.typeLabel,
+          amountOrItem: row.type === 'money' ? row.amountOrItem.replace('$', '') : row.amountOrItem,
+          donorPhoneCountryCode: row.donorPhoneCountryCode,
+          donorPhoneNumber: row.donorPhoneNumber,
+          donorEmail: row.donorEmail,
+          branch: row.branchName === '—' ? '' : row.branchName,
+          event: row.eventTitle,
+          proof: row.proofImageUrl,
+        },
+        onSave: (values) =>
+          this.resolvePayload(values).pipe(
+            switchMap((payload) => this.api.update(row.id, payload)),
+            tap({ error: (err) => this.showError(err, 'Failed to update donation.') }),
+          ),
+        onDelete: () =>
+          this.api.remove(row.id).pipe(tap({ error: (err) => this.showError(err, 'Failed to delete donation.') })),
+      });
     });
   }
 }

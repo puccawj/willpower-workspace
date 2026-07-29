@@ -2,6 +2,19 @@
   <button type="button" class="btn btn-solid" (click)="addTemplate()">⇪ Upload new template</button>
 </div>
 
+<div class="filters-row">
+  <div class="field-inline">
+    <label class="muted-label">Branch</label>
+    <select class="form-input" [ngModel]="branchFilter()" (ngModelChange)="setBranchFilter($event)">
+      <option value="all">All branches</option>
+      <option [value]="globalBranchOption">{{ globalBranchOption }}</option>
+      @for (b of branchFilterOptions(); track b.id) {
+        <option [value]="b.id">{{ b.label }}</option>
+      }
+    </select>
+  </div>
+</div>
+
 @if (error()) {
   <div class="state-error card">{{ error() }}</div>
 } @else if (loading()) {

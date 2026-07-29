@@ -82,6 +82,18 @@
   margin-left: 6px;
 }
 
+.image-size-hint {
+  display: block;
+  font: 400 12px var(--w-font-sans);
+  color: var(--w-muted);
+  margin-bottom: 10px;
+
+  strong {
+    font-weight: 700;
+    color: var(--w-gold-deep, var(--w-accent));
+  }
+}
+
 .multiselect-dropdown {
   position: relative;
 }

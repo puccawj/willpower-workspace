@@ -8,8 +8,7 @@ import { ApiOffering, OfferingApiService } from '../../../core/services/offering
 import { CrudModalService } from '../../../core/services/crud-modal.service';
 import { ToastService } from '../../../core/services/toast.service';
 
-const WHOLE_COURSE = 'Whole course';
-const ANY_OFFERING = 'Any offering (whole course)';
+const WHOLE_COURSE = 'Not session-specific';
 
 interface NeedRow {
   id: string;
@@ -37,7 +36,7 @@ function toRow(n: ApiCourseNeed, offeringLabelById: Map<string, string>): NeedRo
     sessionNumber: n.sessionNumber,
     sessionLabel: n.sessionNumber ? `Session ${n.sessionNumber}` : WHOLE_COURSE,
     offeringId: n.offeringId,
-    offeringLabel: n.offeringId ? offeringLabelById.get(n.offeringId) ?? 'Offering' : ANY_OFFERING,
+    offeringLabel: n.offeringId ? offeringLabelById.get(n.offeringId) ?? 'Offering' : 'Whole course (legacy)',
     type: n.type,
     unit: n.unit,
     target,
@@ -86,7 +85,7 @@ export class CourseNeeds {
     return [WHOLE_COURSE, ...Array.from({ length: total }, (_, i) => `Session ${i + 1}`)];
   });
 
-  private readonly offeringOptions = computed(() => [ANY_OFFERING, ...this.courseOfferings().map((o) => this.offeringLabel(o))]);
+  private readonly offeringOptions = computed(() => this.courseOfferings().map((o) => this.offeringLabel(o)));
 
   private parseSessionNumber(value: string | number): number | undefined {
     const label = String(value ?? '').trim();
@@ -95,9 +94,9 @@ export class CourseNeeds {
     return match ? Number(match[1]) : undefined;
   }
 
+  /** Needs are always scoped to a specific offering now — "whole course" is no longer a choosable option. */
   private parseOfferingId(value: string): string | undefined {
     const label = String(value ?? '').trim();
-    if (!label || label === ANY_OFFERING) return undefined;
     return this.courseOfferings().find((o) => this.offeringLabel(o) === label)?.id;
   }
 
@@ -124,18 +123,23 @@ export class CourseNeeds {
 
   addNeed(): void {
     const courseId = this.courseId();
+    const offeringOptions = this.offeringOptions();
+    if (!offeringOptions.length) {
+      this.toast.show('Add a class offering to this course before creating a donation need.', 'error');
+      return;
+    }
     this.modal.open({
       title: 'Add Need',
       fields: [
         { key: 'title', label: 'Title', type: 'text' },
-        { key: 'offering', label: 'Offering', type: 'select', options: this.offeringOptions() },
+        { key: 'offering', label: 'Offering', type: 'select', options: offeringOptions },
         { key: 'session', label: 'Session', type: 'select', options: this.sessionOptions() },
         { key: 'type', label: 'Type', type: 'select', options: ['Goods', 'Money'] },
         { key: 'unit', label: 'Unit (e.g. bags, pieces) — goods only', type: 'text' },
         { key: 'targetQuantity', label: 'Target quantity', type: 'number', min: 0 },
       ],
       isEdit: false,
-      values: { title: '', offering: ANY_OFFERING, session: WHOLE_COURSE, type: 'Goods', unit: '', targetQuantity: 1 },
+      values: { title: '', offering: offeringOptions[0], session: WHOLE_COURSE, type: 'Goods', unit: '', targetQuantity: 1 },
       onSave: (values) => {
         const type: ApiCourseNeedType = String(values['type']).toLowerCase() === 'money' ? 'money' : 'goods';
         const title = String(values['title'] ?? '').trim();

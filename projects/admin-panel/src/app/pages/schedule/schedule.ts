@@ -1,6 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { tap } from 'rxjs';
+import { Observable, of, tap } from 'rxjs';
 import { CourseApiService } from '../../core/services/course-api.service';
 import { BranchApiService } from '../../core/services/branch-api.service';
 import { UserApiService } from '../../core/services/user-api.service';
@@ -91,7 +91,7 @@ function toRow(o: ApiOffering): OfferingRow {
 function buildFields(courseTitles: string[], branchNames: string[], instructorNames: string[]): FieldDef[] {
   return [
     { key: 'course', label: 'Course', type: 'combobox', options: courseTitles },
-    { key: 'branch', label: 'Branch', type: 'combobox', options: branchNames },
+    { key: 'branch', label: 'Branch', type: 'select', options: branchNames },
     { key: 'instructor', label: 'Instructor', type: 'combobox', options: instructorNames },
     { key: 'startDate', label: 'Start date', type: 'date' },
     { key: 'endDate', label: 'End date', type: 'date' },
@@ -228,51 +228,62 @@ export class Schedule {
     });
   }
 
+  /** The 'branch' select's options are a static snapshot taken when the modal opens — make sure
+   * branches have actually loaded first, so a fast click right after navigating here doesn't open
+   * the modal with an empty branch list. */
+  private ensureBranchesLoaded(): Observable<unknown> {
+    return this.branchApi.branches().length ? of(null) : this.branchApi.load();
+  }
+
   addOffering(): void {
-    this.modal.open({
-      title: 'Add Class Offering',
-      fields: buildFields(this.courseNames(), this.branchNames(), this.instructorNames()),
-      isEdit: false,
-      values: {
-        course: this.courseNames()[0] ?? '',
-        branch: '',
-        instructor: '',
-        startDate: '',
-        endDate: '',
-        capacity: 20,
-        location: '',
-        mode: 'Onsite',
-        status: 'Draft',
-      },
-      onSave: (values) => {
-        this.warnConflicts(values, null);
-        return this.api.create(this.toPayload(values)).pipe(tap({ error: (err) => this.showError(err, 'Failed to create offering.') }));
-      },
+    this.ensureBranchesLoaded().subscribe(() => {
+      this.modal.open({
+        title: 'Add Class Offering',
+        fields: buildFields(this.courseNames(), this.branchNames(), this.instructorNames()),
+        isEdit: false,
+        values: {
+          course: this.courseNames()[0] ?? '',
+          branch: this.branchNames()[0] ?? '',
+          instructor: '',
+          startDate: '',
+          endDate: '',
+          capacity: 20,
+          location: '',
+          mode: 'Onsite',
+          status: 'Draft',
+        },
+        onSave: (values) => {
+          this.warnConflicts(values, null);
+          return this.api.create(this.toPayload(values)).pipe(tap({ error: (err) => this.showError(err, 'Failed to create offering.') }));
+        },
+      });
     });
   }
 
   editOffering(row: OfferingRow): void {
-    this.modal.open({
-      title: 'Edit Class Offering',
-      fields: buildFields(this.courseNames(), this.branchNames(), this.instructorNames()),
-      isEdit: true,
-      values: {
-        course: row.courseTitle,
-        branch: row.branchName,
-        instructor: row.instructorName === 'Unassigned' ? '' : row.instructorName,
-        startDate: row.startDate,
-        endDate: row.endDate,
-        capacity: row.capacity,
-        location: row.location,
-        mode: row.modeLabel,
-        status: row.statusLabel,
-      },
-      onSave: (values) => {
-        this.warnConflicts(values, row.id);
-        return this.api.update(row.id, this.toPayload(values)).pipe(tap({ error: (err) => this.showError(err, 'Failed to update offering.') }));
-      },
-      onDelete: () =>
-        this.api.remove(row.id).pipe(tap({ error: (err) => this.showError(err, 'Failed to delete offering.') })),
+    this.ensureBranchesLoaded().subscribe(() => {
+      this.modal.open({
+        title: 'Edit Class Offering',
+        fields: buildFields(this.courseNames(), this.branchNames(), this.instructorNames()),
+        isEdit: true,
+        values: {
+          course: row.courseTitle,
+          branch: row.branchName,
+          instructor: row.instructorName === 'Unassigned' ? '' : row.instructorName,
+          startDate: row.startDate,
+          endDate: row.endDate,
+          capacity: row.capacity,
+          location: row.location,
+          mode: row.modeLabel,
+          status: row.statusLabel,
+        },
+        onSave: (values) => {
+          this.warnConflicts(values, row.id);
+          return this.api.update(row.id, this.toPayload(values)).pipe(tap({ error: (err) => this.showError(err, 'Failed to update offering.') }));
+        },
+        onDelete: () =>
+          this.api.remove(row.id).pipe(tap({ error: (err) => this.showError(err, 'Failed to delete offering.') })),
+      });
     });
   }
 }

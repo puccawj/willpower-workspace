@@ -62,7 +62,7 @@ export class CoursePhotos {
     this.modal.open({
       title: 'Add Photo',
       fields: [
-        { key: 'image', label: 'Photo', type: 'image' },
+        { key: 'image', label: 'Photo', type: 'image', hint: 'Recommended 1200×800px or larger, landscape.' },
         { key: 'caption', label: 'Caption (optional)', type: 'text' },
       ],
       isEdit: false,
@@ -87,7 +87,7 @@ export class CoursePhotos {
     this.modal.open({
       title: 'Edit Photo',
       fields: [
-        { key: 'image', label: 'Photo', type: 'image' },
+        { key: 'image', label: 'Photo', type: 'image', hint: 'Recommended 1200×800px or larger, landscape.' },
         { key: 'caption', label: 'Caption', type: 'text' },
       ],
       isEdit: true,

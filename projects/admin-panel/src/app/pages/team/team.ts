@@ -30,9 +30,9 @@ function buildFields(branchNames: string[]): FieldDef[] {
   return [
     { key: 'name', label: 'Full name', type: 'text' },
     { key: 'position', label: 'Role/title', type: 'text' },
-    { key: 'branch', label: 'Branch', type: 'combobox', options: branchNames },
+    { key: 'branch', label: 'Branch', type: 'select', options: branchNames },
     { key: 'shown', label: 'Shown on site', type: 'select', options: ['Yes', 'No'] },
-    { key: 'photo', label: 'Photo', type: 'image' },
+    { key: 'photo', label: 'Photo', type: 'image', hint: 'Recommended square, at least 400×400px — shown as a headshot.' },
   ];
 }
 
@@ -115,39 +115,50 @@ export class Team {
     return of(payload);
   }
 
+  /** The 'branch' select's options are a static snapshot taken when the modal opens — make sure
+   * branches have actually loaded first, so a fast click right after navigating here doesn't open
+   * the modal with an empty branch list. */
+  private ensureBranchesLoaded(): Observable<unknown> {
+    return this.branchApi.branches().length ? of(null) : this.branchApi.load();
+  }
+
   addMember(): void {
-    this.modal.open({
-      title: 'Add Team Member',
-      fields: buildFields(this.branchNames()),
-      isEdit: false,
-      values: { name: '', position: '', branch: '', shown: 'Yes', photo: '' },
-      onSave: (values) =>
-        this.resolvePayload(values).pipe(
-          switchMap((payload) => this.api.create(payload)),
-          tap({ error: (err) => this.showError(err, 'Failed to add team member.') }),
-        ),
+    this.ensureBranchesLoaded().subscribe(() => {
+      this.modal.open({
+        title: 'Add Team Member',
+        fields: buildFields(this.branchNames()),
+        isEdit: false,
+        values: { name: '', position: '', branch: this.branchNames()[0] ?? '', shown: 'Yes', photo: '' },
+        onSave: (values) =>
+          this.resolvePayload(values).pipe(
+            switchMap((payload) => this.api.create(payload)),
+            tap({ error: (err) => this.showError(err, 'Failed to add team member.') }),
+          ),
+      });
     });
   }
 
   editMember(row: TeamRow): void {
-    this.modal.open({
-      title: 'Edit Team Member',
-      fields: buildFields(this.branchNames()),
-      isEdit: true,
-      values: {
-        name: row.name,
-        position: row.position,
-        branch: row.branchName === '—' ? '' : row.branchName,
-        shown: row.shownLabel,
-        photo: row.photoUrl,
-      },
-      onSave: (values) =>
-        this.resolvePayload(values).pipe(
-          switchMap((payload) => this.api.update(row.id, payload)),
-          tap({ error: (err) => this.showError(err, 'Failed to update team member.') }),
-        ),
-      onDelete: () =>
-        this.api.remove(row.id).pipe(tap({ error: (err) => this.showError(err, 'Failed to delete team member.') })),
+    this.ensureBranchesLoaded().subscribe(() => {
+      this.modal.open({
+        title: 'Edit Team Member',
+        fields: buildFields(this.branchNames()),
+        isEdit: true,
+        values: {
+          name: row.name,
+          position: row.position,
+          branch: row.branchName === '—' ? '' : row.branchName,
+          shown: row.shownLabel,
+          photo: row.photoUrl,
+        },
+        onSave: (values) =>
+          this.resolvePayload(values).pipe(
+            switchMap((payload) => this.api.update(row.id, payload)),
+            tap({ error: (err) => this.showError(err, 'Failed to update team member.') }),
+          ),
+        onDelete: () =>
+          this.api.remove(row.id).pipe(tap({ error: (err) => this.showError(err, 'Failed to delete team member.') })),
+      });
     });
   }
 }
