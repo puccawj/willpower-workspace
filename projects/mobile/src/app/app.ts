@@ -53,7 +53,12 @@ export class App {
         return;
       }
 
-      if (canGoBack) {
+      // Home is always the bottom of the stack, regardless of how much
+      // history piled up getting here (e.g. Home was reached via the
+      // tab-root redirect above, or several drill-downs deep) — never pop
+      // into whatever came before it. Only a genuine drill-down page (not a
+      // tab root, not Home) pops normally via history.back().
+      if (canGoBack && path !== '/home') {
         this.showExitHint.set(false);
         window.history.back();
         return;

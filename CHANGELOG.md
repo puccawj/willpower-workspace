@@ -2,6 +2,18 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-07-28 (6) — Mobile: Home never pops into leftover navigation history
+
+- **Pressing back while on Home now always shows the double-back-to-exit
+  prompt**, regardless of how much navigation history piled up getting
+  there (e.g. several drill-downs deep, then tapping the Home tab). Home
+  previously still had Capacitor's native `canGoBack` respected, so back
+  could pop into a stale previous page instead of behaving like the app's
+  true root.
+  - Verified on-device: Home → Events → Courses → Profile → My Courses →
+    tap Home tab → back → shows "Press back again to exit" instead of
+    landing on My Courses/Profile.
+
 ## 2026-07-28 (5) — Mobile: fixed back button jumping between tabs instead of going Home
 
 - **Pressing back while on a bottom-tab screen (Events, Courses, Profile) now
