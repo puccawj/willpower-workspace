@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { Observable, map, of, switchMap, tap } from 'rxjs';
 import { ApiCourse, CourseApiService, CoursePayload } from '../../core/services/course-api.service';
 import { CrudModalService } from '../../core/services/crud-modal.service';
+import { MULTISELECT_DELIM } from '../../shared/crud-modal/crud-modal';
 import { ImageViewerService } from '../../core/services/image-viewer.service';
 import { RoleService } from '../../core/services/role.service';
 import { ToastService } from '../../core/services/toast.service';
@@ -24,19 +25,11 @@ interface CourseRow {
   statusLabel: string;
   statusColor: string;
   isActive: boolean;
+  prerequisiteCourseIds: string[];
+  prerequisiteTitles: string;
 }
 
-const FIELDS: FieldDef[] = [
-  { key: 'title', label: 'Course title', type: 'text' },
-  { key: 'description', label: 'Description', type: 'textarea' },
-  { key: 'syllabus', label: 'Syllabus', type: 'textarea', hint: 'One topic per line — shown on the public course page.' },
-  { key: 'category', label: 'Category', type: 'text' },
-  { key: 'totalSessions', label: 'Total sessions', type: 'number' },
-  { key: 'passingAttendancePercent', label: 'Passing % (attendance)', type: 'number' },
-  { key: 'image', label: 'Cover image', type: 'image', hint: 'Recommended 800×600px or larger, landscape (4:3) — shown as a cropped card thumbnail.' },
-];
-
-function toRow(c: ApiCourse): CourseRow {
+function toRow(c: ApiCourse, titleById: Map<string, string>): CourseRow {
   return {
     id: c.id,
     title: c.title,
@@ -50,6 +43,8 @@ function toRow(c: ApiCourse): CourseRow {
     statusLabel: c.status === 'active' ? 'Active' : 'Inactive',
     statusColor: c.status === 'active' ? 'var(--w-green)' : 'var(--w-muted)',
     isActive: c.status === 'active',
+    prerequisiteCourseIds: c.prerequisiteCourseIds,
+    prerequisiteTitles: c.prerequisiteCourseIds.map((id) => titleById.get(id) ?? '?').join(MULTISELECT_DELIM),
   };
 }
 
@@ -67,11 +62,15 @@ export class Courses {
   private readonly uploads = inject(UploadApiService);
   private readonly imageViewer = inject(ImageViewerService);
   readonly roleService = inject(RoleService);
+  readonly multiselectDelim = MULTISELECT_DELIM;
 
   readonly loading = this.api.loading;
   readonly error = this.api.error;
 
-  private readonly rows = computed<CourseRow[]>(() => this.api.courses().map(toRow));
+  private readonly titleById = computed(() => new Map(this.api.courses().map((c) => [c.id, c.title])));
+  private readonly idByTitle = computed(() => new Map(this.api.courses().map((c) => [c.title.toLowerCase(), c.id])));
+
+  private readonly rows = computed<CourseRow[]>(() => this.api.courses().map((c) => toRow(c, this.titleById())));
 
   readonly ctrl = new ListController<CourseRow>(this.rows);
 
@@ -104,7 +103,38 @@ export class Courses {
     if (row.imageUrl) this.imageViewer.open(row.imageUrl);
   }
 
+  /** Options for the "Prerequisite courses" multiselect — every course except the one being edited. */
+  private buildFields(excludeId?: string): FieldDef[] {
+    const options = this.api
+      .courses()
+      .filter((c) => c.id !== excludeId)
+      .map((c) => c.title);
+    return [
+      { key: 'title', label: 'Course title', type: 'text' },
+      { key: 'description', label: 'Description', type: 'textarea' },
+      { key: 'syllabus', label: 'Syllabus', type: 'textarea', hint: 'One topic per line — shown on the public course page.' },
+      { key: 'category', label: 'Category', type: 'text' },
+      { key: 'totalSessions', label: 'Total sessions', type: 'number' },
+      { key: 'passingAttendancePercent', label: 'Passing % (attendance)', type: 'number' },
+      {
+        key: 'prerequisites',
+        label: 'Prerequisite courses',
+        type: 'multiselect',
+        options,
+        hint: 'Students must have completed all of these before they can enroll. Leave empty for no prerequisite.',
+      },
+      { key: 'image', label: 'Cover image', type: 'image', hint: 'Recommended 800×600px or larger, landscape (4:3) — shown as a cropped card thumbnail.' },
+    ];
+  }
+
   private toPayload(values: Record<string, string | number>): CoursePayload {
+    const prereqTitles = String(values['prerequisites'] ?? '')
+      .split(MULTISELECT_DELIM)
+      .map((t) => t.trim())
+      .filter(Boolean);
+    const idByTitle = this.idByTitle();
+    const prerequisiteCourseIds = prereqTitles.map((t) => idByTitle.get(t.toLowerCase())).filter((id): id is string => !!id);
+
     return {
       title: String(values['title'] ?? '').trim(),
       description: String(values['description'] ?? '').trim() || undefined,
@@ -112,6 +142,7 @@ export class Courses {
       category: String(values['category'] ?? '').trim() || undefined,
       totalSessions: Number(values['totalSessions']) || 1,
       passingAttendancePercent: Number(values['passingAttendancePercent']) || 80,
+      prerequisiteCourseIds,
     };
   }
 
@@ -128,9 +159,18 @@ export class Courses {
   addCourse(): void {
     this.modal.open({
       title: 'Add Course',
-      fields: FIELDS,
+      fields: this.buildFields(),
       isEdit: false,
-      values: { title: '', description: '', syllabus: '', category: '', totalSessions: 8, passingAttendancePercent: 80, image: '' },
+      values: {
+        title: '',
+        description: '',
+        syllabus: '',
+        category: '',
+        totalSessions: 8,
+        passingAttendancePercent: 80,
+        prerequisites: '',
+        image: '',
+      },
       onSave: (values) =>
         this.resolvePayload(values).pipe(
           switchMap((payload) => this.api.create(payload)),
@@ -142,7 +182,7 @@ export class Courses {
   editCourse(row: CourseRow): void {
     this.modal.open({
       title: 'Edit Course',
-      fields: FIELDS,
+      fields: this.buildFields(row.id),
       isEdit: true,
       values: {
         title: row.title,
@@ -151,6 +191,7 @@ export class Courses {
         category: row.category === '—' ? '' : row.category,
         totalSessions: row.totalSessions,
         passingAttendancePercent: Number(row.passingLabel.replace('%', '')),
+        prerequisites: row.prerequisiteTitles,
         image: row.imageUrl,
       },
       onSave: (values) =>

@@ -24,6 +24,9 @@
                 · ★ {{ ratingFor(o.offeringId).average }} ({{ ratingFor(o.offeringId).count }})
               }
             </div>
+            @if (o.prerequisiteTitles.length) {
+              <span class="prereq-pill" [title]="'Requires: ' + o.prerequisiteTitles.join(', ')">Requires {{ o.prerequisiteTitles[0] }}</span>
+            }
           </div>
         </a>
       }

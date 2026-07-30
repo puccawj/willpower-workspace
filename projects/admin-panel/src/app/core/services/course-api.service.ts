@@ -16,6 +16,7 @@ export interface ApiCourse {
   passingAttendancePercent: string;
   status: ApiCourseStatus;
   offeringsCount: number;
+  prerequisiteCourseIds: string[];
 }
 
 export interface CoursePayload {
@@ -27,6 +28,7 @@ export interface CoursePayload {
   totalSessions: number;
   passingAttendancePercent?: number;
   status?: ApiCourseStatus;
+  prerequisiteCourseIds?: string[];
 }
 
 @Injectable({ providedIn: 'root' })

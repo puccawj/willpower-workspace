@@ -92,6 +92,9 @@
                 · ★ {{ offeringRatingFor(o.offeringId).average }} ({{ offeringRatingFor(o.offeringId).count }})
               }
             </div>
+            @if (o.prerequisiteTitles.length) {
+              <span class="prereq-pill" [title]="'Requires: ' + o.prerequisiteTitles.join(', ')">Requires {{ o.prerequisiteTitles[0] }}</span>
+            }
           </div>
           <div class="course-row-open">{{ o.open }}</div>
         </a>
@@ -117,6 +120,9 @@
                 }
                 <span class="home-rating-text">{{ offeringRatingFor(o.offeringId).average }}</span>
               </div>
+            }
+            @if (o.prerequisiteTitles.length) {
+              <span class="prereq-pill" [title]="'Requires: ' + o.prerequisiteTitles.join(', ')">Requires {{ o.prerequisiteTitles[0] }}</span>
             }
             <div class="course-open">{{ o.shortStartDate }} · {{ o.open }}</div>
           </div>

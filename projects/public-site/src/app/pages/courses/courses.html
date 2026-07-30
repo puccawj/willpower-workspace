@@ -32,6 +32,9 @@
                 <span class="list-rating-text">{{ ratingFor(o.offeringId).average }} ({{ ratingFor(o.offeringId).count }})</span>
               </div>
             }
+            @if (o.prerequisiteTitles.length) {
+              <span class="prereq-pill" [title]="'Requires: ' + o.prerequisiteTitles.join(', ')">Requires {{ o.prerequisiteTitles.join(', ') }}</span>
+            }
             <p class="course-desc-lg">{{ o.branchName }} &middot; {{ o.startDate }} – {{ o.endDate }}</p>
             @if (formatSchedule(o.scheduleSummary); as sched) {
               <p class="course-desc-lg">{{ sched }}</p>

@@ -18,7 +18,12 @@
         <tbody>
           @for (c of ctrl.pageItems(); track c.id) {
             <tr class="row">
-              <td style="font-weight:500">{{ c.title }}</td>
+              <td>
+                <div style="font-weight:500">{{ c.title }}</div>
+                @if (c.prerequisiteCourseIds.length) {
+                  <div class="muted-label">Requires: {{ c.prerequisiteTitles.split(multiselectDelim).join(', ') }}</div>
+                }
+              </td>
               <td>{{ c.category }}</td>
               <td>{{ c.totalSessions }}</td>
               <td>{{ c.passingLabel }}</td>
@@ -55,6 +60,9 @@
             <span class="badge badge-sm" [style.background]="c.statusColor">{{ c.statusLabel }}</span>
           </div>
           <div class="muted-label mcard-meta">{{ c.category }}</div>
+          @if (c.prerequisiteCourseIds.length) {
+            <div class="muted-label">Requires: {{ c.prerequisiteTitles.split(multiselectDelim).join(', ') }}</div>
+          }
           <div class="course-facts">
             <span>{{ c.totalSessions }} sessions</span>
             <span>{{ c.passingLabel }} to pass</span>

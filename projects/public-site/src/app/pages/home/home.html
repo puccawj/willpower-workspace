@@ -115,6 +115,9 @@
               </div>
             }
             <p class="course-desc">{{ o.format }} · {{ o.shortStartDate }}</p>
+            @if (o.prerequisiteTitles.length) {
+              <span class="prereq-pill" [title]="'Requires: ' + o.prerequisiteTitles.join(', ')">Requires {{ o.prerequisiteTitles[0] }}</span>
+            }
             <div class="course-foot">
               <span class="muted-label">{{ o.open }}</span>
               <a [routerLink]="['/courses', o.courseId]" [queryParams]="{ offering: o.offeringId }" class="link-cta">Enroll →</a>

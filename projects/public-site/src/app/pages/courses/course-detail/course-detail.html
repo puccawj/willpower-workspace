@@ -19,6 +19,12 @@
         </div>
         <p class="detail-body">{{ c.desc }}</p>
 
+        @if (c.prerequisiteTitles.length) {
+          <p class="prerequisite-note">
+            <span><strong>Prerequisite required:</strong> you must have completed {{ c.prerequisiteTitles.join(', ') }} before enrolling in this course.</span>
+          </p>
+        }
+
         <div class="offerings-section">
           <div class="aside-heading">Class offerings</div>
 

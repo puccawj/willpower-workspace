@@ -14,6 +14,7 @@ interface ApiPublicCourseRow {
   offeringsCount: number;
   modes: ('online' | 'onsite')[];
   isOpenForEnrollment: boolean;
+  prerequisiteTitles: string[];
 }
 
 interface ApiPublicCourseDetailRow extends ApiPublicCourseRow {
@@ -32,6 +33,7 @@ export interface PublicCourse {
   pass: string;
   open: string;
   isOpenForEnrollment: boolean;
+  prerequisiteTitles: string[];
 }
 
 export interface PublicCourseDetail extends PublicCourse {
@@ -69,6 +71,7 @@ interface ApiPublicCourseOfferingCard {
   endDate: string;
   spotsLeft: number | null;
   scheduleSummary: PublicOfferingScheduleSlot[];
+  prerequisiteTitles: string[];
 }
 
 export interface PublicCourseOfferingCard {
@@ -86,6 +89,7 @@ export interface PublicCourseOfferingCard {
   spotsLeft: number | null;
   open: string;
   scheduleSummary: PublicOfferingScheduleSlot[];
+  prerequisiteTitles: string[];
 }
 
 export interface PublicCourseNeed {
@@ -179,6 +183,7 @@ function toPublicCourse(row: ApiPublicCourseRow, index: number): PublicCourse {
     pass: `${Number.isInteger(pass) ? pass : pass.toFixed(1)}%`,
     open: row.isOpenForEnrollment ? 'Open for enrollment' : 'New sessions coming soon',
     isOpenForEnrollment: row.isOpenForEnrollment,
+    prerequisiteTitles: row.prerequisiteTitles ?? [],
   };
 }
 
@@ -198,6 +203,7 @@ function toPublicCourseOfferingCard(row: ApiPublicCourseOfferingCard, index: num
     spotsLeft: row.spotsLeft,
     open: row.spotsLeft === null || row.spotsLeft > 0 ? 'Open for enrollment' : 'Full',
     scheduleSummary: row.scheduleSummary,
+    prerequisiteTitles: row.prerequisiteTitles ?? [],
   };
 }
 

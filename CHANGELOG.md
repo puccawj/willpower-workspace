@@ -2,6 +2,21 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-07-30 (3) — Course prerequisites
+
+- Courses can now require completion of other courses first (e.g. Course B
+  requires Course A) — set in Manage Course as a "Requires" multi-select of
+  other course titles. Courses with nothing selected enroll exactly as
+  before, no approval step added.
+- Course cards on Home and the Courses list (public-site + mobile) now
+  show a gold "🔒 Requires ..." pill when a course has a prerequisite, so
+  it's visible before tapping in — not just buried on the detail page.
+- The Course detail page's prerequisite note is now a bolder callout
+  (gold background, left accent bar, lock icon) instead of a plain line
+  of text. Self-enrollment is blocked with a clear message until the
+  member has completed each required course; admins enrolling a member
+  manually from the admin panel can still bypass the requirement.
+
 ## 2026-07-30 (2) — Certificate Templates layout designer: edit-mode gating, Save/Cancel, font size
 
 - The Layout designer on Certificate Templates now opens in a read-only
