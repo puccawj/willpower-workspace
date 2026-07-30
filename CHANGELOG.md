@@ -2,6 +2,12 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-07-30 (4) — Updated mobile app icon
+
+- Replaced the Android app icon/adaptive-icon with a new source image
+  (`android/icon/wpusaiconv2.png`), regenerated at every density. Splash
+  screen is unchanged.
+
 ## 2026-07-30 (3) — Course prerequisites
 
 - Courses can now require completion of other courses first (e.g. Course B
