@@ -44,6 +44,7 @@ export class Sidebar {
     {
       header: 'People',
       items: [
+        { path: 'student-applications', label: 'Student Applications', icon: '⊕', allow: ALL_STAFF },
         { path: 'users', label: 'Manage User', icon: '◐', allow: ALL_STAFF },
         { path: 'branches', label: 'Manage Branch', icon: '⬢', allow: ALL_STAFF },
       ],

@@ -16,6 +16,7 @@ import { MyEvents } from './pages/my/my-events/my-events';
 import { MyCourses } from './pages/my/my-courses/my-courses';
 import { MyCertificates } from './pages/my/my-certificates/my-certificates';
 import { MyDonations } from './pages/my/my-donations/my-donations';
+import { ApplyStudent } from './pages/my/apply-student/apply-student';
 import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
@@ -41,6 +42,7 @@ export const routes: Routes = [
       { path: 'courses', component: MyCourses },
       { path: 'certificates', component: MyCertificates },
       { path: 'donations', component: MyDonations },
+      { path: 'apply-student', component: ApplyStudent },
     ],
   },
   { path: '**', redirectTo: '' },

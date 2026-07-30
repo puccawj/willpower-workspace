@@ -13,6 +13,9 @@
       <a routerLink="/my/courses" routerLinkActive="active">My Learning</a>
       <a routerLink="/my/certificates" routerLinkActive="active">Certificates</a>
       <a routerLink="/my/donations" routerLinkActive="active">Donations</a>
+      @if (auth.currentUser()?.role === 'general') {
+        <a routerLink="/my/apply-student" routerLinkActive="active">Become a Student</a>
+      }
     </nav>
 
     <div class="my-content">

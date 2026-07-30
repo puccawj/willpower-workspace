@@ -1,0 +1,70 @@
+<div class="page-toolbar">
+  <app-filter-tabs [options]="filterOptions" [active]="filter()" [select]="setFilter"></app-filter-tabs>
+</div>
+
+@if (error()) {
+  <div class="state-error card">{{ error() }}</div>
+} @else if (loading()) {
+  <div class="state-loading card">Loading applications…</div>
+} @else {
+  <app-table-toolbar [controller]="ctrl" slot="top"></app-table-toolbar>
+
+  @if (ctrl.effectiveView() === 'table') {
+    <div class="card" style="padding:0;overflow:hidden">
+      <table>
+        <thead>
+          <tr><th>Name</th><th>Email</th><th>Contact</th><th>Applied</th><th>Status</th><th></th></tr>
+        </thead>
+        <tbody>
+          @for (a of ctrl.pageItems(); track a.id) {
+            <tr class="row">
+              <td style="font-weight:500">{{ a.fullName }} <span class="muted-label">"{{ a.nickname }}"</span></td>
+              <td>{{ a.email }}</td>
+              <td>{{ a.contactLabel }}</td>
+              <td>{{ a.appliedLabel }}</td>
+              <td><span class="badge" [style.background]="a.statusColor">{{ a.statusLabel }}</span></td>
+              <td>
+                @if (a.status === 'pending') {
+                  <div class="action-group">
+                    <button type="button" class="btn btn-outline btn-sm" (click)="reject(a)">Reject</button>
+                    <button type="button" class="btn btn-solid btn-sm" (click)="approve(a)">Approve</button>
+                  </div>
+                }
+              </td>
+            </tr>
+          }
+          @if (!ctrl.pageItems().length) {
+            <tr><td colspan="6" class="state-empty">No {{ filter() === 'all' ? '' : filter() }} applications.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <div class="cardgrid">
+      @for (a of ctrl.pageItems(); track a.id) {
+        <div class="mcard">
+          <div class="mcard-head">
+            <h4 class="mcard-title">{{ a.fullName }} <span class="muted-label">"{{ a.nickname }}"</span></h4>
+            <span class="badge badge-sm" [style.background]="a.statusColor">{{ a.statusLabel }}</span>
+          </div>
+          <div class="muted-label">{{ a.email }}</div>
+          <div class="muted-label mcard-meta">{{ a.contactLabel }}</div>
+          <div class="muted-label mcard-meta">Applied {{ a.appliedLabel }}</div>
+          @if (a.status === 'pending') {
+            <div class="mcard-row">
+              <div class="mcard-actions action-group">
+                <button type="button" class="btn btn-outline btn-sm" (click)="reject(a)">Reject</button>
+                <button type="button" class="btn btn-solid btn-sm" (click)="approve(a)">Approve</button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+      @if (!ctrl.pageItems().length) {
+        <div class="card state-empty">No {{ filter() === 'all' ? '' : filter() }} applications.</div>
+      }
+    </div>
+  }
+
+  <app-table-toolbar [controller]="ctrl" slot="bottom"></app-table-toolbar>
+}

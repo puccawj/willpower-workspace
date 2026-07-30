@@ -1,0 +1,73 @@
+:host {
+  display: block;
+}
+
+.apply-wrap {
+  max-width: 560px;
+}
+
+.section-title {
+  font: 400 26px var(--w-font-serif);
+  margin: 4px 0 20px;
+}
+
+.status-card {
+  background: var(--w-bg-alt);
+  border: 1px solid var(--w-border-strong);
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 20px;
+  font: 400 14px/1.6 var(--w-font-sans);
+  color: var(--w-ink-soft);
+}
+
+.status-pending {
+  border-color: var(--w-gold);
+}
+
+.status-approved {
+  border-color: var(--w-green);
+}
+
+.status-rejected {
+  border-color: var(--w-accent);
+}
+
+.apply-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.field-inline {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-input {
+  font: 400 14px var(--w-font-sans);
+  padding: 11px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--w-border-strong);
+  background: #fff;
+  width: 100%;
+}
+
+.form-error {
+  font: 500 13px var(--w-font-sans);
+  color: var(--w-accent);
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}

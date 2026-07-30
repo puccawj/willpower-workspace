@@ -9,6 +9,7 @@ import { Rsvp } from './pages/events/rsvp/rsvp';
 import { RsvpOverview } from './pages/events/rsvp-overview/rsvp-overview';
 import { Donations } from './pages/donations/donations';
 import { Users } from './pages/users/users';
+import { StudentApplications } from './pages/student-applications/student-applications';
 import { Branches } from './pages/branches/branches';
 import { Courses } from './pages/courses/courses';
 import { CourseNeeds } from './pages/courses/course-needs/course-needs';
@@ -88,6 +89,12 @@ export const routes: Routes = [
         component: Donations,
         canActivate: [roleAccessGuard],
         data: { title: 'Manage Donation', subtitle: 'Review, verify, and issue anumodana certificates', allow: ['superadmin', 'admin'] },
+      },
+      {
+        path: 'student-applications',
+        component: StudentApplications,
+        canActivate: [roleAccessGuard],
+        data: { title: 'Student Applications', subtitle: 'Review "become a student" requests', allow: ['superadmin', 'admin'] },
       },
       {
         path: 'users',

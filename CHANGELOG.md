@@ -2,6 +2,16 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-07-30 (1) — Apply to become a student (general → student)
+
+- New self-service flow: a `general` member can apply to become a student
+  from **My Account → Become a Student** (public-site), submitting
+  email/full name/last name/nickname (phone and LINE ID optional).
+- New admin page **People → Student Applications** to review pending
+  requests and Approve (flips the member's role to `student`) or Reject —
+  a searchable, paginated data table (matching every other list page in
+  admin-panel) with filter tabs for Pending/Approved/Rejected/All.
+
 ## 2026-07-29 (9) — Module Usage report redefined around public-site activity
 
 - The "Module Usage" report tab now measures what public-site/mobile
