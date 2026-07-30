@@ -31,22 +31,19 @@
 }
 
 <section class="hero pad">
-  <div class="eyebrow">Established 1932 · USA · Canada · Australia</div>
-  <h1 class="heroh1">Training the mind,<br />strengthening the will</h1>
-  <p class="hero-lead">
-    A center for meditation and contemplative study, guiding students toward clarity, discipline, and inner
-    strength through timeless practice.
-  </p>
+  <div class="eyebrow">{{ hero().eyebrow }}</div>
+  <h1 class="heroh1">{{ hero().headingLine1 }}<br />{{ hero().headingLine2 }}</h1>
+  <p class="hero-lead">{{ hero().description }}</p>
   <div class="hero-actions">
     <a routerLink="/events" class="btn btn-outline">Upcoming events</a>
     <a routerLink="/courses" class="btn btn-solid">Explore courses</a>
   </div>
   <div class="stat-row">
-    <a routerLink="/about" fragment="branches" class="stat stat-link"><div class="stat-num">3</div><div class="stat-label">Branches</div></a>
+    <a routerLink="/about" fragment="branches" class="stat stat-link"><div class="stat-num">{{ hero().stat1Value }}</div><div class="stat-label">{{ hero().stat1Label }}</div></a>
     <div class="stat-sep"></div>
-    <div class="stat"><div class="stat-num">12,000+</div><div class="stat-label">Students</div></div>
+    <div class="stat"><div class="stat-num">{{ hero().stat2Value }}</div><div class="stat-label">{{ hero().stat2Label }}</div></div>
     <div class="stat-sep"></div>
-    <div class="stat"><div class="stat-num">90+</div><div class="stat-label">Years</div></div>
+    <div class="stat"><div class="stat-num">{{ hero().stat3Value }}</div><div class="stat-label">{{ hero().stat3Label }}</div></div>
   </div>
 </section>
 
@@ -96,7 +93,7 @@
     <p class="section-lead">Structured paths of study, from introductory practice to certified completion.</p>
     <div class="grid-3 g3 text-left">
       @for (o of homeOfferings(); track o.offeringId) {
-        <div class="course-card">
+        <a [routerLink]="['/courses', o.courseId]" [queryParams]="{ offering: o.offeringId }" class="course-card">
           <div class="course-card-img">
             <img [src]="o.img" alt="" />
             <div class="img-ribbon-corner">
@@ -120,10 +117,10 @@
             }
             <div class="course-foot">
               <span class="muted-label">{{ o.open }}</span>
-              <a [routerLink]="['/courses', o.courseId]" [queryParams]="{ offering: o.offeringId }" class="link-cta">Enroll →</a>
+              <span class="link-cta">Enroll →</span>
             </div>
           </div>
-        </div>
+        </a>
       } @empty {
         <p class="muted-label">New courses are being scheduled — check back soon.</p>
       }

@@ -283,6 +283,8 @@ img {
   border: 1px solid var(--w-border);
   border-radius: 10px;
   overflow: hidden;
+  display: block;
+  cursor: pointer;
   transition: transform 0.15s;
 
   &:hover {
