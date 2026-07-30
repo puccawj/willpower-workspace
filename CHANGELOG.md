@@ -2,11 +2,12 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
-## 2026-07-30 (4) — Updated mobile app icon
+## 2026-07-30 (4) — Updated mobile app icon and splash screen
 
-- Replaced the Android app icon/adaptive-icon with a new source image
-  (`android/icon/wpusaiconv2.png`), regenerated at every density. Splash
-  screen is unchanged.
+- Replaced the Android app icon/adaptive-icon and the splash screen with
+  a new source image (`android/icon/wpusaiconv2.png`), regenerated at
+  every density — same gold background and centered-icon layout as
+  before, new artwork.
 
 ## 2026-07-30 (3) — Course prerequisites
 
