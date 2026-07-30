@@ -2,6 +2,20 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-07-30 (2) — Certificate Templates layout designer: edit-mode gating, Save/Cancel, font size
+
+- The Layout designer on Certificate Templates now opens in a read-only
+  preview — you must click "✎ Edit Layout" to drag fields, add/remove them,
+  or edit the header text. Changes are staged locally; **Save** commits
+  them, **Cancel** discards and reverts to the last saved layout (previously
+  every drag/edit auto-saved immediately).
+- Each placed field now has a **−/+ font-size stepper** (6-72pt), which
+  also controls the actual size used when generating the certificate PDF.
+- Removed the redundant "View layout" (▦) row-action button — clicking a
+  template row already selects it; the designer card now also
+  auto-scrolls into view when you do.
+- "Upload new template" moved onto the same row as the Branch filter.
+
 ## 2026-07-30 (1) — Apply to become a student (general → student)
 
 - New self-service flow: a `general` member can apply to become a student

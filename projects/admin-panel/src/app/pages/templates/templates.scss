@@ -2,6 +2,11 @@
   display: block;
 }
 
+.filters-row-toolbar {
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
 .filters-row {
   display: flex;
   gap: 16px;
@@ -77,8 +82,28 @@
   max-width: 480px;
 }
 
+.designer-head-actions {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+}
+
 .designer-kicker-input {
   min-width: 260px;
+}
+
+.designer-edit-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.cancel-btn {
+  font: 600 13px var(--w-font-sans);
+  color: var(--w-ink-soft);
+  background: none;
+  border: none;
+  padding: 11px 16px;
+  cursor: pointer;
 }
 
 .field-inline {
@@ -151,6 +176,12 @@
   pointer-events: none;
 }
 
+.designer-canvas-readonly {
+  .designer-field {
+    cursor: default;
+  }
+}
+
 .designer-field {
   position: absolute;
   transform: translate(-50%, -50%);
@@ -166,6 +197,50 @@
   &:active {
     cursor: grabbing;
     border-color: #fff;
+  }
+}
+
+.designer-field-locked {
+  cursor: default;
+
+  &:active {
+    cursor: default;
+    border-color: rgba(255, 255, 255, 0.5);
+  }
+}
+
+.designer-field-size {
+  position: absolute;
+  bottom: -26px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(20, 15, 10, 0.85);
+  border-radius: 10px;
+  padding: 1px 4px;
+  font: 600 10px var(--w-font-sans);
+  white-space: nowrap;
+  cursor: default;
+
+  button {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    font: 600 11px var(--w-font-sans);
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
   }
 }
 

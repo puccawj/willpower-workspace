@@ -1,8 +1,4 @@
-<div class="page-toolbar toolbar-end">
-  <button type="button" class="btn btn-solid" (click)="addTemplate()">⇪ Upload new template</button>
-</div>
-
-<div class="filters-row">
+<div class="filters-row filters-row-toolbar">
   <div class="field-inline">
     <label class="muted-label">Branch</label>
     <select class="form-input" [ngModel]="branchFilter()" (ngModelChange)="setBranchFilter($event)">
@@ -13,6 +9,7 @@
       }
     </select>
   </div>
+  <button type="button" class="btn btn-solid" (click)="addTemplate()">⇪ Upload new template</button>
 </div>
 
 @if (error()) {
@@ -43,7 +40,6 @@
               <td><span class="badge" [style.background]="t.statusColor">{{ t.statusLabel }}</span></td>
               <td>
                 <div class="action-group">
-                  <button type="button" class="icon-btn icon-btn-accent" (click)="$event.stopPropagation(); selectForDesign(t)" title="Edit layout">▦</button>
                   <button type="button" class="icon-btn" [style.color]="t.isActive ? 'var(--w-red)' : 'var(--w-green)'" (click)="$event.stopPropagation(); toggleActive(t)" [title]="t.isActive ? 'Archive' : 'Set active'">⏻</button>
                   <button type="button" class="icon-btn" (click)="$event.stopPropagation(); editTemplate(t)" title="Edit details">✎</button>
                 </div>
@@ -73,7 +69,6 @@
           </div>
           <div class="muted-label mcard-meta">{{ t.typeLabel }} · {{ t.year }} · {{ t.branchName }}</div>
           <div class="mcard-actions action-group">
-            <button type="button" class="icon-btn icon-btn-accent" (click)="$event.stopPropagation(); selectForDesign(t)" title="Edit layout">▦</button>
             <button type="button" class="icon-btn" [style.color]="t.isActive ? 'var(--w-red)' : 'var(--w-green)'" (click)="$event.stopPropagation(); toggleActive(t)" [title]="t.isActive ? 'Archive' : 'Set active'">⏻</button>
             <button type="button" class="icon-btn" (click)="$event.stopPropagation(); editTemplate(t)" title="Edit details">✎</button>
           </div>
@@ -85,33 +80,53 @@
   <app-table-toolbar [controller]="ctrl" slot="bottom"></app-table-toolbar>
 
   @if (selectedTemplate(); as sel) {
-    <div class="card pad designer-card">
+    <div class="card pad designer-card" #designerCard>
       <div class="designer-head">
         <div>
           <h3 class="section-title">Layout designer — {{ sel.name }}</h3>
-          <div class="muted-label designer-hint">Click a field below to place it on the certificate, drag it to position, or remove it to send it back.</div>
+          <div class="muted-label designer-hint">
+            @if (isEditingLayout()) {
+              Click a field below to place it on the certificate, drag it to position, resize its text, or remove it.
+            } @else {
+              Preview of the saved layout. Click "Edit Layout" to make changes.
+            }
+          </div>
         </div>
-        <div class="field-inline designer-kicker-input">
-          <label class="muted-label">Header text</label>
-          <input
-            class="form-input"
-            [ngModel]="kickerText()"
-            (ngModelChange)="onKickerTextChange($event)"
-          />
+        <div class="designer-head-actions">
+          <div class="field-inline designer-kicker-input">
+            <label class="muted-label">Header text</label>
+            <input
+              class="form-input"
+              [ngModel]="kickerText()"
+              (ngModelChange)="onKickerTextChange($event)"
+              [disabled]="!isEditingLayout()"
+            />
+          </div>
+          @if (isEditingLayout()) {
+            <div class="designer-edit-actions">
+              <button type="button" class="cancel-btn" (click)="cancelEditLayout()">Cancel</button>
+              <button type="button" class="btn btn-solid" (click)="saveEditLayout()">Save</button>
+            </div>
+          } @else {
+            <button type="button" class="btn btn-outline" (click)="startEditLayout()">✎ Edit Layout</button>
+          }
         </div>
       </div>
 
-      <div class="designer-palette">
-        @if (!paletteFields().length) {
-          <span class="muted-label">All fields are placed on the certificate.</span>
-        }
-        @for (f of paletteFields(); track f) {
-          <button type="button" class="palette-chip" (click)="addFieldToCanvas(f)">+ {{ paletteLabel(f) }}</button>
-        }
-      </div>
+      @if (isEditingLayout()) {
+        <div class="designer-palette">
+          @if (!paletteFields().length) {
+            <span class="muted-label">All fields are placed on the certificate.</span>
+          }
+          @for (f of paletteFields(); track f) {
+            <button type="button" class="palette-chip" (click)="addFieldToCanvas(f)">+ {{ paletteLabel(f) }}</button>
+          }
+        </div>
+      }
 
       <div
         class="designer-canvas"
+        [class.designer-canvas-readonly]="!isEditingLayout()"
         #designerCanvas
         (pointermove)="onCanvasPointerMove($event)"
         (pointerup)="endDrag()"
@@ -122,18 +137,29 @@
         }
         <div class="designer-frame"></div>
         @if (!placedFields().length) {
-          <div class="designer-empty-hint">Click a field above to add it here</div>
+          <div class="designer-empty-hint">
+            {{ isEditingLayout() ? 'Click a field above to add it here' : 'No fields placed on this certificate yet.' }}
+          </div>
         }
         @for (f of placedFields(); track f) {
           <div
             class="designer-field"
             [class]="'designer-' + f"
+            [class.designer-field-locked]="!isEditingLayout()"
             [style.left.%]="positions()[f]!.xPct"
             [style.top.%]="positions()[f]!.yPct"
+            [style.fontSize.px]="fieldSize(f)"
             (pointerdown)="startDrag(f, $event)"
           >
             {{ fieldLabel(f) }}
-            <span class="designer-field-remove" (pointerdown)="$event.stopPropagation()" (click)="removeField(f, $event)">×</span>
+            @if (isEditingLayout()) {
+              <span class="designer-field-remove" (pointerdown)="$event.stopPropagation()" (click)="removeField(f, $event)">×</span>
+              <div class="designer-field-size" (pointerdown)="$event.stopPropagation()">
+                <button type="button" (click)="adjustFieldSize(f, -1, $event)">−</button>
+                <span>{{ fieldSize(f) }}</span>
+                <button type="button" (click)="adjustFieldSize(f, 1, $event)">+</button>
+              </div>
+            }
           </div>
         }
       </div>

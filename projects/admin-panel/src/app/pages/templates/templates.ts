@@ -62,6 +62,17 @@ const PALETTE_LABELS: Record<CertLayoutFieldKey, string> = {
 
 const ALL_FIELD_KEYS: CertLayoutFieldKey[] = ['kicker', 'name', 'course', 'certNo', 'issueDate'];
 
+const DEFAULT_FIELD_SIZES: Record<CertLayoutFieldKey, number> = {
+  kicker: 11,
+  name: 28,
+  course: 12,
+  certNo: 9,
+  issueDate: 9,
+};
+
+const MIN_FIELD_SIZE = 6;
+const MAX_FIELD_SIZE = 72;
+
 function toRow(t: ApiCertificateTemplate): TemplateRow {
   return {
     id: t.id,
@@ -132,10 +143,16 @@ export class Templates {
   readonly positions = signal<Partial<Record<CertLayoutFieldKey, CertLayoutPosition>>>({});
   readonly kickerText = signal('CERTIFICATE OF COMPLETION');
 
+  /** Layout is read-only (preview) until "Edit Layout" is clicked; Save/Cancel commit or discard. */
+  readonly isEditingLayout = signal(false);
+  private savedPositions: Partial<Record<CertLayoutFieldKey, CertLayoutPosition>> = {};
+  private savedKickerText = 'CERTIFICATE OF COMPLETION';
+
   readonly placedFields = computed(() => ALL_FIELD_KEYS.filter((k) => this.positions()[k]));
   readonly paletteFields = computed(() => ALL_FIELD_KEYS.filter((k) => !this.positions()[k]));
 
   private readonly canvasRef = viewChild<ElementRef<HTMLDivElement>>('designerCanvas');
+  private readonly designerCardRef = viewChild<ElementRef<HTMLDivElement>>('designerCard');
   private draggingKey: CertLayoutFieldKey | null = null;
   private dirty = false;
 
@@ -181,36 +198,87 @@ export class Templates {
   selectForDesign(row: TemplateRow): void {
     this.selectedTemplateId.set(row.id);
     const raw = this.api.templates().find((t) => t.id === row.id);
-    this.positions.set({ ...(raw?.layoutConfig?.positions ?? {}) });
-    this.kickerText.set(raw?.layoutConfig?.kickerText || 'CERTIFICATE OF COMPLETION');
+    const positions = { ...(raw?.layoutConfig?.positions ?? {}) };
+    const kickerText = raw?.layoutConfig?.kickerText || 'CERTIFICATE OF COMPLETION';
+    this.positions.set(positions);
+    this.kickerText.set(kickerText);
+    this.savedPositions = positions;
+    this.savedKickerText = kickerText;
+    this.isEditingLayout.set(false);
+    setTimeout(() => this.designerCardRef()?.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+  }
+
+  startEditLayout(): void {
+    this.savedPositions = this.positions();
+    this.savedKickerText = this.kickerText();
+    this.isEditingLayout.set(true);
+  }
+
+  cancelEditLayout(): void {
+    this.positions.set(this.savedPositions);
+    this.kickerText.set(this.savedKickerText);
+    this.dirty = false;
+    this.isEditingLayout.set(false);
+  }
+
+  saveEditLayout(): void {
+    const id = this.selectedTemplateId();
+    if (!id) return;
+    this.api.saveLayout(id, { kickerText: this.kickerText(), positions: this.positions() }).subscribe({
+      next: () => {
+        this.savedPositions = this.positions();
+        this.savedKickerText = this.kickerText();
+        this.dirty = false;
+        this.isEditingLayout.set(false);
+        this.toast.show('Layout saved.', 'success');
+      },
+      error: (err) => this.showError(err, 'Failed to save layout.'),
+    });
   }
 
   /** Moves a field from the outside palette onto the canvas at a sensible starting position. */
   addFieldToCanvas(key: CertLayoutFieldKey): void {
+    if (!this.isEditingLayout()) return;
     this.positions.update((current) => ({ ...current, [key]: { ...DEFAULT_CERT_POSITIONS[key] } }));
     this.dirty = true;
-    this.saveLayout();
   }
 
   /** Removes a field from the canvas, sending it back to the outside palette. */
   removeField(key: CertLayoutFieldKey, event: Event): void {
     event.stopPropagation();
+    if (!this.isEditingLayout()) return;
     this.positions.update((current) => {
       const next = { ...current };
       delete next[key];
       return next;
     });
     this.dirty = true;
-    this.saveLayout();
   }
 
   onKickerTextChange(value: string): void {
+    if (!this.isEditingLayout()) return;
     this.kickerText.set(value);
     this.dirty = true;
-    this.saveLayout();
+  }
+
+  fieldSize(key: CertLayoutFieldKey): number {
+    return this.positions()[key]?.size ?? DEFAULT_FIELD_SIZES[key];
+  }
+
+  adjustFieldSize(key: CertLayoutFieldKey, delta: number, event: Event): void {
+    event.stopPropagation();
+    if (!this.isEditingLayout()) return;
+    const next = Math.min(MAX_FIELD_SIZE, Math.max(MIN_FIELD_SIZE, this.fieldSize(key) + delta));
+    this.positions.update((current) => {
+      const pos = current[key];
+      if (!pos) return current;
+      return { ...current, [key]: { ...pos, size: next } };
+    });
+    this.dirty = true;
   }
 
   startDrag(key: CertLayoutFieldKey, event: PointerEvent): void {
+    if (!this.isEditingLayout()) return;
     event.preventDefault();
     this.draggingKey = key;
     (event.target as HTMLElement).setPointerCapture(event.pointerId);
@@ -225,22 +293,16 @@ export class Templates {
     const xPct = Math.min(96, Math.max(4, ((event.clientX - rect.left) / rect.width) * 100));
     const yPct = Math.min(96, Math.max(4, ((event.clientY - rect.top) / rect.height) * 100));
 
-    this.positions.update((current) => ({ ...current, [this.draggingKey as CertLayoutFieldKey]: { xPct, yPct } }));
+    this.positions.update((current) => {
+      const key = this.draggingKey as CertLayoutFieldKey;
+      const pos = current[key];
+      return { ...current, [key]: { ...pos, xPct, yPct } };
+    });
     this.dirty = true;
   }
 
   endDrag(): void {
-    if (this.draggingKey && this.dirty) this.saveLayout();
     this.draggingKey = null;
-  }
-
-  private saveLayout(): void {
-    const id = this.selectedTemplateId();
-    if (!id) return;
-    this.dirty = false;
-    this.api
-      .saveLayout(id, { kickerText: this.kickerText(), positions: this.positions() })
-      .subscribe({ error: (err) => this.showError(err, 'Failed to save layout.') });
   }
 
   private toPayload(values: Record<string, string | number>): TemplatePayload {

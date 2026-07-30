@@ -22,6 +22,8 @@ export type CertLayoutFieldKey = 'kicker' | 'name' | 'course' | 'certNo' | 'issu
 export interface CertLayoutPosition {
   xPct: number;
   yPct: number;
+  /** Font size in pt. Omit to use the field's built-in default size. */
+  size?: number;
 }
 
 export interface CertLayoutConfig {
@@ -146,7 +148,8 @@ export class PdfService {
       const pos = positions[key];
       const content = fieldContent[key];
       if (!pos || !content) continue;
-      this.drawCentered(doc, pos, content.text, pageW, pageH, content.style, content.maxWidth);
+      const style = pos.size ? { ...content.style, size: pos.size } : content.style;
+      this.drawCentered(doc, pos, content.text, pageW, pageH, style, content.maxWidth);
     }
 
     return doc.output('datauristring');
