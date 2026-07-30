@@ -2,6 +2,21 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-07-30 (6) — Home page hero text is now editable via admin
+
+- New admin page **Site Content → Home Hero** to edit the Home page's
+  eyebrow tagline, two-line heading, description, and the 3-stat row
+  (value + label for each) — previously hardcoded in the template.
+  Public-site Home falls back to the original copy if nothing has been
+  saved yet, so the page never looks broken pre-edit.
+
+## 2026-07-30 (5) — Fixed Home page course cards not being clickable
+
+- The "Courses & programs" cards on the public-site Home page only had
+  a small "Enroll →" link clickable; the rest of the card (image, title)
+  did nothing. The whole card is now a link to the course detail page,
+  matching how the Events cards already behaved.
+
 ## 2026-07-30 (4) — Updated mobile app icon and splash screen
 
 - Replaced the Android app icon/adaptive-icon and the splash screen with

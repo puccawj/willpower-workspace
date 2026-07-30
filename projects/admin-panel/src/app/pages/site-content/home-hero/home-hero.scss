@@ -1,0 +1,28 @@
+:host {
+  display: block;
+}
+
+.card + .card {
+  margin-top: 18px;
+}
+
+.field-inline {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.stat-col .field-inline:last-child {
+  margin-bottom: 0;
+}
+
+button.btn-solid {
+  margin-top: 18px;
+}

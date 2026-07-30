@@ -70,6 +70,7 @@ export class Sidebar {
       items: [
         { path: 'team', label: 'Team Management', icon: '◍', allow: ALL_STAFF },
         { path: 'broadcast', label: 'Broadcast', icon: '◉', allow: ALL_STAFF },
+        { path: 'home-hero', label: 'Home Hero', icon: '⛩', allow: ALL_STAFF },
         { path: 'home-banners', label: 'Home Banners', icon: '▨', allow: ALL_STAFF },
         { path: 'about-content', label: 'About Page', icon: '❋', allow: ALL_STAFF },
         { path: 'privacy-policy-content', label: 'Privacy Policy', icon: '¶', allow: ALL_STAFF },

@@ -1,0 +1,68 @@
+@if (loading()) {
+  <div class="state-loading card">Loading Home hero content…</div>
+} @else {
+  <div class="card pad">
+    <h3 class="section-title">Hero text</h3>
+    <div class="field-inline">
+      <label class="muted-label">Eyebrow</label>
+      <input class="form-input" [ngModel]="content().eyebrow" (ngModelChange)="updateField('eyebrow', $event)" />
+    </div>
+    <div class="field-inline">
+      <label class="muted-label">Heading — line 1</label>
+      <input class="form-input" [ngModel]="content().headingLine1" (ngModelChange)="updateField('headingLine1', $event)" />
+    </div>
+    <div class="field-inline">
+      <label class="muted-label">Heading — line 2</label>
+      <input class="form-input" [ngModel]="content().headingLine2" (ngModelChange)="updateField('headingLine2', $event)" />
+    </div>
+    <div class="field-inline">
+      <label class="muted-label">Description</label>
+      <textarea
+        class="form-input form-textarea"
+        rows="4"
+        [ngModel]="content().description"
+        (ngModelChange)="updateField('description', $event)"
+      ></textarea>
+    </div>
+  </div>
+
+  <div class="card pad">
+    <h3 class="section-title">Stats row</h3>
+    <div class="stats-grid">
+      <div class="stat-col">
+        <div class="field-inline">
+          <label class="muted-label">Stat 1 value</label>
+          <input class="form-input" [ngModel]="content().stat1Value" (ngModelChange)="updateField('stat1Value', $event)" />
+        </div>
+        <div class="field-inline">
+          <label class="muted-label">Stat 1 label</label>
+          <input class="form-input" [ngModel]="content().stat1Label" (ngModelChange)="updateField('stat1Label', $event)" />
+        </div>
+      </div>
+      <div class="stat-col">
+        <div class="field-inline">
+          <label class="muted-label">Stat 2 value</label>
+          <input class="form-input" [ngModel]="content().stat2Value" (ngModelChange)="updateField('stat2Value', $event)" />
+        </div>
+        <div class="field-inline">
+          <label class="muted-label">Stat 2 label</label>
+          <input class="form-input" [ngModel]="content().stat2Label" (ngModelChange)="updateField('stat2Label', $event)" />
+        </div>
+      </div>
+      <div class="stat-col">
+        <div class="field-inline">
+          <label class="muted-label">Stat 3 value</label>
+          <input class="form-input" [ngModel]="content().stat3Value" (ngModelChange)="updateField('stat3Value', $event)" />
+        </div>
+        <div class="field-inline">
+          <label class="muted-label">Stat 3 label</label>
+          <input class="form-input" [ngModel]="content().stat3Label" (ngModelChange)="updateField('stat3Label', $event)" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button type="button" class="btn btn-solid" [disabled]="saving()" (click)="save()">
+    {{ saving() ? 'Saving…' : 'Save changes' }}
+  </button>
+}

@@ -26,6 +26,7 @@ import { Broadcast } from './pages/broadcast/broadcast';
 import { AboutContentPage } from './pages/site-content/about-content/about-content';
 import { PrivacyPolicyContentPage } from './pages/site-content/privacy-policy-content/privacy-policy-content';
 import { HomeBanners } from './pages/site-content/home-banners/home-banners';
+import { HomeHero } from './pages/site-content/home-hero/home-hero';
 import { roleAccessGuard } from './core/guards/role-access.guard';
 import { authGuard } from './core/guards/auth.guard';
 
@@ -161,6 +162,12 @@ export const routes: Routes = [
         component: Templates,
         canActivate: [roleAccessGuard],
         data: { title: 'Certificate Templates', subtitle: 'Upload backgrounds and design the layout', allow: ['superadmin'] },
+      },
+      {
+        path: 'home-hero',
+        component: HomeHero,
+        canActivate: [roleAccessGuard],
+        data: { title: 'Home Hero', subtitle: 'Edit the tagline, heading, description, and stats row on the public-site Home page', allow: ['superadmin', 'admin'] },
       },
       {
         path: 'home-banners',
