@@ -32,7 +32,8 @@
 }
 
 .google-icon-btn,
-.fb-icon-btn {
+.fb-icon-btn,
+.apple-icon-btn {
   width: 44px;
   height: 44px;
   border-radius: 50%;
@@ -66,4 +67,14 @@
 .fb-icon {
   color: #fff;
   font: 700 20px Georgia, serif;
+}
+
+.apple-icon-btn {
+  background: #000;
+}
+
+.apple-icon {
+  color: #fff;
+  font-size: 22px;
+  line-height: 1;
 }

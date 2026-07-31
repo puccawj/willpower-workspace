@@ -1,4 +1,4 @@
-@if (googleConfigured || facebookConfigured) {
+@if (googleConfigured || facebookConfigured || appleConfigured) {
   <div class="sso-divider"><span>or continue with</span></div>
 
   <div class="sso-row">
@@ -10,6 +10,11 @@
     @if (facebookConfigured) {
       <button type="button" class="fb-icon-btn" (click)="continueWithFacebook()" aria-label="Continue with Facebook" title="Continue with Facebook">
         <span class="fb-icon">f</span>
+      </button>
+    }
+    @if (appleConfigured) {
+      <button type="button" class="apple-icon-btn" (click)="continueWithApple()" aria-label="Continue with Apple" title="Continue with Apple">
+        <span class="apple-icon"></span>
       </button>
     }
   </div>

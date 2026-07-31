@@ -32,6 +32,20 @@ yarn-error.log
 .vs/
 .vs/*
 
+# iOS (Capacitor) — Podfile/Pods/.xcworkspace are regenerated fresh by `cap sync ios`
+# (which needs CocoaPods, so only actually runs on macOS/CI, never on this Windows box)
+ios/App/Podfile
+ios/App/Podfile.lock
+ios/App/Pods/
+ios/App/App.xcworkspace/
+ios/App/App/public/
+**/xcuserdata/
+*.xcuserstate
+
+# Ruby (Fastlane)
+ios/vendor/
+ios/.bundle/
+
 # Miscellaneous
 /.angular/cache
 .sass-cache/

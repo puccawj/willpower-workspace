@@ -2,6 +2,24 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-07-31 (1) — iOS platform scaffolding + TestFlight CI pipeline
+
+- Added the `ios/` Capacitor platform and a GitHub Actions workflow
+  (`.github/workflows/ios-build.yml`) that builds and uploads to
+  TestFlight on a free macOS runner — see `ios/SETUP.md` for the
+  one-time secrets/Apple Developer Portal setup still needed before
+  the first real run.
+- Swapped the push notification plugin from `@capacitor/push-notifications`
+  to `@capacitor-firebase/messaging` so iOS yields an FCM token like
+  Android does — the backend's Firebase Admin SDK can only target FCM
+  tokens, and the old plugin gave iOS a raw APNs token it couldn't use.
+- Added **Sign in with Apple** to the mobile app (iOS only) — App Store
+  guideline 4.8 requires it whenever Google/Facebook sign-in is offered.
+- Generated iOS app icon + splash screen from the same artwork used for
+  Android, and added the Info.plist permission strings / Facebook and
+  Google native config needed for social login and the QR/biometric
+  features to work on iOS.
+
 ## 2026-07-30 (6) — Home page hero text is now editable via admin
 
 - New admin page **Site Content → Home Hero** to edit the Home page's

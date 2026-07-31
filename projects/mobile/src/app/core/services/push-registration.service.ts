@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { Capacitor } from '@capacitor/core';
-import { PushNotifications } from '@capacitor/push-notifications';
+import { FirebaseMessaging } from '@capacitor-firebase/messaging';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { AuthService } from './auth.service';
@@ -11,6 +11,11 @@ import { AuthService } from './auth.service';
  * Registers this device for native push notifications (Android/iOS only — no-ops on
  * web, where the in-app bell + polling already covers notifications). Call `init()`
  * once after login, from a screen the user only reaches with a valid session.
+ *
+ * Uses @capacitor-firebase/messaging (not the plain @capacitor/push-notifications
+ * plugin) specifically so iOS yields an FCM token like Android does — the backend's
+ * Firebase Admin SDK (`sendEachForMulticast`) only knows how to target FCM tokens,
+ * and the plain plugin gives iOS a raw APNs token it can't send to directly.
  */
 @Injectable({ providedIn: 'root' })
 export class PushRegistrationService {
@@ -25,28 +30,30 @@ export class PushRegistrationService {
     if (this.started || !Capacitor.isNativePlatform()) return;
     this.started = true;
 
-    const permission = await PushNotifications.checkPermissions();
+    const permission = await FirebaseMessaging.checkPermissions();
     let receive = permission.receive;
     if (receive === 'prompt' || receive === 'prompt-with-rationale') {
-      receive = (await PushNotifications.requestPermissions()).receive;
+      receive = (await FirebaseMessaging.requestPermissions()).receive;
     }
     if (receive !== 'granted') return;
 
-    await PushNotifications.register();
-
-    PushNotifications.addListener('registration', (token) => {
-      this.currentToken = token.value;
-      void this.sendTokenToServer(token.value);
-    });
-
-    PushNotifications.addListener('registrationError', (err) => {
-      console.error('Push registration failed:', err);
+    await FirebaseMessaging.addListener('tokenReceived', (event) => {
+      this.currentToken = event.token;
+      void this.sendTokenToServer(event.token);
     });
 
     // Tapped a push while the app was backgrounded/closed — take them to the notification list.
-    PushNotifications.addListener('pushNotificationActionPerformed', () => {
+    await FirebaseMessaging.addListener('notificationActionPerformed', () => {
       void this.router.navigateByUrl('/notifications');
     });
+
+    try {
+      const { token } = await FirebaseMessaging.getToken();
+      this.currentToken = token;
+      void this.sendTokenToServer(token);
+    } catch (err) {
+      console.error('Push registration failed:', err);
+    }
   }
 
   async unregister(): Promise<void> {

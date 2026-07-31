@@ -1,0 +1,64 @@
+name: iOS build → TestFlight
+
+# Runs on a free macOS runner (public repo = unlimited minutes) — no local Mac needed.
+# Trigger manually until secrets are configured; add `push: { branches: [main], paths: [...] }`
+# once the first successful TestFlight upload confirms everything is wired up correctly.
+on:
+  workflow_dispatch:
+    inputs:
+      bootstrap_certs:
+        description: "One-time: generate + push the initial signing certificate to the match repo"
+        type: boolean
+        default: false
+
+jobs:
+  build:
+    runs-on: macos-14
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install JS dependencies
+        run: npm ci
+
+      - name: Build mobile web bundle
+        run: npx ng build mobile --configuration production
+
+      - name: Sync Capacitor iOS (generates Podfile + runs pod install on this Mac)
+        run: npx cap sync ios
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          working-directory: ios
+          bundler-cache: true
+
+      - name: Bootstrap signing certificate (manual, one-time)
+        if: ${{ inputs.bootstrap_certs }}
+        working-directory: ios
+        env:
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          MATCH_READONLY: "false"
+          APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_KEY_CONTENT }}
+          APPLE_DEVELOPER_TEAM_ID: ${{ secrets.APPLE_DEVELOPER_TEAM_ID }}
+        run: bundle exec fastlane ios bootstrap_certs
+
+      - name: Build and upload to TestFlight
+        if: ${{ !inputs.bootstrap_certs }}
+        working-directory: ios
+        env:
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_KEY_CONTENT }}
+          APPLE_DEVELOPER_TEAM_ID: ${{ secrets.APPLE_DEVELOPER_TEAM_ID }}
+          APP_STORE_CONNECT_TEAM_ID: ${{ secrets.APP_STORE_CONNECT_TEAM_ID }}
+        run: bundle exec fastlane ios beta

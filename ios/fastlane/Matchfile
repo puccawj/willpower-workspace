@@ -1,0 +1,16 @@
+# fastlane match stores your signing certificate + provisioning profile, encrypted, in a
+# PRIVATE git repo you create separately (never commit certs/profiles to this repo).
+# Setup: https://docs.fastlane.tools/actions/match/
+#
+# 1. Create a new PRIVATE GitHub repo, e.g. "willpower-ios-certs" (empty is fine).
+# 2. Set MATCH_GIT_URL and MATCH_PASSWORD as GitHub Actions secrets on THIS repo
+#    (willpower-workspace) — MATCH_PASSWORD is a passphrase you make up, used to encrypt
+#    the certs before they're pushed to the certs repo.
+# 3. Run `bundle exec fastlane match appstore` once from a Mac (or the first CI run with
+#    FASTLANE_MATCH_READONLY unset) to generate and push the initial certificate.
+
+git_url(ENV["MATCH_GIT_URL"] || "")
+storage_mode("git")
+type("appstore")
+app_identifier(["org.willpowerinstitute.app"])
+readonly(ENV["MATCH_READONLY"] != "false")
