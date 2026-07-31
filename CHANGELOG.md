@@ -2,6 +2,12 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-07-31 (2) — Mobile app icon updated to the official Willpower Institute seal
+
+- Replaced the app icon and splash screen (Android + iOS) with the
+  official round seal (`android/icon/willpowericon.png`), regenerated
+  at every density, same gold splash background as before.
+
 ## 2026-07-31 (1) — iOS platform scaffolding + TestFlight CI pipeline
 
 - Added the `ios/` Capacitor platform and a GitHub Actions workflow
