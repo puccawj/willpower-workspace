@@ -2,6 +2,22 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-03 (10) — Follow-up: white gap was back on every page, not just one field
+
+- (9)'s keyboard-avoidance fallback padded `document.body`, but almost
+  every screen in this app actually scrolls inside the tab shell's own
+  `.tab-content` container (`overflow-y: auto`, fixed `100dvh` — see
+  `tab-shell.scss`), not the document body. Padding body created a
+  second, independent scroll layer on top of `.tab-content`'s real
+  scroll, and `scrollIntoView()` dragged that outer body-scroll along
+  too — visible as the padding itself, a blank white box above the
+  keyboard, on every tab page (reported on the donation form's Phone
+  number field, but not specific to it). Fixed by padding the focused
+  field's actual nearest scrollable ancestor instead of hardcoding
+  `body`. Confirmed clean on-device on both the donation form's Phone
+  number field and the course rating's Optional note field, with the
+  layout restoring correctly after the keyboard closes.
+
 ## 2026-08-03 (9) — Follow-up: adjustPan didn't pan for some fields either
 
 - (8)'s `adjustPan` avoided the white-gap bug, but native panning turned

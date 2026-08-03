@@ -27,30 +27,66 @@ const TAB_ROOTS = new Set(['/home', '/events', '/courses', '/profile']);
 // reserve bottom space equal to the keyboard height (so a field near the end of the
 // document has somewhere to scroll *to*), wait a frame for that layout change to commit,
 // then scroll the focused field to a known-good position.
+//
+// Almost every screen in this app lives inside the tab shell's ".tab-content" — a fixed
+// 100dvh flex child with its own "overflow-y: auto" (see tab-shell.scss) — NOT the
+// document body. Padding document.body unconditionally (as an earlier version of this
+// function did) padded an element that isn't the actual scroll container: body became
+// scrollable as a second, independent scroll layer on top of .tab-content's own scroll,
+// and scrollIntoView() dragged that outer body-scroll along too, exposing the padding
+// itself as a big blank white gap above the keyboard — on every tab page. Padding the
+// focused field's real nearest scrollable ancestor (whatever that is on a given page)
+// instead of hardcoding body fixes this generally.
+function findScrollParent(el: HTMLElement): HTMLElement {
+  let node = el.parentElement;
+  while (node) {
+    const style = getComputedStyle(node);
+    if (/(auto|scroll)/.test(style.overflowY) && node.scrollHeight > node.clientHeight) {
+      return node;
+    }
+    node = node.parentElement;
+  }
+  return (document.scrollingElement as HTMLElement | null) ?? document.body;
+}
+
 function setupKeyboardAvoidance(): () => void {
   const viewport = window.visualViewport;
   if (!viewport) return () => {};
 
+  let paddedEl: HTMLElement | null = null;
+  const clearPadding = () => {
+    if (paddedEl) {
+      paddedEl.style.paddingBottom = '';
+      paddedEl = null;
+    }
+  };
+
   const onViewportResize = () => {
     const keyboardHeight = Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop);
-    document.body.style.paddingBottom = keyboardHeight > 50 ? `${keyboardHeight}px` : '';
+    const active = document.activeElement as HTMLElement | null;
+    const isField = !!active && ['INPUT', 'TEXTAREA', 'SELECT'].includes(active.tagName);
 
-    if (keyboardHeight > 50) {
-      requestAnimationFrame(() =>
-        requestAnimationFrame(() => {
-          const active = document.activeElement as HTMLElement | null;
-          if (active && ['INPUT', 'TEXTAREA', 'SELECT'].includes(active.tagName)) {
-            active.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          }
-        }),
-      );
+    if (keyboardHeight <= 50 || !isField) {
+      clearPadding();
+      return;
     }
+
+    const scrollParent = findScrollParent(active!);
+    if (paddedEl && paddedEl !== scrollParent) clearPadding();
+    scrollParent.style.paddingBottom = `${keyboardHeight}px`;
+    paddedEl = scrollParent;
+
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        active!.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }),
+    );
   };
 
   viewport.addEventListener('resize', onViewportResize);
   return () => {
     viewport.removeEventListener('resize', onViewportResize);
-    document.body.style.paddingBottom = '';
+    clearPadding();
   };
 }
 
