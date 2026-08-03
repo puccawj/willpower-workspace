@@ -2,6 +2,17 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-03 (3) — Fixed Android splash circle looking stretched/oval
+
+- Android renders the splash drawable as a raw window background, which
+  stretches it to exactly fill the screen with no aspect-ratio
+  preservation — the old splash images (~1.5-1.78 h/w, an older-phone
+  preset) were stretched noticeably taller on modern ~2.05-2.2 h/w
+  screens, making the round seal look egg-shaped. Rebuilt every splash
+  density bucket at a ~2.16 h/w canvas so the stretch is minimal and the
+  seal reads as a true circle again. Confirmed round on-device (Note9).
+  iOS is unaffected (its launch image already uses aspect-fill scaling).
+
 ## 2026-08-03 (2) — Mobile app icon now has even padding on all sides
 
 - Shrunk the seal artwork to ~72% of the icon canvas (was edge-to-edge)
