@@ -2,6 +2,13 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-03 (2) — Mobile app icon now has even padding on all sides
+
+- Shrunk the seal artwork to ~72% of the icon canvas (was edge-to-edge)
+  so every launcher icon variant shows even breathing room around the
+  circle instead of being cropped flush to the edge. Splash screen
+  unchanged.
+
 ## 2026-08-03 (1) — Mobile app icon/splash updated to the revised seal artwork
 
 - Regenerated the Android/iOS launcher icon and splash screen from a
