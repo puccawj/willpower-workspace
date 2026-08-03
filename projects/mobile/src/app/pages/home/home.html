@@ -1,4 +1,32 @@
 <div class="home">
+  @if (banners().length) {
+    <div class="home-banner">
+      @for (b of banners(); track b.id; let i = $index) {
+        <img
+          [src]="b.imageUrl"
+          alt=""
+          class="banner-slide"
+          [class.active]="i === activeSlide()"
+          [class.clickable]="!!b.linkUrl"
+          (click)="onBannerClick(b.linkUrl)"
+        />
+      }
+      @if (banners().length > 1) {
+        <div class="banner-dots">
+          @for (b of banners(); track b.id; let i = $index) {
+            <button
+              type="button"
+              class="banner-dot"
+              [class.active]="i === activeSlide()"
+              (click)="goToSlide(i)"
+              [attr.aria-label]="'Go to banner ' + (i + 1)"
+            ></button>
+          }
+        </div>
+      }
+    </div>
+  }
+
   <div class="home-head">
     <div>
       <div class="greeting">{{ greeting() }}</div>

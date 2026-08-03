@@ -1,7 +1,9 @@
 import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { Browser } from '@capacitor/browser';
 import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
+import { HomeBannerApiService } from '../../core/services/home-banner-api.service';
 import { MeApiService, MyEvent } from '../../core/services/me-api.service';
 import { NotificationApiService } from '../../core/services/notification-api.service';
 import { PushRegistrationService } from '../../core/services/push-registration.service';
@@ -9,6 +11,8 @@ import { PublicEventApiService } from '../../core/services/public-event-api.serv
 import { PublicCourseApiService, PublicCourseOfferingCard } from '../../core/services/public-course-api.service';
 import { PullToRefreshService } from '../../core/services/pull-to-refresh.service';
 import { RatingApiService, RatingSummary } from '../../core/services/rating-api.service';
+
+const AUTO_ADVANCE_MS = 6000;
 
 @Component({
   selector: 'app-home',
@@ -21,12 +25,17 @@ export class Home {
   private readonly meApi = inject(MeApiService);
   private readonly publicEvents = inject(PublicEventApiService);
   private readonly publicCourses = inject(PublicCourseApiService);
+  private readonly bannerApi = inject(HomeBannerApiService);
   private readonly pullToRefresh = inject(PullToRefreshService);
   protected readonly notificationApi = inject(NotificationApiService);
   private readonly pushRegistration = inject(PushRegistrationService);
   private readonly ratingApi = inject(RatingApiService);
+  private readonly router = inject(Router);
 
   readonly view = signal<'list' | 'card'>('card');
+  readonly banners = this.bannerApi.banners;
+  readonly activeSlide = signal(0);
+  private bannerTimer: ReturnType<typeof setInterval> | null = null;
 
   readonly greeting = computed(() => {
     const hour = new Date().getHours();
@@ -77,6 +86,29 @@ export class Home {
       ' · ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
   }
 
+  goToSlide(index: number): void {
+    this.activeSlide.set(index);
+  }
+
+  nextSlide(): void {
+    const total = this.banners().length;
+    this.activeSlide.set((this.activeSlide() + 1) % total);
+  }
+
+  prevSlide(): void {
+    const total = this.banners().length;
+    this.activeSlide.set((this.activeSlide() - 1 + total) % total);
+  }
+
+  onBannerClick(link: string | null): void {
+    if (!link) return;
+    if (/^https?:\/\//.test(link)) {
+      void Browser.open({ url: link });
+    } else {
+      this.router.navigateByUrl(link);
+    }
+  }
+
   constructor() {
     this.meApi.loadEvents().subscribe();
     this.publicEvents.load().subscribe(() => this.refreshRatings());
@@ -86,14 +118,21 @@ export class Home {
     });
     this.notificationApi.loadUnreadCount().subscribe();
     void this.pushRegistration.init();
+    this.bannerApi.load().subscribe(() => {
+      if (this.banners().length > 1) this.bannerTimer = setInterval(() => this.nextSlide(), AUTO_ADVANCE_MS);
+    });
 
     this.pullToRefresh.register(() =>
       Promise.all([
         firstValueFrom(this.meApi.loadEvents()),
         firstValueFrom(this.publicEvents.load()),
         firstValueFrom(this.publicCourses.loadAllOfferings()).then((rows) => this.offeringCards.set(rows)),
+        firstValueFrom(this.bannerApi.load()),
       ]).then(() => this.refreshRatings()),
     );
-    inject(DestroyRef).onDestroy(() => this.pullToRefresh.clear());
+    inject(DestroyRef).onDestroy(() => {
+      this.pullToRefresh.clear();
+      if (this.bannerTimer) clearInterval(this.bannerTimer);
+    });
   }
 }
