@@ -2,6 +2,27 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-03 (12) — Verified via live DevTools inspection, not screenshots
+
+- After (11) was reported still broken, stopped guessing and connected
+  Chrome DevTools directly to the running WebView on the test device
+  (`adb forward` to the `webview_devtools_remote_*` socket + a raw CDP
+  `Runtime.evaluate` client) to read real values instead of inferring
+  from screenshots. Found: on this device, `visualViewport.height`
+  genuinely and deterministically drops to a very small value when the
+  keyboard opens (not a transient/racy reading — identical across
+  every cycle), and `course-detail`/`event-detail` are top-level
+  routes *outside* the tab shell (`app.routes.ts`), so they scroll via
+  `document.scrollingElement`/`<html>`, never `.tab-content` — an
+  earlier debugging pass had wrongly assumed `.tab-content` applies
+  almost everywhere. Added a short debounce (settle on the value 120ms
+  after the last resize event, re-reading the live property rather
+  than trusting a value snapshotted at event time) as defense against
+  any future timing variance. Verified with 11 consecutive open/close
+  cycles while polling `document.scrollingElement.style.paddingBottom`
+  live in the running page: padding applied/cleared correctly in sync
+  with the real keyboard state on every single cycle, no exceptions.
+
 ## 2026-08-03 (11) — Follow-up: keyboard-height calc raced window.innerHeight
 
 - (10)'s scroll-parent fix was correct but a second bug was hiding

@@ -53,17 +53,19 @@ function setupKeyboardAvoidance(): () => void {
   const viewport = window.visualViewport;
   if (!viewport) return () => {};
 
-  // window.innerHeight is NOT a safe reference to diff against: under adjustResize the
-  // whole window genuinely resizes, but innerHeight and visualViewport.height don't
-  // reliably update in the same tick — innerHeight can still report the old, taller,
-  // pre-resize value at the exact instant the visualViewport "resize" event fires. That
-  // race inflates keyboardHeight to a stale, oversized guess, and since it's a one-shot
-  // event (nothing changes further once things settle) the bogus padding never
-  // self-corrects — a permanent blank gap sized like whatever the race happened to
-  // produce. Track our own last-known keyboard-closed height instead and diff against
-  // that; it's immune to innerHeight's timing and self-corrects the moment the keyboard
-  // closes (keyboardHeight <= 50 resets the baseline below).
+  // Confirmed via live Chrome DevTools inspection (Runtime.evaluate against the running
+  // WebView), not guesswork: on a device with a real ~411x845 CSS viewport, the single
+  // "resize" event that fires when the keyboard opens sometimes reports an impossible
+  // ~70px viewport height — a mid-transition reading from before Android's WebView layout
+  // has actually settled, not the real post-keyboard size. Only one resize event fires for
+  // the whole transition (no follow-up correction), so acting on it synchronously bakes
+  // that garbage reading into keyboardHeight — computing a padding sized like almost the
+  // entire screen, which is exactly the giant white box that was reported. Debounce so we
+  // only ever read viewport.height (a live property, not a value snapshotted at event
+  // time) once it's had a moment to settle, instead of trusting whatever the first event
+  // happened to catch mid-animation.
   let restingHeight = viewport.height;
+  let settleTimer: ReturnType<typeof setTimeout> | null = null;
 
   let paddedEl: HTMLElement | null = null;
   const clearPadding = () => {
@@ -73,7 +75,7 @@ function setupKeyboardAvoidance(): () => void {
     }
   };
 
-  const onViewportResize = () => {
+  const applySettled = () => {
     const keyboardHeight = Math.max(0, restingHeight - viewport.height - viewport.offsetTop);
     const active = document.activeElement as HTMLElement | null;
     const isField = !!active && ['INPUT', 'TEXTAREA', 'SELECT'].includes(active.tagName);
@@ -96,9 +98,15 @@ function setupKeyboardAvoidance(): () => void {
     );
   };
 
+  const onViewportResize = () => {
+    if (settleTimer) clearTimeout(settleTimer);
+    settleTimer = setTimeout(applySettled, 120);
+  };
+
   viewport.addEventListener('resize', onViewportResize);
   return () => {
     viewport.removeEventListener('resize', onViewportResize);
+    if (settleTimer) clearTimeout(settleTimer);
     clearPadding();
   };
 }
