@@ -2,6 +2,16 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-03 (8) — Follow-up: adjustResize left a white gap above the keyboard
+
+- (7)'s `adjustResize` fix stopped the keyboard from covering fields,
+  but introduced a different bug — a blank white gap between the
+  focused input and the keyboard on some pages, from a known Android
+  WebView resize-timing race. Switched to
+  `android:windowSoftInputMode="adjustPan"` instead, which pans the
+  window up to reveal the focused field without resizing/reflowing the
+  page at all, avoiding the race entirely. Confirmed on-device.
+
 ## 2026-08-03 (7) — Fixed Android keyboard covering input fields
 
 - `AndroidManifest.xml` had no `windowSoftInputMode`, so the WebView
