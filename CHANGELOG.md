@@ -2,6 +2,19 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-03 (9) — Follow-up: adjustPan didn't pan for some fields either
+
+- (8)'s `adjustPan` avoided the white-gap bug, but native panning turned
+  out unreliable for WebView content too — fields near the end of a
+  long page (e.g. the course rating note) never got panned into view
+  at all. Switched back to `adjustResize` and added a JS-level
+  "keyboard avoidance" fallback in `app.ts`: on `visualViewport`
+  resize, reserve bottom padding equal to the keyboard height (so
+  there's always room to scroll *to*, even for the last field on a
+  page) and scroll the focused field into view once that layout
+  change has committed. Confirmed on-device across login, a mid-page
+  donate form, and the previously-broken end-of-page rating note.
+
 ## 2026-08-03 (8) — Follow-up: adjustResize left a white gap above the keyboard
 
 - (7)'s `adjustResize` fix stopped the keyboard from covering fields,

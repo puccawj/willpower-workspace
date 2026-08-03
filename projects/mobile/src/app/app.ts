@@ -17,6 +17,43 @@ const EXIT_HINT_WINDOW_MS = 2000;
 // it came from, via the normal history.back() path below.
 const TAB_ROOTS = new Set(['/home', '/events', '/courses', '/profile']);
 
+// android:windowSoftInputMode is "adjustResize" (see AndroidManifest.xml) so the WebView's
+// own visible area actually shrinks when the keyboard opens — window.visualViewport can
+// only detect a real resize, and "adjustPan" (tried first) doesn't produce one, since
+// panning shifts the whole window instead of resizing it, silently disabling this entire
+// fallback. adjustResize's own built-in browser auto-scroll-to-focused-field is what
+// caused the original white-gap bug (it scrolled based on the pre-resize layout and
+// overshot past the end of the document), so here we take over that scroll ourselves:
+// reserve bottom space equal to the keyboard height (so a field near the end of the
+// document has somewhere to scroll *to*), wait a frame for that layout change to commit,
+// then scroll the focused field to a known-good position.
+function setupKeyboardAvoidance(): () => void {
+  const viewport = window.visualViewport;
+  if (!viewport) return () => {};
+
+  const onViewportResize = () => {
+    const keyboardHeight = Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop);
+    document.body.style.paddingBottom = keyboardHeight > 50 ? `${keyboardHeight}px` : '';
+
+    if (keyboardHeight > 50) {
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() => {
+          const active = document.activeElement as HTMLElement | null;
+          if (active && ['INPUT', 'TEXTAREA', 'SELECT'].includes(active.tagName)) {
+            active.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }),
+      );
+    }
+  };
+
+  viewport.addEventListener('resize', onViewportResize);
+  return () => {
+    viewport.removeEventListener('resize', onViewportResize);
+    document.body.style.paddingBottom = '';
+  };
+}
+
 @Component({
   selector: 'app-root',
   imports: [RouterOutlet, PhotoViewer],
@@ -29,6 +66,8 @@ export class App {
 
   constructor() {
     if (!Capacitor.isNativePlatform()) return;
+
+    const teardownKeyboardAvoidance = setupKeyboardAvoidance();
 
     const router = inject(Router);
 
@@ -79,6 +118,7 @@ export class App {
 
     inject(DestroyRef).onDestroy(() => {
       void listener.then((l) => l.remove());
+      teardownKeyboardAvoidance();
       if (this.exitHintTimer) clearTimeout(this.exitHintTimer);
     });
   }
