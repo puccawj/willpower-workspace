@@ -53,6 +53,18 @@ function setupKeyboardAvoidance(): () => void {
   const viewport = window.visualViewport;
   if (!viewport) return () => {};
 
+  // window.innerHeight is NOT a safe reference to diff against: under adjustResize the
+  // whole window genuinely resizes, but innerHeight and visualViewport.height don't
+  // reliably update in the same tick — innerHeight can still report the old, taller,
+  // pre-resize value at the exact instant the visualViewport "resize" event fires. That
+  // race inflates keyboardHeight to a stale, oversized guess, and since it's a one-shot
+  // event (nothing changes further once things settle) the bogus padding never
+  // self-corrects — a permanent blank gap sized like whatever the race happened to
+  // produce. Track our own last-known keyboard-closed height instead and diff against
+  // that; it's immune to innerHeight's timing and self-corrects the moment the keyboard
+  // closes (keyboardHeight <= 50 resets the baseline below).
+  let restingHeight = viewport.height;
+
   let paddedEl: HTMLElement | null = null;
   const clearPadding = () => {
     if (paddedEl) {
@@ -62,11 +74,12 @@ function setupKeyboardAvoidance(): () => void {
   };
 
   const onViewportResize = () => {
-    const keyboardHeight = Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop);
+    const keyboardHeight = Math.max(0, restingHeight - viewport.height - viewport.offsetTop);
     const active = document.activeElement as HTMLElement | null;
     const isField = !!active && ['INPUT', 'TEXTAREA', 'SELECT'].includes(active.tagName);
 
     if (keyboardHeight <= 50 || !isField) {
+      restingHeight = viewport.height;
       clearPadding();
       return;
     }

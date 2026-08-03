@@ -2,6 +2,24 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-03 (11) — Follow-up: keyboard-height calc raced window.innerHeight
+
+- (10)'s scroll-parent fix was correct but a second bug was hiding
+  behind it: `keyboardHeight` was computed as `window.innerHeight -
+  visualViewport.height`, and under real `adjustResize` those two
+  don't reliably update in the same tick — `innerHeight` could still
+  report the taller pre-resize value at the exact instant the
+  `visualViewport` "resize" event fired, inflating the computed
+  keyboard height. That padding then never self-corrected (a one-shot
+  event with nothing left to fire once things settled), leaving a
+  blank gap sized like whatever the race happened to produce —
+  intermittent, matching the "sometimes there, sometimes not" reports.
+  Replaced the `innerHeight` diff with a self-tracked "last known
+  keyboard-closed height" baseline that resets every time the keyboard
+  closes, removing the dependency on `innerHeight`'s timing entirely.
+  Verified with 4 back-to-back open/close cycles on the same field
+  (course rating's Optional note) with no gap on any cycle.
+
 ## 2026-08-03 (10) — Follow-up: white gap was back on every page, not just one field
 
 - (9)'s keyboard-avoidance fallback padded `document.body`, but almost
