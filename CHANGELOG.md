@@ -2,6 +2,28 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-03 (7) — Fixed Android keyboard covering input fields
+
+- `AndroidManifest.xml` had no `windowSoftInputMode`, so the WebView
+  never resized when the soft keyboard opened — the keyboard just
+  drew over whatever field you were typing into. Set
+  `android:windowSoftInputMode="adjustResize"` so the page now shrinks
+  to fit above the keyboard, matching normal Android app behavior.
+
+## 2026-08-03 (6) — Mobile: added "Become a Student" application page
+
+- Mirrors the public-site flow (built 2026-07-30): a `general` member
+  can apply from Profile → Become a Student, submitting email/name/
+  nickname (phone and LINE ID optional), reusing the existing
+  `/me/student-application` endpoints. No backend changes needed.
+
+## 2026-08-03 (5) — Mobile: added the Home banner carousel
+
+- The Home page now shows the same rotating banner carousel as
+  public-site's Home (`/public/home-banners`), so banners configured
+  in admin's Home Banners page now actually appear on mobile too —
+  previously mobile had no banner support at all.
+
 ## 2026-08-03 (4) — Splash: bigger seal, black background, Android now stretch-proof
 
 - Reworked the Android splash as a layer-list (solid color + a 260dp
