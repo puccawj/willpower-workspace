@@ -2,6 +2,12 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-03 (1) — Mobile app icon/splash updated to the revised seal artwork
+
+- Regenerated the Android/iOS launcher icon and splash screen from a
+  revised `android/icon/willpowericon.png` (cleaner circular crop,
+  transparent background) — same gold splash background as before.
+
 ## 2026-07-31 (2) — Mobile app icon updated to the official Willpower Institute seal
 
 - Replaced the app icon and splash screen (Android + iOS) with the
