@@ -2,6 +2,16 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-03 (4) — Splash: bigger seal, black background, Android now stretch-proof
+
+- Reworked the Android splash as a layer-list (solid color + a 260dp
+  icon centered via fixed dp box) instead of a set of pre-stretched
+  per-density bitmaps — this makes it immune to the aspect-ratio
+  stretching from (3) by construction, not just approximation, and
+  lets the seal render noticeably larger.
+- Switched the splash background to black on both platforms (was
+  gold), per a quick side-by-side comparison on-device.
+
 ## 2026-08-03 (3) — Fixed Android splash circle looking stretched/oval
 
 - Android renders the splash drawable as a raw window background, which
