@@ -37,6 +37,10 @@ export const routes: Routes = [
         path: 'profile/donations',
         loadComponent: () => import('./pages/profile/my-donations/my-donations').then((m) => m.MyDonations),
       },
+      {
+        path: 'profile/apply-student',
+        loadComponent: () => import('./pages/profile/apply-student/apply-student').then((m) => m.ApplyStudent),
+      },
     ],
   },
   {

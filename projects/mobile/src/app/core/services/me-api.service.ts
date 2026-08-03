@@ -82,6 +82,23 @@ export interface MyRating {
   note: string | null;
 }
 
+export type StudentApplicationStatus = 'pending' | 'approved' | 'rejected';
+
+export interface MyStudentApplication {
+  id: string;
+  status: StudentApplicationStatus;
+  createdAt: string;
+}
+
+export interface StudentApplicationRequest {
+  email: string;
+  firstName: string;
+  lastName: string;
+  nickname: string;
+  phone?: string;
+  lineId?: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class MeApiService {
   private readonly http = inject(HttpClient);
@@ -154,6 +171,14 @@ export class MeApiService {
 
   rateOffering(offeringId: string, stars: number, note?: string): Observable<MyRating> {
     return this.http.put<MyRating>(`${this.baseUrl}/course-offerings/${offeringId}/rating`, { stars, note });
+  }
+
+  myStudentApplication(): Observable<MyStudentApplication | null> {
+    return this.http.get<MyStudentApplication | null>(`${this.baseUrl}/student-application`);
+  }
+
+  applyForStudent(dto: StudentApplicationRequest): Observable<MyStudentApplication> {
+    return this.http.post<MyStudentApplication>(`${this.baseUrl}/student-application`, dto);
   }
 
   loadAll(): Promise<void> {

@@ -25,6 +25,9 @@
     <a routerLink="/profile/certificates" class="menu-row"><span>My certificates</span><span class="chev">›</span></a>
     <a routerLink="/profile/rsvps" class="menu-row"><span>My RSVPs</span><span class="chev">›</span></a>
     <a routerLink="/profile/donations" class="menu-row"><span>Donation history</span><span class="chev">›</span></a>
+    @if (auth.currentUser()?.role === 'general') {
+      <a routerLink="/profile/apply-student" class="menu-row"><span>Become a student</span><span class="chev">›</span></a>
+    }
   </div>
 
   <div class="menu-group-title">About Willpower Institute</div>

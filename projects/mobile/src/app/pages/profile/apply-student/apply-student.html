@@ -1,0 +1,67 @@
+<div class="apply-page">
+  <app-back-button />
+  <h1 class="page-title">Become a student</h1>
+
+  @if (loading()) {
+    <p class="muted-label">Loading…</p>
+  } @else if (isStudent()) {
+    <div class="status-card status-approved">
+      <p>You're already a student — you can enroll in courses directly from any course page.</p>
+    </div>
+  } @else if (!isGeneral()) {
+    <div class="status-card">
+      <p>This form is only available to general member accounts.</p>
+    </div>
+  } @else if (application(); as app) {
+    @if (app.status === 'pending') {
+      <div class="status-card status-pending">
+        <p><strong>Application submitted.</strong> An admin will review it shortly — you'll be able to enroll in courses once approved.</p>
+      </div>
+    } @else if (app.status === 'rejected') {
+      <div class="status-card status-rejected">
+        <p>Your previous application was not approved. Please contact your branch for more information, or submit a new application below.</p>
+      </div>
+    }
+  }
+
+  @if (submitted() && !application()) {
+    <p class="apply-success">Application submitted — an admin will review it shortly.</p>
+  }
+
+  @if (isGeneral() && (!application() || application()!.status === 'rejected')) {
+    <form class="apply-form" (submit)="$event.preventDefault(); submit()">
+      <div class="field-inline">
+        <label class="muted-label">Email *</label>
+        <input class="apply-input" type="email" [ngModel]="email()" (ngModelChange)="email.set($event)" name="email" required />
+      </div>
+      <div class="field-inline">
+        <label class="muted-label">Full name *</label>
+        <input class="apply-input" [ngModel]="firstName()" (ngModelChange)="firstName.set($event)" name="firstName" required />
+      </div>
+      <div class="field-inline">
+        <label class="muted-label">Last name *</label>
+        <input class="apply-input" [ngModel]="lastName()" (ngModelChange)="lastName.set($event)" name="lastName" required />
+      </div>
+      <div class="field-inline">
+        <label class="muted-label">Nickname *</label>
+        <input class="apply-input" [ngModel]="nickname()" (ngModelChange)="nickname.set($event)" name="nickname" required />
+      </div>
+      <div class="field-inline">
+        <label class="muted-label">Phone (optional)</label>
+        <input class="apply-input" [ngModel]="phone()" (ngModelChange)="phone.set($event)" name="phone" />
+      </div>
+      <div class="field-inline">
+        <label class="muted-label">LINE ID (optional)</label>
+        <input class="apply-input" [ngModel]="lineId()" (ngModelChange)="lineId.set($event)" name="lineId" />
+      </div>
+
+      @if (error()) {
+        <p class="apply-error">{{ error() }}</p>
+      }
+
+      <button type="submit" class="apply-submit-btn" [disabled]="submitting()">
+        {{ submitting() ? 'Submitting…' : 'Submit application' }}
+      </button>
+    </form>
+  }
+</div>
