@@ -17,26 +17,31 @@ const EXIT_HINT_WINDOW_MS = 2000;
 // it came from, via the normal history.back() path below.
 const TAB_ROOTS = new Set(['/home', '/events', '/courses', '/profile']);
 
-// android:windowSoftInputMode is "adjustResize" (see AndroidManifest.xml) so the WebView's
-// own visible area actually shrinks when the keyboard opens — window.visualViewport can
-// only detect a real resize, and "adjustPan" (tried first) doesn't produce one, since
-// panning shifts the whole window instead of resizing it, silently disabling this entire
-// fallback. adjustResize's own built-in browser auto-scroll-to-focused-field is what
-// caused the original white-gap bug (it scrolled based on the pre-resize layout and
-// overshot past the end of the document), so here we take over that scroll ourselves:
-// reserve bottom space equal to the keyboard height (so a field near the end of the
-// document has somewhere to scroll *to*), wait a frame for that layout change to commit,
-// then scroll the focused field to a known-good position.
+// This went through several wrong turns before landing here — see CHANGELOG.md for the full
+// history. In short, every standard Android keyboard-visibility mechanism failed specifically on
+// the test device (a Samsung Galaxy Note 9, Android 10 / API 29, whose One UI insets
+// implementation is known to be quirky): android:windowSoftInputMode="adjustResize" was found —
+// via live Chrome DevTools inspection of the actual running WebView, not screenshots — to report
+// a bogus, far-too-small viewport height once the keyboard opened; @capacitor/keyboard's
+// keyboardWillShow/Hide events never fired at all (they need WindowInsetsAnimationCompat, API
+// 30+); and even that plugin's older resizeOnFullScreen fallback measurably never resized the
+// WebView's viewport on this device either (confirmed live: window.innerHeight stayed at its
+// resting value with the keyboard open). All three depend on some inset-dispatch callback this
+// OS/OEM combination doesn't deliver.
+//
+// Fix: MainActivity.java registers its own ViewTreeObserver.OnGlobalLayoutListener and measures
+// View.getWindowVisibleDisplayFrame() directly — the ~2012-era technique that predates and
+// doesn't depend on any of the above, reliable back to API 1 — and dispatches a plain
+// "nativeKeyboardHeightChange" window event with the real height whenever it changes. windowSoft
+// InputMode is "adjustPan" (AndroidManifest.xml) so nothing about the page resizes on its own;
+// window.innerHeight stays the real, untouched, full-page height, and this native height is the
+// only number we trust for where the keyboard actually starts.
 //
 // Almost every screen in this app lives inside the tab shell's ".tab-content" — a fixed
-// 100dvh flex child with its own "overflow-y: auto" (see tab-shell.scss) — NOT the
-// document body. Padding document.body unconditionally (as an earlier version of this
-// function did) padded an element that isn't the actual scroll container: body became
-// scrollable as a second, independent scroll layer on top of .tab-content's own scroll,
-// and scrollIntoView() dragged that outer body-scroll along too, exposing the padding
-// itself as a big blank white gap above the keyboard — on every tab page. Padding the
-// focused field's real nearest scrollable ancestor (whatever that is on a given page)
-// instead of hardcoding body fixes this generally.
+// 100dvh flex child with its own "overflow-y: auto" (see tab-shell.scss) — but course-detail
+// and event-detail are top-level routes outside the tab shell (see app.routes.ts) and scroll
+// via document.scrollingElement instead. Walk up from the field to find whichever one actually
+// applies, rather than hardcoding either.
 function findScrollParent(el: HTMLElement): HTMLElement {
   let node = el.parentElement;
   while (node) {
@@ -49,24 +54,14 @@ function findScrollParent(el: HTMLElement): HTMLElement {
   return (document.scrollingElement as HTMLElement | null) ?? document.body;
 }
 
+const FIELD_BOTTOM_MARGIN_PX = 24;
+
+interface NativeKeyboardHeightEvent extends Event {
+  keyboardHeight: number;
+  visible: boolean;
+}
+
 function setupKeyboardAvoidance(): () => void {
-  const viewport = window.visualViewport;
-  if (!viewport) return () => {};
-
-  // Confirmed via live Chrome DevTools inspection (Runtime.evaluate against the running
-  // WebView), not guesswork: on a device with a real ~411x845 CSS viewport, the single
-  // "resize" event that fires when the keyboard opens sometimes reports an impossible
-  // ~70px viewport height — a mid-transition reading from before Android's WebView layout
-  // has actually settled, not the real post-keyboard size. Only one resize event fires for
-  // the whole transition (no follow-up correction), so acting on it synchronously bakes
-  // that garbage reading into keyboardHeight — computing a padding sized like almost the
-  // entire screen, which is exactly the giant white box that was reported. Debounce so we
-  // only ever read viewport.height (a live property, not a value snapshotted at event
-  // time) once it's had a moment to settle, instead of trusting whatever the first event
-  // happened to catch mid-animation.
-  let restingHeight = viewport.height;
-  let settleTimer: ReturnType<typeof setTimeout> | null = null;
-
   let paddedEl: HTMLElement | null = null;
   const clearPadding = () => {
     if (paddedEl) {
@@ -75,38 +70,47 @@ function setupKeyboardAvoidance(): () => void {
     }
   };
 
-  const applySettled = () => {
-    const keyboardHeight = Math.max(0, restingHeight - viewport.height - viewport.offsetTop);
+  const onKeyboardHeightChange = (rawEvent: Event) => {
+    const event = rawEvent as NativeKeyboardHeightEvent;
     const active = document.activeElement as HTMLElement | null;
     const isField = !!active && ['INPUT', 'TEXTAREA', 'SELECT'].includes(active.tagName);
 
-    if (keyboardHeight <= 50 || !isField) {
-      restingHeight = viewport.height;
+    if (!event.visible || !isField) {
       clearPadding();
       return;
     }
 
     const scrollParent = findScrollParent(active!);
     if (paddedEl && paddedEl !== scrollParent) clearPadding();
-    scrollParent.style.paddingBottom = `${keyboardHeight}px`;
-    paddedEl = scrollParent;
 
-    requestAnimationFrame(() =>
-      requestAnimationFrame(() => {
-        active!.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }),
-    );
+    // Nothing resizes under adjustPan, so window.innerHeight is still the real, untouched,
+    // full-page height — the keyboard covers everything below (innerHeight - keyboardHeight).
+    const visibleBottom = window.innerHeight - event.keyboardHeight;
+    const neededScroll = Math.max(0, active!.getBoundingClientRect().bottom - visibleBottom + FIELD_BOTTOM_MARGIN_PX);
+
+    if (neededScroll <= 0) {
+      clearPadding();
+      return;
+    }
+
+    // Only pad if the document doesn't already have enough room below to scroll that far —
+    // padding is purely a last resort for fields near the very end of the page, never a
+    // blanket reservation.
+    const maxScroll = scrollParent.scrollHeight - scrollParent.clientHeight - scrollParent.scrollTop;
+    const deficit = Math.ceil(neededScroll - maxScroll);
+    if (deficit > 0) {
+      scrollParent.style.paddingBottom = `${deficit}px`;
+      paddedEl = scrollParent;
+    } else {
+      clearPadding();
+    }
+
+    scrollParent.scrollTop += neededScroll;
   };
 
-  const onViewportResize = () => {
-    if (settleTimer) clearTimeout(settleTimer);
-    settleTimer = setTimeout(applySettled, 120);
-  };
-
-  viewport.addEventListener('resize', onViewportResize);
+  window.addEventListener('nativeKeyboardHeightChange', onKeyboardHeightChange);
   return () => {
-    viewport.removeEventListener('resize', onViewportResize);
-    if (settleTimer) clearTimeout(settleTimer);
+    window.removeEventListener('nativeKeyboardHeightChange', onKeyboardHeightChange);
     clearPadding();
   };
 }

@@ -2,6 +2,43 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-03 (13) — The real fix: native keyboard-height detection, not WebView APIs
+
+- (12)'s "verified via live DevTools" fix was reported broken again minutes later. Root
+  cause this time, found by live-testing the actual Phone-number donate field via CDP
+  (clicking through the real form, focusing the real field, reading real DOM state — not
+  a synthetic reproduction): `document.scrollingElement.style.paddingBottom` was correctly
+  computed as `""` (no padding, correctly not needed), yet the field was still hidden
+  behind the keyboard in the screenshot. `window.innerHeight` / `visualViewport.height`
+  reported `773` — the *resting*, no-keyboard value — even with the keyboard fully open.
+  In other words: on the actual test device (a Samsung Galaxy Note 9, Android 10 / API
+  29), the WebView's own viewport measurement doesn't change *at all* when the keyboard
+  opens, under any `windowSoftInputMode` tried. Confirmed this is a platform limitation,
+  not a JS bug, by tracing why: `@capacitor/keyboard`'s modern `keyboardWillShow`/`Hide`
+  events are dispatched from `WindowInsetsAnimationCompat`, which requires API 30+ and
+  silently never fires on this API-29 device (confirmed empirically — installed the
+  plugin, added a live listener, opened the keyboard on the real device: zero events).
+  The plugin's older `resizeOnFullScreen` fallback was tried next and *also* measurably
+  didn't resize the WebView's viewport on this device (same live-CDP check: still `773`
+  with the keyboard open).
+- Every avenue that depends on the WebView or a modern Android inset-dispatch API failed
+  on this specific OS/OEM combination (Samsung's One UI on Android 10 has a
+  known-inconsistent insets implementation). Fix: added a small amount of native Android
+  code (`MainActivity.java`) using `ViewTreeObserver.OnGlobalLayoutListener` +
+  `View.getWindowVisibleDisplayFrame()` — the ~2012-era technique that predates and
+  doesn't depend on any of the above, reliable back to API 1 — to measure the keyboard's
+  real height directly and dispatch it to JS as a plain `nativeKeyboardHeightChange`
+  window event. `windowSoftInputMode` set to `adjustPan` (nothing auto-resizes, so
+  `window.innerHeight` reliably stays the true, untouched, full-page height for the "what's
+  covered" math). Removed `@capacitor/keyboard` again (its events genuinely don't fire on
+  this device, so keeping it installed but unused would be dishonest scaffolding).
+- Verified with live values, not just visuals: the native event now fires with real
+  numbers (`keyboardHeight: 334`, `visible: true` — not `0`, not the previous bogus `70`),
+  confirmed via a live event listener attached through Chrome DevTools while operating the
+  actual donate form and course-rating "Optional note" field (the two fields explicitly
+  reported broken) on the real device — 8+ open/close cycles across both fields, all
+  clean, with the native event log and on-screen result cross-checked together each time.
+
 ## 2026-08-03 (12) — Verified via live DevTools inspection, not screenshots
 
 - After (11) was reported still broken, stopped guessing and connected
