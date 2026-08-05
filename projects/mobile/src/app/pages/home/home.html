@@ -135,7 +135,12 @@
           <div class="course-card-img">
             <img [src]="o.img" alt="" />
             <div class="img-ribbon-corner">
-              <div class="img-ribbon">{{ o.branchCity || o.branchName }}<br />{{ o.shortStartDate }}</div>
+              <div class="img-ribbon" [class.locked]="o.prerequisiteTitles.length">
+                @if (o.prerequisiteTitles.length) {
+                  <span class="ribbon-lock" [title]="'Requires: ' + o.prerequisiteTitles.join(', ')">🔒</span>
+                }
+                {{ o.branchCity || o.branchName }}<br />{{ o.shortStartDate }}
+              </div>
             </div>
           </div>
           <div class="course-card-body">
@@ -148,9 +153,6 @@
                 }
                 <span class="home-rating-text">{{ offeringRatingFor(o.offeringId).average }}</span>
               </div>
-            }
-            @if (o.prerequisiteTitles.length) {
-              <span class="prereq-pill" [title]="'Requires: ' + o.prerequisiteTitles.join(', ')">Requires {{ o.prerequisiteTitles[0] }}</span>
             }
             <div class="course-open">{{ o.shortStartDate }} · {{ o.open }}</div>
           </div>

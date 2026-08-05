@@ -2,6 +2,16 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-05 (16) — Home course cards: prerequisite lock moved onto the ribbon
+
+- On Home's "Courses & programs" grid (card view), the "Requires <course>" text
+  pill under the title was removed; a small 🔒 lock icon now appears at the top
+  of the diagonal ribbon instead, on courses that have a prerequisite. Ribbon
+  background switches to a gold→accent gradient for locked offerings so they
+  stand out more against unlocked ones. List view (the row layout, no ribbon)
+  and the standalone Courses page keep the existing text pill since they have
+  no ribbon element to attach the icon to.
+
 ## 2026-08-05 (15) — Course ribbon shows city instead of branch name
 
 - Mobile course cards (course-list, course-detail, and Home's "Courses & programs"

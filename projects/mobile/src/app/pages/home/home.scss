@@ -390,6 +390,19 @@
   text-transform: uppercase;
   padding: 3px 0;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+
+  &.locked {
+    background: linear-gradient(135deg, var(--w-gold-deep), var(--w-accent));
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+}
+
+.ribbon-lock {
+  display: block;
+  font-size: 10px;
+  line-height: 1;
+  margin-bottom: 2px;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.35));
 }
 
 .course-card-body {
