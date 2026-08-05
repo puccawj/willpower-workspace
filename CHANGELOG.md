@@ -4,6 +4,14 @@ Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
 ## 2026-08-05 (18) — Extended full-image display fix to course/event/branch/team photos
 
+**Deploy note:** (17) and (18) covered the public-site changes in code, but
+public-site was never actually deployed to production after either commit —
+`wpusa.online` kept serving pre-fix CSS (`event-card-img{height:130px}`,
+no `aspect-ratio` anywhere) until this was caught and `public-site` was
+rebuilt + `nginx_proxy` restarted. Confirmed live afterward via the deployed
+CSS bundle content, not just container-up status.
+
+
 - Extended (17)'s fix beyond banners to every other admin-uploaded image
   surface: course cards, event cards, course/event detail hero photos,
   course/event photo galleries, branch photos, and team headshots — all of
