@@ -2,6 +2,28 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-05 (17) — Uploaded banner images no longer get cropped
+
+- Home Banner (and the About page's banner carousel, same underlying pattern)
+  displayed uploaded images cropped, because every surface used a different
+  fixed pixel height (public-site desktop 420px, public-site mobile-web 220px,
+  native mobile app 160px, About page 300px) combined with `object-fit: cover`.
+  None of these boxes matched the ~16:5 ratio the admin upload hint suggests, so
+  admin-uploaded promotional flyers (which are often dense with text/QR codes
+  near the edges) had important content sliced off on most screens.
+- Fix: replaced every fixed-height banner box with a responsive CSS
+  `aspect-ratio` (16:5 desktop / 16:9 on narrower layouts) and switched
+  `object-fit` from `cover` to `contain`, so the full uploaded image always
+  shows — letterboxed against the existing `--w-bg-alt` background if its
+  ratio doesn't exactly match, never cropped. Applied to: public-site Home
+  (`pages/home/home.scss`), public-site About (`pages/about/about.scss`), and
+  mobile Home (`pages/home/home.scss`).
+- Scope note: this fix targets banner/promo-graphic carousels specifically
+  (Home Banner, About banner) since those are admin-uploaded flyers where any
+  cropping loses meaning. Photo-thumbnail surfaces elsewhere (course/event
+  cover photos, branch/team photos) intentionally keep `object-fit: cover`
+  cropping, which is the expected/normal behavior for photographic thumbnails.
+
 ## 2026-08-05 (16) — Home course cards: prerequisite lock moved onto the ribbon
 
 - On Home's "Courses & programs" grid (card view), the "Requires <course>" text
