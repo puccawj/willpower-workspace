@@ -2,6 +2,45 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-05 (15) — Course ribbon shows city instead of branch name
+
+- Mobile course cards (course-list, course-detail, and Home's "Courses & programs"
+  carousel) showed the diagonal ribbon as `<branch name><date>`, e.g.
+  "WILLPOWER INSTITUTE USA / JUN 3". Changed to show `<city><date>` instead, e.g.
+  "Los Angeles / Jun 3", per request. Falls back to branch name if a branch has no
+  city set (`o.branchCity || o.branchName`).
+- Backend: `branches.city` existed in the DB but wasn't exposed by the public
+  course-offerings endpoints. Added `branchCity` to `findPublicOfferings` and
+  `findAllPublicOfferings` in `api/src/courses/courses.service.ts` (both SQL
+  SELECT and response mapping), and threaded it through the mobile app's
+  `PublicOffering` / `ApiPublicCourseOfferingCard` / `PublicCourseOfferingCard`
+  interfaces in `public-course-api.service.ts`. Deployed to production
+  (`api` commit `ecd5fe9`) — verified live via `curl` showing `branchCity` in the
+  response before touching the mobile templates.
+- Updated three templates: `course-list.html`, `course-detail.html`, and
+  `home.html` — only the actual `.img-ribbon` / `.offering-ribbon` element was
+  changed; adjacent subtitle lines that also print the branch name (e.g.
+  `course-level`, `course-row-meta`) were deliberately left showing the branch
+  name, not city — those are a different piece of UI, not the ribbon.
+- Side effect: deploying this required pulling 2 pending commits to production,
+  including a previously-undeployed Apple Sign-In backend feature from an earlier
+  session — confirmed live afterward (`POST /auth/apple` now 401, was 404).
+
+## 2026-08-05 (14) — Fix Prerequisite banner touching Class offerings section
+
+- On mobile course-detail, the "Prerequisite" warning banner and the
+  "Class offerings" heading below it had no visual gap — text was touching.
+  Root cause: `.offerings-note` in `course-detail.scss` (reused across many
+  states — prerequisite banner, login prompts, loading/error notes, "no open
+  class times", donate login prompt) had `margin: 0`, so whichever state
+  rendered last before the next section had nothing separating it.
+- Fix: changed `.offerings-note` margin from `0` to `0 0 12px` — one shared
+  rule, so it also fixed spacing for every other state reusing that class, not
+  just the prerequisite banner.
+- Checked `event-detail.scss`'s analogous `.rsvp-closed-note` (also `margin: 0`)
+  — left unchanged, it's always the last element before card padding so there
+  was no actual touching bug there.
+
 ## 2026-08-03 (13) — The real fix: native keyboard-height detection, not WebView APIs
 
 - (12)'s "verified via live DevTools" fix was reported broken again minutes later. Root

@@ -135,7 +135,7 @@
           <div class="course-card-img">
             <img [src]="o.img" alt="" />
             <div class="img-ribbon-corner">
-              <div class="img-ribbon">{{ o.branchName }}<br />{{ o.shortStartDate }}</div>
+              <div class="img-ribbon">{{ o.branchCity || o.branchName }}<br />{{ o.shortStartDate }}</div>
             </div>
           </div>
           <div class="course-card-body">

@@ -50,6 +50,7 @@ export interface PublicOffering {
   id: string;
   branchId: string;
   branchName: string;
+  branchCity: string | null;
   mode: 'online' | 'onsite';
   location: string | null;
   startDate: string;
@@ -66,6 +67,7 @@ interface ApiPublicCourseOfferingCard {
   imageUrl: string | null;
   branchId: string;
   branchName: string;
+  branchCity: string | null;
   mode: 'online' | 'onsite';
   startDate: string;
   endDate: string;
@@ -81,6 +83,7 @@ export interface PublicCourseOfferingCard {
   level: string;
   img: string;
   branchName: string;
+  branchCity: string | null;
   mode: 'online' | 'onsite';
   format: string;
   startDate: string;
@@ -195,6 +198,7 @@ function toPublicCourseOfferingCard(row: ApiPublicCourseOfferingCard, index: num
     level: row.category ?? 'Course',
     img: row.imageUrl ?? FALLBACK_IMAGES[index % FALLBACK_IMAGES.length],
     branchName: row.branchName,
+    branchCity: row.branchCity,
     mode: row.mode,
     format: row.mode === 'online' ? 'Online' : 'Onsite',
     startDate: row.startDate,
