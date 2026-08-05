@@ -7,13 +7,16 @@
 
 .hero {
   position: relative;
-  height: 220px;
+  aspect-ratio: 2 / 1;
   flex-shrink: 0;
+  background: var(--w-bg-alt);
 
   img {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
   }
 }
 
@@ -96,12 +99,15 @@
 }
 
 .photo-item {
+  position: relative;
   flex: 0 0 110px;
-  height: 84px;
+  aspect-ratio: 4 / 3;
   border-radius: 8px;
   overflow: hidden;
 
   img {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;

@@ -2,6 +2,43 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-05 (18) — Extended full-image display fix to course/event/branch/team photos
+
+- Extended (17)'s fix beyond banners to every other admin-uploaded image
+  surface: course cards, event cards, course/event detail hero photos,
+  course/event photo galleries, branch photos, and team headshots — all of
+  these previously used a different fixed pixel height per surface (e.g.
+  course cover shown at 120px in admin, 150px on public-site, 130px on
+  mobile, 100px on mobile Home — four different crops of the same image),
+  which is the same root cause as the banner bug.
+- Card/thumbnail grids (course cards, event cards, branch cards, photo
+  galleries) unified to a consistent `aspect-ratio` matching the admin's
+  documented upload hint (4:3 for course/event/branch photos, 1:1 for team
+  headshots) with `object-fit: cover` kept — minor, predictable cropping is
+  expected/acceptable for compact grid thumbnails, but now every surface
+  crops the *same* image consistently instead of each doing its own
+  arbitrary crop.
+- Single prominent "showcase" photos (course/event/branch detail-page hero)
+  switched to `aspect-ratio: 2/1` + `object-fit: contain`, same treatment as
+  the banner fix, so the full photo always shows (letterboxed if needed)
+  rather than being cropped.
+- Bug found and fixed along the way: `aspect-ratio` on a container combined
+  with a plain `img { width:100%; height:100% }` child does not reliably
+  compute layout on this device's older Android System WebView — the box
+  collapses to the *image's own* natural aspect ratio instead of the CSS
+  one (confirmed live via CDP: a `.hero` styled `aspect-ratio: 2/1` rendered
+  at 411×617px, exactly matching its 1200×1800 source image, not 411×205).
+  Fixed by switching every affected `img` to `position: absolute; inset: 0`
+  inside a `position: relative` parent — the same pattern already used
+  (and already known to work) for the carousel banner — which sizes off the
+  parent's box directly instead of hitting the percentage-height/
+  aspect-ratio interaction bug.
+- Mobile's `course-detail.scss` component style grew past the Angular
+  budget's hard error threshold (8kB) from these additions; raised
+  `mobile`'s `anyComponentStyle` budget in `angular.json` from 4kB
+  warn/8kB error to 8kB warn/10kB error, matching the threshold already
+  used by `public-site` and `admin-panel`.
+
 ## 2026-08-05 (17) — Uploaded banner images no longer get cropped
 
 - Home Banner (and the About page's banner carousel, same underlying pattern)

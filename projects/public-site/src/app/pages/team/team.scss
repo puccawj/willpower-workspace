@@ -41,10 +41,13 @@
 }
 
 .member-img {
-  height: 220px;
+  position: relative;
+  aspect-ratio: 1 / 1;
   overflow: hidden;
 
   img {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
