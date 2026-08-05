@@ -2,6 +2,18 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-05 (19) — Missed the mobile Events tab in the image-crop fix
+
+- (18) covered mobile's Home event grid and Event detail hero/gallery, but
+  missed `pages/events/event-list/event-list.scss` — the actual Events tab
+  list — which still had the old `height: 130px` + `cover` box. Applied the
+  same `aspect-ratio: 4/3` + `position:absolute` fix there.
+- Audited the rest of the mobile app for the same `height:Npx` + `object-fit:
+  cover` pattern to check nothing else was missed; the two remaining hits
+  (`qr-camera.scss`, `introduction.scss`) are a live camera preview and
+  bundled onboarding art respectively, not admin-uploaded content, so left
+  as-is.
+
 ## 2026-08-05 (18) — Extended full-image display fix to course/event/branch/team photos
 
 **Deploy note:** (17) and (18) covered the public-site changes in code, but
