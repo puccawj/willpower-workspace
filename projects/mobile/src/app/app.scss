@@ -1,3 +1,14 @@
+// html/body never scroll (see styles.scss) — app-root is the single scroll container for
+// every standalone page (event/course detail, notifications, profile, etc.). Pages that
+// manage their own internal scroll region (tab-shell's .tab-content) fit exactly within
+// this box and never need it to actually scroll.
+:host {
+  display: block;
+  height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .exit-hint {
   position: fixed;
   left: 50%;

@@ -1,6 +1,7 @@
 .set-pin-page {
   min-height: 100vh;
   min-height: 100dvh;
+  overflow-y: auto;
   background: var(--w-dark);
   display: flex;
   flex-direction: column;

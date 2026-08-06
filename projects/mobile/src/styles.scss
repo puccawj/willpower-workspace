@@ -32,6 +32,17 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+// Every page manages its own internal scroll region (tab-shell's .tab-content, or a
+// page's own overflow-y wrapper) — the outer document itself must never scroll. Without
+// this, iOS's WKWebView (unlike Android's WebView) sometimes lays the document out taller
+// than the visible viewport and adds its own outer scrollbar on top of the page's inner
+// one, so content never quite fills the screen and double-scrolls.
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+}
+
 html {
   scroll-behavior: smooth;
 }
