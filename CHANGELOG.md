@@ -2,6 +2,35 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-06 (5) — iOS: back button on Notifications did nothing, Apple button had no logo
+
+- **Back button**: `<app-back-button>` called `Location.back()` unconditionally. When a
+  page (e.g. Notifications, reached via a push notification tap) was the first
+  navigation of the session, there was no history entry to pop, so the tap silently did
+  nothing — looked broken. Now falls back to `/home` if the URL hasn't actually changed
+  shortly after asking history to go back. Verified the normal case (Home → Notifications
+  → back → Home) still works via live in-app navigation, not just the fallback path.
+- **Apple sign-in button**: the button showed a blank black circle — `<span
+  class="apple-icon">` was empty in the HTML with no CSS `content` or glyph ever defined
+  to fill it, so there was never an actual logo mark on it (Apple-only bug since this
+  button is gated to iOS: `Capacitor.getPlatform() === 'ios'`). Replaced with an inline
+  SVG of the Apple logo mark.
+
+## 2026-08-06 (4) — App version on Profile, fixed iOS push notifications
+
+- Profile page now shows the installed app's version/build number (via
+  `@capacitor/app`'s `getInfo()`, so it always reflects the real build rather than a
+  hardcoded string — matters especially for iOS where the build number auto-increments
+  per CI run).
+- Push notifications never worked on iOS: `App.entitlements` never declared
+  `aps-environment`, without which `registerForRemoteNotifications()` (called
+  automatically by `@capacitor-firebase/messaging`'s iOS plugin) can't obtain a valid
+  APNs token, so Firebase Messaging can never exchange it for an FCM token — everything
+  else (Push Notifications capability, APNs key uploaded to Firebase, plugin wiring,
+  backend) was already correctly configured. Set to `production` since `match` builds
+  for App Store/TestFlight distribution, which always uses the production APNs
+  environment.
+
 ## 2026-08-06 (3) — Disabled double-tap-to-zoom on iOS
 
 - Repeated taps in quick succession (e.g. double-tapping a button) triggered
