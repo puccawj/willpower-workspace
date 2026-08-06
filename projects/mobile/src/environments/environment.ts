@@ -4,10 +4,7 @@ export const environment = {
   // Same public Client ID / App ID as the backend's GOOGLE_CLIENT_ID / FACEBOOK_APP_ID env vars.
   // Leave blank to hide the corresponding "Continue with..." button.
   googleClientId: '415889498195-n64sb80ht9osvb14lv6v3k5tonl354js.apps.googleusercontent.com',
-  // TODO(iOS): create an "iOS" type OAuth client in Google Cloud Console (separate from
-  // the Web client above) and paste its Client ID here — required for native Google
-  // sign-in on iOS. Google login on iOS silently fails until this is filled in.
-  googleIosClientId: '',
+  googleIosClientId: '415889498195-tf94qer8p42cq8so2n37oun3kh268iga.apps.googleusercontent.com',
   facebookAppId: '1031348352734699',
   // Required by @capgo/capacitor-social-login's native Facebook SDK init (the web apps'
   // SDK loader never needed this). Get it from Meta App Dashboard > Settings > Advanced.

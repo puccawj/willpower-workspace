@@ -76,15 +76,9 @@
 			</array>
 		</dict>
 		<dict>
-			<!-- TODO(iOS): replace with the REVERSED_CLIENT_ID from the iOS OAuth client
-			     created in Google Cloud Console (same value goes into environment.ts's
-			     googleIosClientId, just reversed — e.g. client ID
-			     "123-abc.apps.googleusercontent.com" becomes scheme
-			     "com.googleusercontent.apps.123-abc"). Google sign-in on iOS silently
-			     fails to return to the app until this is filled in. -->
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.googleusercontent.apps.REPLACE_ME</string>
+				<string>com.googleusercontent.apps.415889498195-tf94qer8p42cq8so2n37oun3kh268iga</string>
 			</array>
 		</dict>
 	</array>
