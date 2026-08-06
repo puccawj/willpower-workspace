@@ -11,6 +11,7 @@ const config: CapacitorConfig = {
   server: {
     hostname: 'app.wpusa.online',
     androidScheme: 'https',
+    iosScheme: 'https',
   },
   // Only bundle the providers sso-buttons.ts actually uses — Twitter is enabled by
   // default by the plugin otherwise, which bloats both platform builds for nothing.
