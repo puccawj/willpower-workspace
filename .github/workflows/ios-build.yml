@@ -24,7 +24,12 @@ jobs:
           cache: npm
 
       - name: Install JS dependencies
-        run: npm ci
+        # npm ci fails here: package-lock.json was generated on Windows, where npm doesn't
+        # resolve the macOS-only optional peer deps of @napi-rs/wasm-runtime (@emnapi/*),
+        # so npm ci's strict lockfile match rejects it on this macOS runner. npm install
+        # resolves whatever the current platform actually needs instead of requiring an
+        # exact match.
+        run: npm install
 
       - name: Build mobile web bundle
         run: npx ng build mobile --configuration production
