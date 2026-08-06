@@ -18,6 +18,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Select latest available Xcode
+        # App Store Connect now rejects uploads built with an SDK older than the current
+        # requirement (Apple ties this to the newest Xcode). The runner's *default* Xcode
+        # lags behind, but newer versions are usually already installed at /Applications —
+        # this picks the newest one actually present instead of a hardcoded version number.
+        run: sudo xcode-select -s /Applications/$(ls /Applications | grep '^Xcode_' | sort -V | tail -1)/Contents/Developer
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
