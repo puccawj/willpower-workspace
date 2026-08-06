@@ -3,6 +3,12 @@ default_platform(:ios)
 platform :ios do
   desc "Build the app and upload it to TestFlight"
   lane :beta do
+    # Creates a temporary keychain with a known password and configures it so codesign
+    # can access the imported certificate's private key without an interactive "Always
+    # Allow" permission prompt — without this, archiving hangs forever on a headless
+    # CI runner waiting for a prompt nobody can click.
+    setup_ci
+
     api_key = app_store_connect_api_key(
       key_id: ENV["APP_STORE_CONNECT_KEY_ID"],
       issuer_id: ENV["APP_STORE_CONNECT_ISSUER_ID"],
@@ -48,6 +54,8 @@ platform :ios do
 
   desc "One-time bootstrap: generate and push the initial signing certificate to the match repo (run with MATCH_READONLY=false)"
   lane :bootstrap_certs do
+    setup_ci
+
     api_key = app_store_connect_api_key(
       key_id: ENV["APP_STORE_CONNECT_KEY_ID"],
       issuer_id: ENV["APP_STORE_CONNECT_ISSUER_ID"],
