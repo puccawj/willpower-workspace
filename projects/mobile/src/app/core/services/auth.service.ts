@@ -113,15 +113,7 @@ export class AuthService {
         void Preferences.set({ key: STORAGE_KEY, value: JSON.stringify(session) });
       }),
       map(() => ({ ok: true as const })),
-      catchError((err) =>
-        of({
-          ok: false as const,
-          // TEMP DEBUG: append raw HttpErrorResponse details so a real cause is visible
-          // on-screen without device console access — status 0 means the request never
-          // reached the server at all (CORS/network), any other status means it did.
-          message: `${err?.error?.message ?? fallbackMessage} [DEBUG status=${err?.status} statusText=${err?.statusText} name=${err?.name} msg=${err?.message}]`,
-        }),
-      ),
+      catchError((err) => of({ ok: false as const, message: err?.error?.message ?? fallbackMessage })),
     );
   }
 }

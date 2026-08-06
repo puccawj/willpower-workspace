@@ -2,6 +2,35 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-06 (3) — Disabled double-tap-to-zoom on iOS
+
+- Repeated taps in quick succession (e.g. double-tapping a button) triggered
+  Safari/WKWebView's built-in double-tap-to-zoom gesture on iOS, zooming the
+  whole page in and making it hard to use — Android doesn't have this
+  behavior. Added `maximum-scale=1, user-scalable=no` to the viewport meta
+  tag (`index.html`) to disable pinch/double-tap zoom entirely, matching how
+  a native app behaves.
+
+## 2026-08-06 (2) — Fixed iOS login/Google sign-in: CORS rejected the app's real origin
+
+- Login and Google/Facebook sign-in appeared to fail on iOS with a generic
+  "Invalid email or password." / "Google sign-in failed." message, while the
+  same credentials worked fine on Android. Root-caused via temporary debug
+  logging (both client-side, showing the raw HTTP error, and server-side,
+  logging every CORS origin seen) — confirmed the request actually reached
+  the backend, which was rejecting it: the iOS WebView's `Origin` header is
+  `capacitor://app.wpusa.online`, not `https://app.wpusa.online`.
+- A prior fix (this session, `iosScheme: 'https'` in `capacitor.config.ts`,
+  meant to make iOS match Android's already-fixed `androidScheme: 'https'`)
+  did not actually change this in practice, even confirmed correctly present
+  in the built app's `capacitor.config.json` — Capacitor's `iosScheme`
+  config does not reliably control the WebView's actual request origin the
+  way `androidScheme` does on Android. Rather than depend on a client-side
+  fix that wasn't working, allowlisted `capacitor://app.wpusa.online`
+  directly in the backend's CORS config (`api/src/main.ts`).
+- All temporary debug logging (client error detail suffix, server origin
+  console.log) removed once confirmed fixed via live server logs.
+
 ## 2026-08-06 (1) — Splash screen background now matches the PIN unlock screen
 
 - Splash screen was plain black (`#000000`), while the PIN/login screen right
