@@ -2,6 +2,17 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-06 (6) — iOS: overlay back/close buttons overlapped the status bar clock
+
+- The overlay-style back button (course/event detail hero) and photo viewer's close
+  button used `top: max(16px, env(safe-area-inset-top))`. On notched iPhones this wasn't
+  enough clearance — the button rendered under/overlapping the system status bar clock,
+  making it untappable there. Changed to `calc(env(safe-area-inset-top, 44px) + 8px)`
+  (a real status-bar-height fallback plus extra margin) on both.
+- Also confirmed working end-to-end this session: iOS push notifications, verified by
+  sending a real push directly from the server to the registered device's FCM token
+  (bypassing the app entirely) and confirming it arrived.
+
 ## 2026-08-06 (5) — iOS: back button on Notifications did nothing, Apple button had no logo
 
 - **Back button**: `<app-back-button>` called `Location.back()` unconditionally. When a

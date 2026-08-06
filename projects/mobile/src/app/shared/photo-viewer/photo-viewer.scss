@@ -10,7 +10,7 @@
 
 .viewer-close {
   position: absolute;
-  top: max(16px, env(safe-area-inset-top));
+  top: calc(env(safe-area-inset-top, 44px) + 8px);
   right: 16px;
   width: 34px;
   height: 34px;
