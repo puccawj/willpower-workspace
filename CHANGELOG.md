@@ -2,15 +2,20 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
-## 2026-08-06 (7) — Mobile app text/UI scaled up ~15% for easier reading
+## 2026-08-06 (7) — Mobile app text/UI scale-up attempted, reverted — broke real pages
 
-- Requested for elderly users. Every font-size in the app is a fixed px value (not a
-  relative unit), so there's no single root size to bump that would scale text alone —
-  it'd just overflow its box, since padding/height/width are fixed px too. Used
-  `zoom: 1.15` on `html` instead, scaling the whole page uniformly (text, buttons, tap
-  targets together) — also the more useful outcome for accessibility, not just
-  readability. Verified on Android across Home (cards/tab bar) and Login (form fields +
-  Cloudflare Turnstile widget) with no overflow/clipping.
+- Requested for elderly users. Tried `zoom: 1.15` on `html` (every font-size in the app
+  is a fixed px value, not relative, so there's no single root size to bump that scales
+  text alone without overflowing boxes — `zoom` scales everything, box included). Looked
+  correct on Home and Login in initial testing, but broke on further testing: the
+  Cloudflare Turnstile widget is a cross-origin iframe, whose own internal content isn't
+  affected by the parent page's `zoom` the same way the iframe's own box is, so its
+  rendered content came out mismatched/escaping its container; separately, pages sized
+  with `100vh`/`100dvh` (PIN unlock, login, etc.) no longer filled the real screen after
+  zoom, since those units measure the physical viewport, not the zoomed one. Reverted.
+  Needs a different approach — likely a real per-component font-size increase (the
+  correct but much larger-scope fix, since sizes are hardcoded px everywhere) rather than
+  a single global scale.
 
 ## 2026-08-06 (6) — iOS: overlay back/close buttons overlapped the status bar clock
 
