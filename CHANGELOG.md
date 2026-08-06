@@ -2,6 +2,18 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-06 (1) — Splash screen background now matches the PIN unlock screen
+
+- Splash screen was plain black (`#000000`), while the PIN/login screen right
+  after it uses the brand dark brown (`--w-dark` = `#241c15`) — created a
+  visible flash/mismatch between the two on launch.
+- Android: `android/app/src/main/res/values/colors.xml` `splash_background`
+  changed to `#241c15`. iOS: `LaunchScreen.storyboard`'s imageView background
+  color changed to match (was defaulting to white via `systemBackgroundColor`,
+  only visible as edge letterboxing since the splash image itself fills via
+  `scaleAspectFill`, but still worth matching).
+- Verified on Android device via screenshot at launch.
+
 ## 2026-08-05 (19) — Missed the mobile Events tab in the image-crop fix
 
 - (18) covered mobile's Home event grid and Event detail hero/gallery, but
