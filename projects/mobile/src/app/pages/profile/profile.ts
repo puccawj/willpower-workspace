@@ -1,5 +1,6 @@
-import { Component, DestroyRef, inject } from '@angular/core';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
+import { App as CapacitorApp } from '@capacitor/app';
 import { Browser } from '@capacitor/browser';
 import { AuthService } from '../../core/services/auth.service';
 import { MeApiService } from '../../core/services/me-api.service';
@@ -21,11 +22,17 @@ export class Profile {
   private readonly pullToRefresh = inject(PullToRefreshService);
   private readonly pushRegistration = inject(PushRegistrationService);
 
+  protected readonly appVersion = signal('');
+
   constructor() {
     this.meApi.loadAll();
 
     this.pullToRefresh.register(() => this.meApi.loadAll());
     inject(DestroyRef).onDestroy(() => this.pullToRefresh.clear());
+
+    CapacitorApp.getInfo()
+      .then((info) => this.appVersion.set(`v${info.version} (${info.build})`))
+      .catch(() => this.appVersion.set(''));
   }
 
   openAbout(): void {

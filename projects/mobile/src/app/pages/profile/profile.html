@@ -43,4 +43,8 @@
   </div>
 
   <button type="button" class="logout-btn" (click)="logout()">Log out</button>
+
+  @if (appVersion()) {
+    <div class="app-version">{{ appVersion() }}</div>
+  }
 </div>
