@@ -2,6 +2,16 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-06 (7) — Mobile app text/UI scaled up ~15% for easier reading
+
+- Requested for elderly users. Every font-size in the app is a fixed px value (not a
+  relative unit), so there's no single root size to bump that would scale text alone —
+  it'd just overflow its box, since padding/height/width are fixed px too. Used
+  `zoom: 1.15` on `html` instead, scaling the whole page uniformly (text, buttons, tap
+  targets together) — also the more useful outcome for accessibility, not just
+  readability. Verified on Android across Home (cards/tab bar) and Login (form fields +
+  Cloudflare Turnstile widget) with no overflow/clipping.
+
 ## 2026-08-06 (6) — iOS: overlay back/close buttons overlapped the status bar clock
 
 - The overlay-style back button (course/event detail hero) and photo viewer's close

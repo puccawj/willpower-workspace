@@ -45,6 +45,13 @@ body {
 
 html {
   scroll-behavior: smooth;
+  // Every font-size in this app is a fixed px value, not a relative unit — there's no
+  // single root size to bump that would proportionally scale text alone without also
+  // needing every padding/height/width touched too (text would just overflow its
+  // boxes otherwise). Scaling the whole page uniformly instead makes everything bigger
+  // together (text, buttons, tap targets) — also the more useful outcome for
+  // accessibility, not just readability.
+  zoom: 1.15;
 }
 
 body {
