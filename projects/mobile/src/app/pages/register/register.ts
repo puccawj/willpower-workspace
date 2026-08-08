@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { SecurityGateService } from '../../core/services/security-gate.service';
 import { SsoButtons } from '../../shared/sso-buttons/sso-buttons';
 
 @Component({
@@ -12,6 +13,7 @@ import { SsoButtons } from '../../shared/sso-buttons/sso-buttons';
 })
 export class Register {
   private readonly auth = inject(AuthService);
+  private readonly gate = inject(SecurityGateService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
@@ -53,8 +55,17 @@ export class Register {
     this.error.set(message);
   }
 
-  private goToDestination(): void {
+  private async goToDestination(): Promise<void> {
+    // A fresh registration already proves identity for this cold start — no need to also
+    // clear the biometric/PIN gate right after.
+    this.gate.unlocked.set(true);
     const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') ?? '/home';
+
+    if (this.gate.isNative && !(await this.gate.hasSeenPinSetup())) {
+      this.router.navigate(['/security/set-pin'], { queryParams: { returnUrl } });
+      return;
+    }
+
     this.router.navigateByUrl(returnUrl);
   }
 }
