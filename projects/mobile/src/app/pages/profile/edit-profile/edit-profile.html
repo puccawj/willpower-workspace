@@ -8,6 +8,10 @@
     <div class="section-title">Your details</div>
     <form class="edit-form" (submit)="$event.preventDefault(); saveProfile()">
       <div class="field-inline">
+        <label class="muted-label">Email</label>
+        <input class="edit-input" [value]="profile()?.email" disabled />
+      </div>
+      <div class="field-inline">
         <label class="muted-label">First name *</label>
         <input class="edit-input" [ngModel]="firstName()" (ngModelChange)="firstName.set($event)" name="firstName" required />
       </div>

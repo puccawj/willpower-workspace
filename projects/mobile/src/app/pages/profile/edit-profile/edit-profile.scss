@@ -45,6 +45,11 @@
   border: 1px solid var(--w-border);
   background: #fff;
   width: 100%;
+
+  &:disabled {
+    background: var(--w-bg-soft, #f2f0ea);
+    color: var(--w-muted);
+  }
 }
 
 .edit-error {
