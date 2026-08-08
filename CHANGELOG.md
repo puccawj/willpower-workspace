@@ -2,6 +2,18 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-08 (8) — Fixed the fix: web QR fallback still didn't open on a real iPhone
+
+- The BarcodeDetector-based fallback from (7) still showed "Camera scanning isn't
+  supported" on a real iPhone via TestFlight — turns out `BarcodeDetector` is undefined
+  inside Capacitor's iOS WKWebView regardless of iOS version, even where Safari itself
+  supports it. Replaced it with `jsqr`, a pure-JS decoder needing only `getUserMedia` +
+  `<canvas>` (drawing video frames to an offscreen canvas each animation frame) — no
+  browser API dependency at all. Verified the decode logic itself with a standalone
+  Node round-trip (generate → decode a QR PNG through the same call the component uses).
+  Still can't verify the live camera pipeline without a real device — next TestFlight
+  build needs on-device confirmation.
+
 ## 2026-08-08 (7) — Fixed: QR check-in camera never opened on iOS
 
 - Root cause: `@capacitor-mlkit/barcode-scanning` (used for native QR check-in scanning)
