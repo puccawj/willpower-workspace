@@ -9,7 +9,11 @@
     <form class="edit-form" (submit)="$event.preventDefault(); saveProfile()">
       <div class="field-inline">
         <label class="muted-label">Email</label>
-        <input class="edit-input" [value]="profile()?.email" disabled />
+        <input class="edit-input" [value]="profile()?.email ?? ''" disabled />
+      </div>
+      <div class="field-inline">
+        <label class="muted-label">Role</label>
+        <input class="edit-input" [value]="roleLabel()" disabled />
       </div>
       <div class="field-inline">
         <label class="muted-label">First name *</label>
@@ -94,23 +98,10 @@
       } @else if (app.status === 'rejected') {
         <p class="muted-note">Your previous application was not approved.</p>
       } @else {
+        <p class="muted-note">
+          Name, nickname, and phone come from your account details above — update those there if needed.
+        </p>
         <form class="edit-form" (submit)="$event.preventDefault(); saveApplication()">
-          <div class="field-inline">
-            <label class="muted-label">First name *</label>
-            <input class="edit-input" [ngModel]="appFirstName()" (ngModelChange)="appFirstName.set($event)" name="appFirstName" required />
-          </div>
-          <div class="field-inline">
-            <label class="muted-label">Last name *</label>
-            <input class="edit-input" [ngModel]="appLastName()" (ngModelChange)="appLastName.set($event)" name="appLastName" required />
-          </div>
-          <div class="field-inline">
-            <label class="muted-label">Nickname *</label>
-            <input class="edit-input" [ngModel]="appNickname()" (ngModelChange)="appNickname.set($event)" name="appNickname" required />
-          </div>
-          <div class="field-inline">
-            <label class="muted-label">Phone</label>
-            <input class="edit-input" [ngModel]="appPhone()" (ngModelChange)="appPhone.set($event)" name="appPhone" />
-          </div>
           <div class="field-inline">
             <label class="muted-label">LINE ID</label>
             <input class="edit-input" [ngModel]="appLineId()" (ngModelChange)="appLineId.set($event)" name="appLineId" />

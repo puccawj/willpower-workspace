@@ -12,6 +12,14 @@ function computeInitials(firstName: string, lastName: string): string {
   return `${firstName[0] ?? ''}${lastName[0] ?? ''}`.toUpperCase();
 }
 
+const ROLE_LABELS: Record<string, string> = {
+  general: 'General member',
+  student: 'Student',
+  instructor: 'Instructor',
+  admin: 'Admin',
+  superadmin: 'Super admin',
+};
+
 @Component({
   selector: 'app-edit-profile',
   imports: [FormsModule, BackButton],
@@ -44,16 +52,13 @@ export class EditProfile {
 
   // Student application
   readonly application = signal<MyStudentApplication | null>(null);
-  readonly appFirstName = signal('');
-  readonly appLastName = signal('');
-  readonly appNickname = signal('');
-  readonly appPhone = signal('');
   readonly appLineId = signal('');
   readonly appSaving = signal(false);
   readonly appSaved = signal(false);
   readonly appError = signal('');
 
   readonly canChangePassword = () => this.profile()?.registrationSource === 'self';
+  readonly roleLabel = () => ROLE_LABELS[this.auth.currentUser()?.role ?? ''] ?? this.auth.currentUser()?.role ?? '';
 
   constructor() {
     this.meApi.getProfile().subscribe({
@@ -72,10 +77,6 @@ export class EditProfile {
       next: (app) => {
         this.application.set(app);
         if (app) {
-          this.appFirstName.set(app.firstName);
-          this.appLastName.set(app.lastName);
-          this.appNickname.set(app.nickname);
-          this.appPhone.set(app.phone ?? '');
           this.appLineId.set(app.lineId ?? '');
         }
       },
@@ -150,18 +151,10 @@ export class EditProfile {
   saveApplication(): void {
     this.appError.set('');
     this.appSaved.set(false);
-    if (!this.appFirstName().trim() || !this.appLastName().trim() || !this.appNickname().trim()) {
-      this.appError.set('First name, last name, and nickname are required.');
-      return;
-    }
 
     this.appSaving.set(true);
     this.meApi
       .updateStudentApplication({
-        firstName: this.appFirstName().trim(),
-        lastName: this.appLastName().trim(),
-        nickname: this.appNickname().trim(),
-        phone: this.appPhone().trim(),
         lineId: this.appLineId().trim(),
       })
       .subscribe({

@@ -1,12 +1,13 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
-import { MeApiService, MyStudentApplication } from '../../../core/services/me-api.service';
+import { MeApiService, MyProfile, MyStudentApplication } from '../../../core/services/me-api.service';
 import { BackButton } from '../../../shared/back-button/back-button';
 
 @Component({
   selector: 'app-apply-student',
-  imports: [FormsModule, BackButton],
+  imports: [FormsModule, BackButton, RouterLink],
   templateUrl: './apply-student.html',
   styleUrl: './apply-student.scss',
 })
@@ -18,43 +19,53 @@ export class ApplyStudent {
   readonly isStudent = () => this.auth.currentUser()?.role === 'student';
 
   readonly loading = signal(true);
+  readonly profile = signal<MyProfile | null>(null);
   readonly application = signal<MyStudentApplication | null>(null);
   readonly submitting = signal(false);
   readonly error = signal('');
   readonly submitted = signal(false);
 
-  readonly email = signal(this.auth.currentUser()?.email ?? '');
-  readonly firstName = signal('');
-  readonly lastName = signal('');
-  readonly nickname = signal('');
-  readonly phone = signal('');
   readonly lineId = signal('');
 
   constructor() {
-    this.meApi.myStudentApplication().subscribe({
-      next: (app) => {
-        this.application.set(app);
-        this.loading.set(false);
-      },
-      error: () => this.loading.set(false),
-    });
+    Promise.all([
+      new Promise<void>((resolve) => {
+        this.meApi.getProfile().subscribe({
+          next: (p) => {
+            this.profile.set(p);
+            resolve();
+          },
+          error: () => resolve(),
+        });
+      }),
+      new Promise<void>((resolve) => {
+        this.meApi.myStudentApplication().subscribe({
+          next: (app) => {
+            this.application.set(app);
+            resolve();
+          },
+          error: () => resolve(),
+        });
+      }),
+    ]).then(() => this.loading.set(false));
   }
 
   submit(): void {
     this.error.set('');
-    if (!this.firstName().trim() || !this.lastName().trim() || !this.nickname().trim() || !this.email().trim()) {
-      this.error.set('Please fill in Email, Full name, Last name, and Nickname.');
+    const p = this.profile();
+    if (!p || !p.firstName.trim() || !p.lastName.trim() || !(p.nickname ?? '').trim()) {
+      this.error.set('Please fill in your first name, last name, and nickname in Edit profile first.');
       return;
     }
 
     this.submitting.set(true);
     this.meApi
       .applyForStudent({
-        email: this.email().trim(),
-        firstName: this.firstName().trim(),
-        lastName: this.lastName().trim(),
-        nickname: this.nickname().trim(),
-        phone: this.phone().trim() || undefined,
+        email: p.email,
+        firstName: p.firstName,
+        lastName: p.lastName,
+        nickname: p.nickname ?? '',
+        phone: p.phoneNumber ?? undefined,
         lineId: this.lineId().trim() || undefined,
       })
       .subscribe({

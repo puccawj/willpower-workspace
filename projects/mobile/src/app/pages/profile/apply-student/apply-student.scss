@@ -54,6 +54,28 @@
   border: 1px solid var(--w-border);
   background: #fff;
   width: 100%;
+
+  &:disabled {
+    background: var(--w-bg-soft, #f2f0ea);
+    color: var(--w-muted);
+  }
+}
+
+.apply-note {
+  font: 400 calc(13.5px * var(--text-scale, 1))/1.5 var(--w-font-sans);
+  color: var(--w-muted);
+  margin: 0;
+
+  a {
+    color: var(--w-gold-deep);
+  }
+}
+
+.apply-edit-link {
+  display: inline-block;
+  margin-top: 8px;
+  font: 500 calc(14px * var(--text-scale, 1)) var(--w-font-sans);
+  color: var(--w-gold-deep);
 }
 
 .apply-error {

@@ -18,6 +18,13 @@ Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 - New `nickname` column on `users` (migration `2026-08-08-add-user-nickname.sql`).
 - Verified on Android via CDP: page renders real data, conditional sections show/hide
   correctly, and client-side error handling surfaces backend errors cleanly.
+- Follow-up: added a read-only **Role** field to Edit profile. Removed the duplicate
+  name/nickname/phone editable fields from both **Become a student** and Edit profile's
+  Student application section — they now read straight from the account profile above
+  (shown read-only, with a note pointing to Edit profile to change them), so users no
+  longer fill in the same details twice. Become a student's Email field is also read-only
+  now (it comes from registration). Once an application is pending, its status card links
+  straight to Edit profile instead of duplicating an edit form on the apply page.
 
 ## 2026-08-08 (2) — User-adjustable text size in Profile → Display
 
