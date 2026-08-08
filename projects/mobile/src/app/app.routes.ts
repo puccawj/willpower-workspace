@@ -27,6 +27,7 @@ export const routes: Routes = [
       { path: 'events', loadComponent: () => import('./pages/events/event-list/event-list').then((m) => m.EventList) },
       { path: 'courses', loadComponent: () => import('./pages/courses/course-list/course-list').then((m) => m.CourseList) },
       { path: 'profile', loadComponent: () => import('./pages/profile/profile').then((m) => m.Profile) },
+      { path: 'profile/edit', loadComponent: () => import('./pages/profile/edit-profile/edit-profile').then((m) => m.EditProfile) },
       { path: 'profile/courses', loadComponent: () => import('./pages/profile/my-courses/my-courses').then((m) => m.MyCourses) },
       {
         path: 'profile/certificates',

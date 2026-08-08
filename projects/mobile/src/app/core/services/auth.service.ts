@@ -101,6 +101,16 @@ export class AuthService {
     void Preferences.remove({ key: STORAGE_KEY });
   }
 
+  /** After editing name/nickname on the Edit Profile page — refreshes what's shown
+   * everywhere else in the app (Profile header, Home greeting) without a re-login. */
+  updateUser(patch: Partial<StudentUser>): void {
+    const current = this.session();
+    if (!current) return;
+    const updated: Session = { ...current, user: { ...current.user, ...patch } };
+    this.session.set(updated);
+    void Preferences.set({ key: STORAGE_KEY, value: JSON.stringify(updated) });
+  }
+
   getToken(): string | null {
     return this.session()?.token ?? null;
   }

@@ -1,0 +1,129 @@
+<div class="edit-page">
+  <app-back-button />
+  <h1 class="page-title">Edit profile</h1>
+
+  @if (loading()) {
+    <p class="muted-label">Loading…</p>
+  } @else {
+    <div class="section-title">Your details</div>
+    <form class="edit-form" (submit)="$event.preventDefault(); saveProfile()">
+      <div class="field-inline">
+        <label class="muted-label">First name *</label>
+        <input class="edit-input" [ngModel]="firstName()" (ngModelChange)="firstName.set($event)" name="firstName" required />
+      </div>
+      <div class="field-inline">
+        <label class="muted-label">Last name *</label>
+        <input class="edit-input" [ngModel]="lastName()" (ngModelChange)="lastName.set($event)" name="lastName" required />
+      </div>
+      <div class="field-inline">
+        <label class="muted-label">Nickname</label>
+        <input class="edit-input" [ngModel]="nickname()" (ngModelChange)="nickname.set($event)" name="nickname" />
+      </div>
+      <div class="field-inline">
+        <label class="muted-label">Phone number</label>
+        <input class="edit-input" type="tel" [ngModel]="phoneNumber()" (ngModelChange)="phoneNumber.set($event)" name="phoneNumber" />
+      </div>
+
+      @if (profileError()) {
+        <p class="edit-error">{{ profileError() }}</p>
+      }
+      @if (profileSaved()) {
+        <p class="edit-success">Profile updated.</p>
+      }
+
+      <button type="submit" class="edit-submit-btn" [disabled]="profileSaving()">
+        {{ profileSaving() ? 'Saving…' : 'Save changes' }}
+      </button>
+    </form>
+
+    @if (canChangePassword()) {
+      <div class="section-title">Change password</div>
+      <form class="edit-form" (submit)="$event.preventDefault(); changePassword()">
+        <div class="field-inline">
+          <label class="muted-label">Current password</label>
+          <input
+            class="edit-input"
+            type="password"
+            [ngModel]="currentPassword()"
+            (ngModelChange)="currentPassword.set($event)"
+            name="currentPassword"
+          />
+        </div>
+        <div class="field-inline">
+          <label class="muted-label">New password</label>
+          <input class="edit-input" type="password" [ngModel]="newPassword()" (ngModelChange)="newPassword.set($event)" name="newPassword" />
+        </div>
+        <div class="field-inline">
+          <label class="muted-label">Confirm new password</label>
+          <input
+            class="edit-input"
+            type="password"
+            [ngModel]="confirmPassword()"
+            (ngModelChange)="confirmPassword.set($event)"
+            name="confirmPassword"
+          />
+        </div>
+
+        @if (passwordError()) {
+          <p class="edit-error">{{ passwordError() }}</p>
+        }
+        @if (passwordSaved()) {
+          <p class="edit-success">Password changed.</p>
+        }
+
+        <button type="submit" class="edit-submit-btn" [disabled]="passwordSaving()">
+          {{ passwordSaving() ? 'Changing…' : 'Change password' }}
+        </button>
+      </form>
+    } @else {
+      <div class="section-title">Change password</div>
+      <p class="muted-note">
+        You signed in with {{ profile()?.registrationSource === 'google' ? 'Google' : profile()?.registrationSource === 'facebook' ? 'Facebook' :
+        profile()?.registrationSource === 'apple' ? 'Apple' : 'a social account' }} — manage your password there instead.
+      </p>
+    }
+
+    @if (application(); as app) {
+      <div class="section-title">Student application</div>
+      @if (app.status === 'approved') {
+        <p class="muted-note">Your application was approved — you're a student now.</p>
+      } @else if (app.status === 'rejected') {
+        <p class="muted-note">Your previous application was not approved.</p>
+      } @else {
+        <form class="edit-form" (submit)="$event.preventDefault(); saveApplication()">
+          <div class="field-inline">
+            <label class="muted-label">First name *</label>
+            <input class="edit-input" [ngModel]="appFirstName()" (ngModelChange)="appFirstName.set($event)" name="appFirstName" required />
+          </div>
+          <div class="field-inline">
+            <label class="muted-label">Last name *</label>
+            <input class="edit-input" [ngModel]="appLastName()" (ngModelChange)="appLastName.set($event)" name="appLastName" required />
+          </div>
+          <div class="field-inline">
+            <label class="muted-label">Nickname *</label>
+            <input class="edit-input" [ngModel]="appNickname()" (ngModelChange)="appNickname.set($event)" name="appNickname" required />
+          </div>
+          <div class="field-inline">
+            <label class="muted-label">Phone</label>
+            <input class="edit-input" [ngModel]="appPhone()" (ngModelChange)="appPhone.set($event)" name="appPhone" />
+          </div>
+          <div class="field-inline">
+            <label class="muted-label">LINE ID</label>
+            <input class="edit-input" [ngModel]="appLineId()" (ngModelChange)="appLineId.set($event)" name="appLineId" />
+          </div>
+
+          @if (appError()) {
+            <p class="edit-error">{{ appError() }}</p>
+          }
+          @if (appSaved()) {
+            <p class="edit-success">Application updated.</p>
+          }
+
+          <button type="submit" class="edit-submit-btn" [disabled]="appSaving()">
+            {{ appSaving() ? 'Saving…' : 'Save application' }}
+          </button>
+        </form>
+      }
+    }
+  }
+</div>
