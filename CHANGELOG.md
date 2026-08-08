@@ -2,6 +2,22 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-08 (6) — Public-site (wpusa.online) now has the same profile editing as mobile
+
+- New **My Account → Edit Profile** page (previously didn't exist on the website at all):
+  read-only Email/Role, editable first/last name, nickname, phone; change password (self-
+  registered accounts only); edit a pending student application's LINE ID and photo.
+- **Become a Student** reworked to match mobile: email is now read-only (came from
+  registration, was previously editable — the bug the user actually meant by "fix it on
+  wpusa.online too"), name/nickname/phone are pulled from the account profile instead of
+  re-typed, added an optional photo upload with the same styled file picker, and a
+  pending application links to Edit Profile instead of duplicating an edit form.
+- No backend changes needed — reuses the `/me` and `/me/student-application` endpoints
+  already deployed for mobile.
+- Verified end-to-end against production: register → Edit Profile save → Become a
+  Student (profile-derived fields, photo picker) → submit → "Edit your application" link.
+  Zero console errors.
+
 ## 2026-08-08 (5) — Fixed: new registrations couldn't get past the PIN screen
 
 - `register.ts` sent brand-new accounts straight to `/home`, which the security gate then
