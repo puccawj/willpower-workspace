@@ -22,7 +22,7 @@
 
 .pull-spinner {
   display: inline-block;
-  font-size: 20.5px;
+  font-size: calc(20.5px * var(--text-scale, 1));
   color: var(--w-accent);
   transform-origin: center;
 
@@ -84,7 +84,7 @@
 }
 
 .tab-icon {
-  font-size: 19.5px;
+  font-size: calc(19.5px * var(--text-scale, 1));
   line-height: 1;
   transition: transform 0.2s ease;
 }
@@ -96,7 +96,7 @@
 }
 
 .tab-label {
-  font: 500 11px var(--w-font-sans);
+  font: 500 calc(11px * var(--text-scale, 1)) var(--w-font-sans);
 }
 
 .tab-item.active {

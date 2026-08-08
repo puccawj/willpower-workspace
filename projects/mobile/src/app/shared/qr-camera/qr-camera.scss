@@ -12,7 +12,7 @@
 }
 
 .qr-camera-error {
-  font: 500 14.5px var(--w-font-sans);
+  font: 500 calc(14.5px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-accent);
   margin: 0 0 12px;
 }

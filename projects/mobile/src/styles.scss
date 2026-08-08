@@ -20,6 +20,11 @@
 
   --w-font-serif: 'Newsreader', serif;
   --w-font-sans: 'Archivo', system-ui, sans-serif;
+
+  // Overridden at runtime by TextScaleService from the user's saved Profile → Text size
+  // preference. Every font-size in the app is written as calc(Npx * var(--text-scale, 1))
+  // so changing this one value rescales all of them at once.
+  --text-scale: 1;
 }
 
 * {
@@ -66,7 +71,7 @@ img {
 }
 
 .prereq-pill {
-  font: 600 11px var(--w-font-sans);
+  font: 600 calc(12.5px * var(--text-scale, 1)) var(--w-font-sans);
   letter-spacing: 0.02em;
   color: #8a5a00;
   background: #fdf1d6;
@@ -83,7 +88,7 @@ img {
 
   &::before {
     content: '🔒';
-    font-size: 10px;
+    font-size: calc(11.5px * var(--text-scale, 1));
   }
 }
 

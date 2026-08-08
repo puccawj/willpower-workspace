@@ -30,6 +30,25 @@
     }
   </div>
 
+  <div class="menu-group-title">Display</div>
+  <div class="menu">
+    <div class="menu-row static text-scale-row">
+      <span>Text size</span>
+      <div class="text-scale-options">
+        @for (opt of textScaleOptions; track opt.value) {
+          <button
+            type="button"
+            class="text-scale-btn"
+            [class.active]="textScale.scale() === opt.value"
+            (click)="setTextScale(opt.value)"
+          >
+            {{ opt.label }}
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+
   <div class="menu-group-title">About Willpower Institute</div>
   <div class="menu">
     <button type="button" class="menu-row" (click)="openAbout()"><span>About</span><span class="chev">›</span></button>

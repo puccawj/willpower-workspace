@@ -25,7 +25,7 @@
 }
 
 .branch-pill {
-  font: 500 11.5px var(--w-font-sans);
+  font: 500 calc(11.5px * var(--text-scale, 1)) var(--w-font-sans);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--w-green);
@@ -35,7 +35,7 @@
 }
 
 .title {
-  font: 400 25.5px/1.15 var(--w-font-serif);
+  font: 400 calc(25.5px * var(--text-scale, 1))/1.15 var(--w-font-serif);
   margin: 12px 0 12px;
 }
 
@@ -54,7 +54,7 @@
 }
 
 .stat-label {
-  font: 500 10.5px var(--w-font-sans);
+  font: 500 calc(10.5px * var(--text-scale, 1)) var(--w-font-sans);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--w-muted-2);
@@ -62,17 +62,17 @@
 }
 
 .stat-value {
-  font: 500 14.5px var(--w-font-sans);
+  font: 500 calc(14.5px * var(--text-scale, 1)) var(--w-font-sans);
   overflow-wrap: break-word;
 }
 
 .desc {
-  font: 400 15px/1.65 var(--w-font-sans);
+  font: 400 calc(15px * var(--text-scale, 1))/1.65 var(--w-font-sans);
   color: var(--w-ink-soft);
 }
 
 .section-heading {
-  font: 500 12.5px var(--w-font-sans);
+  font: 500 calc(12.5px * var(--text-scale, 1)) var(--w-font-sans);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--w-gold);
@@ -133,7 +133,7 @@
   border-radius: 8px;
   border: 1px solid var(--w-border);
   background: #fff;
-  font: 500 14.5px var(--w-font-sans);
+  font: 500 calc(14.5px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-muted-2);
   display: flex;
   align-items: center;
@@ -148,14 +148,14 @@
 }
 
 .donor-tab-count {
-  font: 600 11.5px var(--w-font-sans);
+  font: 600 calc(11.5px * var(--text-scale, 1)) var(--w-font-sans);
   background: rgba(255, 255, 255, 0.3);
   border-radius: 10px;
   padding: 1px 6px;
 }
 
 .donate-thanks {
-  font: 400 14.5px/1.5 var(--w-font-sans);
+  font: 400 calc(14.5px * var(--text-scale, 1))/1.5 var(--w-font-sans);
   color: var(--w-green);
   background: rgba(124, 144, 104, 0.1);
   border-radius: 8px;
@@ -198,7 +198,7 @@
 }
 
 .need-title {
-  font: 500 15px var(--w-font-sans);
+  font: 500 calc(15px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-ink);
   display: block;
   margin-bottom: 6px;
@@ -218,13 +218,13 @@
 }
 
 .need-meta {
-  font: 400 12px var(--w-font-sans);
+  font: 400 calc(12px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-muted-2);
 }
 
 .need-donate-btn {
   flex-shrink: 0;
-  font: 600 12.5px var(--w-font-sans);
+  font: 600 calc(12.5px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-accent);
   border: 1px solid var(--w-accent);
   background: none;
@@ -243,7 +243,7 @@
 
 .donate-input {
   width: 100%;
-  font: 400 15px var(--w-font-sans);
+  font: 400 calc(15px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-ink);
   background: var(--w-bg-alt);
   border: 1px solid var(--w-border);
@@ -259,7 +259,7 @@
 .donate-type-btn {
   flex: 1;
   text-align: center;
-  font: 500 14px var(--w-font-sans);
+  font: 500 calc(14px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-muted-2);
   background: var(--w-bg-alt);
   border: 1px solid var(--w-border);
@@ -283,25 +283,25 @@
 }
 
 .donate-file-label {
-  font: 400 13px var(--w-font-sans);
+  font: 400 calc(13px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-muted-2);
 
   input {
     display: block;
     margin-top: 4px;
-    font: 400 12.5px var(--w-font-sans);
+    font: 400 calc(12.5px * var(--text-scale, 1)) var(--w-font-sans);
     width: 100%;
   }
 }
 
 .donate-error {
-  font: 500 13px var(--w-font-sans);
+  font: 500 calc(13px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-red);
   margin: 0;
 }
 
 .donate-submit-btn {
-  font: 600 15px var(--w-font-sans);
+  font: 600 calc(15px * var(--text-scale, 1)) var(--w-font-sans);
   color: #fff;
   background: var(--w-gold-deep);
   border: none;
@@ -335,14 +335,14 @@
 }
 
 .donor-item {
-  font: 400 14.5px var(--w-font-sans);
+  font: 400 calc(14.5px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-ink);
   flex: 1;
   min-width: 0;
 }
 
 .donor-type-badge {
-  font: 600 10px var(--w-font-sans);
+  font: 600 calc(10px * var(--text-scale, 1)) var(--w-font-sans);
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--w-accent);
@@ -357,18 +357,18 @@
 }
 
 .donor-name {
-  font: 500 14px var(--w-font-sans);
+  font: 500 calc(14px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-ink);
   flex-shrink: 0;
 }
 
 .donor-date {
-  font: 400 12px var(--w-font-sans);
+  font: 400 calc(12px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-muted-2);
 }
 
 .donor-empty {
-  font: 400 14.5px var(--w-font-sans);
+  font: 400 calc(14.5px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-muted);
 }
 
@@ -388,13 +388,13 @@
 }
 
 .rating-summary-text {
-  font: 400 14px var(--w-font-sans);
+  font: 400 calc(14px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-muted);
 }
 
 .star {
   color: var(--w-border);
-  font-size: 17px;
+  font-size: calc(17px * var(--text-scale, 1));
 
   &.filled {
     color: var(--w-gold);
@@ -408,7 +408,7 @@
 }
 
 .star-input {
-  font-size: 32px;
+  font-size: calc(32px * var(--text-scale, 1));
   cursor: pointer;
 }
 
@@ -418,7 +418,7 @@
 }
 
 .rating-saved-note {
-  font: 500 14.5px var(--w-font-sans);
+  font: 500 calc(14.5px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-green);
   margin: 10px 0 0;
 }
@@ -430,12 +430,12 @@
 }
 
 .seats-label {
-  font: 400 13px var(--w-font-sans);
+  font: 400 calc(13px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-muted-2);
 }
 
 .seats-value {
-  font: 600 14px var(--w-font-sans);
+  font: 600 calc(14px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-ink);
 }
 
@@ -457,7 +457,7 @@
 }
 
 .rsvp-closed-note {
-  font: 400 14.5px var(--w-font-sans);
+  font: 400 calc(14.5px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-muted);
   margin: 0;
 }
@@ -471,7 +471,7 @@
 .rsvp-choice-btn {
   width: 100%;
   text-align: center;
-  font: 600 15px var(--w-font-sans);
+  font: 600 calc(15px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-ink);
   background: var(--w-bg-alt);
   border: 1px solid var(--w-border);
@@ -504,19 +504,19 @@
 }
 
 .rsvp-error {
-  font: 500 13px var(--w-font-sans);
+  font: 500 calc(13px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-red);
   margin-top: 10px;
 }
 
 .rsvp-msg {
-  font: 400 14px/1.5 var(--w-font-sans);
+  font: 400 calc(14px * var(--text-scale, 1))/1.5 var(--w-font-sans);
   color: var(--w-ink-soft);
   margin-top: 10px;
 }
 
 .checkin-qr-hint {
-  font: 600 14.5px var(--w-font-sans);
+  font: 600 calc(14.5px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-green);
   margin: 10px 0 0;
 }
@@ -524,7 +524,7 @@
 .checkin-qr-btn {
   display: block;
   text-align: center;
-  font: 600 15px var(--w-font-sans);
+  font: 600 calc(15px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-accent);
   border: 1px solid var(--w-accent);
   background: none;

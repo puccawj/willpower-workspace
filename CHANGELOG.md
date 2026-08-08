@@ -2,6 +2,21 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-08 (2) — User-adjustable text size in Profile → Display
+
+- Follow-up to (1) below. Every `font-size`/`font:` px value across the mobile app is now
+  wrapped as `calc(Npx * var(--text-scale, 1))` instead of a plain px number, so a single
+  CSS custom property rescales every font in the app at once. `--text-scale` defaults to
+  `1`, matching (1)'s shipped baseline exactly — existing users see no change unless they
+  opt into something different.
+- New **Profile → Display → Text size** setting with four options (Small 0.85×, Normal
+  1×, Large 1.15×, Extra large 1.3×). New `TextScaleService` applies the choice instantly
+  (sets the CSS var on `<html>`) and persists it via Capacitor `Preferences`, restored on
+  every app launch through a `provideAppInitializer` (same pattern as session restore) so
+  it's already applied before the first page paints.
+- Verified on Android: switching sizes rescales the whole UI live, and the choice survives
+  a full app force-stop + relaunch.
+
 ## 2026-08-08 (1) — Mobile app text scaled up ~15%, this time without breaking anything
 
 - Follow-up to (7) below, which used `zoom` and broke Cloudflare Turnstile + `100vh`

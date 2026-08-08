@@ -12,7 +12,7 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  font: 500 27.5px var(--w-font-serif);
+  font: 500 calc(27.5px * var(--text-scale, 1)) var(--w-font-serif);
   color: #f4eddd;
   background: none;
   border: 1px solid rgba(244, 237, 221, 0.28);

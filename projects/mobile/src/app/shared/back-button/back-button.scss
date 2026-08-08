@@ -5,7 +5,7 @@
   border: 1px solid var(--w-border);
   background: #fff;
   color: var(--w-ink);
-  font-size: 23px;
+  font-size: calc(23px * var(--text-scale, 1));
   line-height: 1;
   display: flex;
   align-items: center;

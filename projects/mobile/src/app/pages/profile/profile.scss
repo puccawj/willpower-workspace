@@ -19,16 +19,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font: 600 23px var(--w-font-sans);
+  font: 600 calc(23px * var(--text-scale, 1)) var(--w-font-sans);
   margin-bottom: 10px;
 }
 
 .name {
-  font: 500 20.5px var(--w-font-serif);
+  font: 500 calc(20.5px * var(--text-scale, 1)) var(--w-font-serif);
 }
 
 .email {
-  font: 400 14px var(--w-font-sans);
+  font: 400 calc(14px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-muted-2);
   margin-top: 2px;
 }
@@ -49,12 +49,12 @@
 }
 
 .stat-value {
-  font: 500 19.5px var(--w-font-serif);
+  font: 500 calc(19.5px * var(--text-scale, 1)) var(--w-font-serif);
   color: var(--w-accent);
 }
 
 .stat-label {
-  font: 500 10.5px var(--w-font-sans);
+  font: 500 calc(10.5px * var(--text-scale, 1)) var(--w-font-sans);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--w-muted-2);
@@ -81,7 +81,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font: 500 15px var(--w-font-sans);
+  font: 500 calc(15px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-ink);
   cursor: pointer;
   text-align: left;
@@ -95,13 +95,42 @@
   }
 }
 
+.text-scale-row {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.text-scale-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.text-scale-btn {
+  text-align: center;
+  font: 500 calc(12.5px * var(--text-scale, 1)) var(--w-font-sans);
+  color: var(--w-muted-2);
+  background: var(--w-bg-alt);
+  border: 1px solid var(--w-border);
+  padding: 9px 4px;
+  border-radius: 8px;
+  cursor: pointer;
+
+  &.active {
+    background: var(--w-accent);
+    border-color: var(--w-accent);
+    color: #fff;
+  }
+}
+
 .menu-row-sub {
-  font: 400 13px var(--w-font-sans);
+  font: 400 calc(13px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-muted-2);
 }
 
 .menu-group-title {
-  font: 500 12.5px var(--w-font-sans);
+  font: 500 calc(12.5px * var(--text-scale, 1)) var(--w-font-sans);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--w-muted-2);
@@ -115,7 +144,7 @@
 .logout-btn {
   width: 100%;
   text-align: center;
-  font: 600 15px var(--w-font-sans);
+  font: 600 calc(15px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-accent);
   background: none;
   border: 1px solid var(--w-border-strong);
@@ -126,7 +155,7 @@
 
 .app-version {
   text-align: center;
-  font: 400 12.5px var(--w-font-sans);
+  font: 400 calc(12.5px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-muted-2);
   margin-top: 16px;
 }

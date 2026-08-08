@@ -20,18 +20,18 @@
   align-items: center;
   justify-content: center;
   color: var(--w-gold-deep);
-  font-size: 22px;
+  font-size: calc(22px * var(--text-scale, 1));
   margin-bottom: 18px;
 }
 
 .title {
-  font: 400 23px var(--w-font-serif);
+  font: 400 calc(23px * var(--text-scale, 1)) var(--w-font-serif);
   color: #f4eddd;
   margin-bottom: 6px;
 }
 
 .subtitle {
-  font: 400 14.5px var(--w-font-sans);
+  font: 400 calc(14.5px * var(--text-scale, 1)) var(--w-font-sans);
   color: #b6a892;
   margin-bottom: 40px;
   min-height: 16px;
@@ -61,7 +61,7 @@
 
 .skip-link {
   margin-top: 30px;
-  font: 500 14px var(--w-font-sans);
+  font: 500 calc(14px * var(--text-scale, 1)) var(--w-font-sans);
   color: #9c8d76;
   background: none;
   border: none;

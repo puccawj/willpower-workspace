@@ -61,12 +61,12 @@
 }
 
 .greeting {
-  font: 400 14px var(--w-font-sans);
+  font: 400 calc(14px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-muted-2);
 }
 
 .name {
-  font: 500 20.5px var(--w-font-serif);
+  font: 500 calc(20.5px * var(--text-scale, 1)) var(--w-font-serif);
 }
 
 .head-actions {
@@ -85,7 +85,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
+  font-size: calc(16px * var(--text-scale, 1));
 }
 
 .bell-badge {
@@ -98,7 +98,7 @@
   border-radius: 999px;
   background: var(--w-accent);
   color: #fff;
-  font: 700 10.5px var(--w-font-sans);
+  font: 700 calc(10.5px * var(--text-scale, 1)) var(--w-font-sans);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -113,7 +113,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font: 600 14px var(--w-font-sans);
+  font: 600 calc(14px * var(--text-scale, 1)) var(--w-font-sans);
 }
 
 .next-card {
@@ -137,7 +137,7 @@
 }
 
 .next-eyebrow {
-  font: 500 11.5px var(--w-font-sans);
+  font: 500 calc(11.5px * var(--text-scale, 1)) var(--w-font-sans);
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--w-gold-deep);
@@ -146,14 +146,14 @@
 }
 
 .next-title {
-  font: 500 19.5px var(--w-font-serif);
+  font: 500 calc(19.5px * var(--text-scale, 1)) var(--w-font-serif);
   color: #f4eddd;
   margin-bottom: 4px;
   position: relative;
 }
 
 .next-meta {
-  font: 400 14px var(--w-font-sans);
+  font: 400 calc(14px * var(--text-scale, 1)) var(--w-font-sans);
   color: #b6a892;
   position: relative;
 }
@@ -166,7 +166,7 @@
 }
 
 .section-title {
-  font: 500 17px var(--w-font-serif);
+  font: 500 calc(17px * var(--text-scale, 1)) var(--w-font-serif);
 }
 
 .view-toggle {
@@ -181,7 +181,7 @@
 .toggle-btn {
   padding: 4px 8px;
   border-radius: 5px;
-  font: 600 11.5px var(--w-font-sans);
+  font: 600 calc(11.5px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-muted-2);
   cursor: pointer;
 
@@ -192,7 +192,7 @@
 }
 
 .empty-note {
-  font: 400 15px var(--w-font-sans);
+  font: 400 calc(15px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-muted);
 }
 
@@ -223,11 +223,11 @@
 }
 
 .event-day {
-  font: 600 16px var(--w-font-sans);
+  font: 600 calc(16px * var(--text-scale, 1)) var(--w-font-sans);
 }
 
 .event-mon {
-  font: 600 9px var(--w-font-sans);
+  font: 600 calc(9px * var(--text-scale, 1)) var(--w-font-sans);
 }
 
 .event-info {
@@ -236,12 +236,12 @@
 }
 
 .event-title {
-  font: 500 15px var(--w-font-sans);
+  font: 500 calc(15px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-ink);
 }
 
 .event-meta {
-  font: 400 12.5px var(--w-font-sans);
+  font: 400 calc(12.5px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-muted-2);
 }
 
@@ -277,13 +277,13 @@
 }
 
 .event-card-date {
-  font: 600 10.5px var(--w-font-sans);
+  font: 600 calc(10.5px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-accent);
   margin-bottom: 3px;
 }
 
 .event-card-title {
-  font: 500 14px var(--w-font-sans);
+  font: 500 calc(14px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-ink);
 }
 
@@ -292,7 +292,7 @@
 }
 
 .view-all-link {
-  font: 500 13px var(--w-font-sans);
+  font: 500 calc(13px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-accent);
   white-space: nowrap;
 }
@@ -319,17 +319,17 @@
 }
 
 .course-row-title {
-  font: 500 15px var(--w-font-sans);
+  font: 500 calc(15px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-ink);
 }
 
 .course-row-meta {
-  font: 400 12.5px var(--w-font-sans);
+  font: 400 calc(12.5px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-muted-2);
 }
 
 .course-row-open {
-  font: 500 12px var(--w-font-sans);
+  font: 500 calc(12px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-green);
   white-space: nowrap;
   flex-shrink: 0;
@@ -391,7 +391,7 @@
   background: var(--w-accent);
   color: #fff;
   text-align: center;
-  font: 700 9px/1.3 var(--w-font-sans);
+  font: 700 calc(9px * var(--text-scale, 1))/1.3 var(--w-font-sans);
   letter-spacing: 0.02em;
   text-transform: uppercase;
   padding: 3px 0;
@@ -405,7 +405,7 @@
 
 .ribbon-lock {
   display: block;
-  font-size: 11.5px;
+  font-size: calc(11.5px * var(--text-scale, 1));
   line-height: 1;
   margin-bottom: 2px;
   filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.35));
@@ -416,18 +416,18 @@
 }
 
 .course-level {
-  font: 400 11.5px var(--w-font-sans);
+  font: 400 calc(11.5px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-muted-2);
   margin-bottom: 5px;
 }
 
 .course-title {
-  font: 500 15.5px var(--w-font-serif);
+  font: 500 calc(15.5px * var(--text-scale, 1)) var(--w-font-serif);
   margin-bottom: 5px;
 }
 
 .course-open {
-  font: 500 12px var(--w-font-sans);
+  font: 500 calc(12px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-green);
 }
 
@@ -440,7 +440,7 @@
 
 .home-star {
   color: var(--w-border);
-  font-size: 12.5px;
+  font-size: calc(12.5px * var(--text-scale, 1));
 }
 
 .home-star.filled {
@@ -448,6 +448,6 @@
 }
 
 .home-rating-text {
-  font: 400 11.5px var(--w-font-sans);
+  font: 400 calc(11.5px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-muted-2);
 }

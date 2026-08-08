@@ -3,12 +3,12 @@
 }
 
 .page-title {
-  font: 400 27.5px var(--w-font-serif);
+  font: 400 calc(27.5px * var(--text-scale, 1)) var(--w-font-serif);
   margin: 0 0 18px;
 }
 
 .empty-note {
-  font: 400 15px var(--w-font-sans);
+  font: 400 calc(15px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-muted);
 }
 
@@ -27,7 +27,7 @@
 
 .filter-btn {
   flex-shrink: 0;
-  font: 500 14px var(--w-font-sans);
+  font: 500 calc(14px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-muted-2);
   background: #fff;
   border: 1px solid var(--w-border);
@@ -42,7 +42,7 @@
 }
 
 .live-pill {
-  font: 600 10.5px var(--w-font-sans);
+  font: 600 calc(10.5px * var(--text-scale, 1)) var(--w-font-sans);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: #fff;
@@ -84,7 +84,7 @@
 }
 
 .branch-pill {
-  font: 500 11.5px var(--w-font-sans);
+  font: 500 calc(11.5px * var(--text-scale, 1)) var(--w-font-sans);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--w-green);
@@ -94,11 +94,11 @@
 }
 
 .event-card-title {
-  font: 500 18.5px var(--w-font-serif);
+  font: 500 calc(18.5px * var(--text-scale, 1)) var(--w-font-serif);
   margin: 10px 0 4px;
 }
 
 .event-card-meta {
-  font: 400 14px var(--w-font-sans);
+  font: 400 calc(14px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-muted);
 }

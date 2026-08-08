@@ -6,6 +6,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { MeApiService } from '../../core/services/me-api.service';
 import { PullToRefreshService } from '../../core/services/pull-to-refresh.service';
 import { PushRegistrationService } from '../../core/services/push-registration.service';
+import { TEXT_SCALE_OPTIONS, TextScaleService } from '../../core/services/text-scale.service';
 
 const PUBLIC_SITE_URL = 'https://www.wpusa.online';
 
@@ -18,10 +19,12 @@ const PUBLIC_SITE_URL = 'https://www.wpusa.online';
 export class Profile {
   protected readonly auth = inject(AuthService);
   protected readonly meApi = inject(MeApiService);
+  protected readonly textScale = inject(TextScaleService);
   private readonly router = inject(Router);
   private readonly pullToRefresh = inject(PullToRefreshService);
   private readonly pushRegistration = inject(PushRegistrationService);
 
+  protected readonly textScaleOptions = TEXT_SCALE_OPTIONS;
   protected readonly appVersion = signal('');
 
   constructor() {
@@ -49,6 +52,10 @@ export class Profile {
 
   openPrivacyPolicy(): void {
     void Browser.open({ url: `${PUBLIC_SITE_URL}/#/policy` });
+  }
+
+  setTextScale(scale: number): void {
+    void this.textScale.setScale(scale);
   }
 
   logout(): void {

@@ -4,12 +4,12 @@
 }
 
 .page-title {
-  font: 400 25.5px var(--w-font-serif);
+  font: 400 calc(25.5px * var(--text-scale, 1)) var(--w-font-serif);
   margin: 0 0 16px;
 }
 
 .empty-note {
-  font: 400 15px var(--w-font-sans);
+  font: 400 calc(15px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-muted);
 }
 
@@ -28,12 +28,12 @@
 }
 
 .row-title {
-  font: 500 16px var(--w-font-serif);
+  font: 500 calc(16px * var(--text-scale, 1)) var(--w-font-serif);
   margin-bottom: 4px;
 }
 
 .row-meta {
-  font: 400 14px var(--w-font-sans);
+  font: 400 calc(14px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-muted-2);
 }
 
@@ -45,7 +45,7 @@
 }
 
 .pill {
-  font: 600 12px var(--w-font-sans);
+  font: 600 calc(12px * var(--text-scale, 1)) var(--w-font-sans);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   padding: 3px 9px;
