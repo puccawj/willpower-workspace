@@ -2,6 +2,15 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-08 (5) — Fixed: new registrations couldn't get past the PIN screen
+
+- `register.ts` sent brand-new accounts straight to `/home`, which the security gate then
+  bounced to `/security/unlock` — a "confirm it's you" passcode screen with nothing to
+  enter, since the account never had a PIN set. Registration was effectively a dead end
+  on mobile. Fixed by mirroring `login.ts`'s existing logic: mark the gate unlocked and
+  route first-time accounts to `/security/set-pin` instead. Verified on Android with a
+  fresh account — now lands on "Set a PIN" as expected.
+
 ## 2026-08-08 (4) — Optional photo upload on Become a Student
 
 - Applicants can attach a photo when applying to become a student, or skip it — reuses
