@@ -5,9 +5,9 @@ Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 ## 2026-08-08 (3) — Users can now edit their own profile, password, and student application
 
 - New **Profile → Edit profile** page (mobile) with three independent sections:
-  - **Your details** — first name, last name, nickname, phone number, backed by a new
-    `PATCH /me` endpoint. Saves update the Profile header name/initials app-wide without
-    re-login.
+  - **Your details** — registered email shown read-only, plus editable first name, last
+    name, nickname, phone number, backed by a new `PATCH /me` endpoint. Saves update the
+    Profile header name/initials app-wide without re-login.
   - **Change password** — only shown for accounts that registered with email/password
     (`registrationSource === 'self'`); social-login accounts see a note to manage their
     password with that provider instead. Backed by a new `PATCH /me/password`, which
