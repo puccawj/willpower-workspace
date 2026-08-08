@@ -11,6 +11,13 @@
   flex: 1;
   overflow-y: auto;
   overscroll-behavior-y: contain;
+  // Each tab page (Home/Events/Courses/Profile) has its own flat top padding for normal
+  // spacing, but none of them account for the iPhone's status bar / Dynamic Island — on
+  // iOS that leaves page titles rendering underneath the clock/battery icons. Adding the
+  // safe-area inset here once, on the shared scroll container, fixes every tab at once
+  // instead of patching each page's padding individually. Resolves to 0 on Android, so
+  // it's a no-op there.
+  padding-top: env(safe-area-inset-top);
 }
 
 .pull-indicator {
