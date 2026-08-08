@@ -12,6 +12,13 @@
   justify-content: center;
   cursor: pointer;
   margin-bottom: 12px;
+  // The default (non-overlay) variant sits in normal document flow, inside whatever flat
+  // px top padding its page happens to use (e.g. `padding: 20px ...`) — none of those
+  // pages account for the iOS status bar/notch, so on iOS this button rendered right
+  // under it, same overlap bug as the overlay variant had. Push it down by the real
+  // inset on top of the page's own padding (0 on Android/no-notch iPhones, so no change
+  // there).
+  margin-top: env(safe-area-inset-top);
 
   &.overlay {
     position: absolute;
@@ -25,6 +32,7 @@
     left: 16px;
     z-index: 2;
     margin-bottom: 0;
+    margin-top: 0;
     background: rgba(36, 28, 21, 0.45);
     border-color: transparent;
     color: #fff;
