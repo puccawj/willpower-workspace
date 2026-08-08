@@ -44,6 +44,34 @@ jobs:
       - name: Sync Capacitor iOS (copies the web build into the Xcode project)
         run: npx cap sync ios
 
+      - name: Build for iOS Simulator (for Appetize.io browser testing)
+        # Separate from the App Store build below: simulator builds need no code signing
+        # at all (CODE_SIGNING_ALLOWED=NO), so this doesn't touch match/certificates and
+        # can't be broken by anything in that pipeline. Appetize can only stream a
+        # simulator build (a zipped .app), not the real-device App Store .ipa the beta
+        # lane produces — those are built for entirely different architectures/signing.
+        working-directory: ios
+        run: |
+          xcodebuild -project App/App.xcodeproj -scheme App -sdk iphonesimulator \
+            -configuration Debug -derivedDataPath build CODE_SIGNING_ALLOWED=NO \
+            -destination "generic/platform=iOS Simulator"
+          cd build/Build/Products/Debug-iphonesimulator
+          zip -r App.zip App.app
+
+      - name: Upload to Appetize.io for browser testing
+        working-directory: ios/build/Build/Products/Debug-iphonesimulator
+        env:
+          APPETIZE_API_TOKEN: ${{ secrets.APPETIZE_API_TOKEN }}
+        run: |
+          response=$(curl -sS https://api.appetize.io/v1/apps -X POST \
+            -H "X-API-KEY: $APPETIZE_API_TOKEN" \
+            -F "file=@App.zip" \
+            -F "platform=ios")
+          echo "$response"
+          public_key=$(echo "$response" | node -pe "JSON.parse(require('fs').readFileSync(0, 'utf8')).publicKey")
+          echo "### 📱 Appetize.io test link" >> $GITHUB_STEP_SUMMARY
+          echo "https://appetize.io/app/$public_key" >> $GITHUB_STEP_SUMMARY
+
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.3"

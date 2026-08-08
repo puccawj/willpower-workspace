@@ -14,6 +14,7 @@ set these as **GitHub repo secrets** (Settings → Secrets and variables → Act
 | `MATCH_GIT_URL` | URL of a new **private** GitHub repo you create (e.g. `https://github.com/puccawj/willpower-ios-certs.git`) — this is where your encrypted signing certificate gets stored, never in this repo |
 | `MATCH_PASSWORD` | Any passphrase you make up — encrypts the certificate before it's pushed to the certs repo |
 | `MATCH_GIT_BASIC_AUTHORIZATION` | Required because the certs repo above is private and `actions/checkout` only authenticates the main repo, not other ones `match` needs to `git clone`. Create a GitHub **classic** Personal Access Token (Settings → Developer settings → Personal access tokens → Generate new token (classic), scope: `repo`), then base64-encode `<github-username>:<token>` — e.g. `printf '%s' "puccawj:ghp_xxxx" \| base64` (Mac/Linux) or `[Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes("puccawj:ghp_xxxx"))` (PowerShell) |
+| `APPETIZE_API_TOKEN` | Optional — only needed to test builds in-browser via [appetize.io](https://appetize.io) without an iPhone. Get it from your Appetize account (Settings → API). Every run uploads a simulator build and prints a test link in the run's Job Summary. |
 
 ## Also required before the app will build correctly
 
