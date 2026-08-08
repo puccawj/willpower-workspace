@@ -2,6 +2,20 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-08 (7) — Fixed: QR check-in camera never opened on iOS
+
+- Root cause: `@capacitor-mlkit/barcode-scanning` (used for native QR check-in scanning)
+  only supports CocoaPods on iOS — Google's ML Kit SDK has no SPM distribution — but this
+  project's iOS integration is pure SPM by design, so the native plugin was never actually
+  linked into the iOS binary. `BarcodeScanner.startScan()` always threw there, silently.
+- Now falls back to the existing browser-based camera scanner (Shape Detection API) when
+  the native scan fails to start, which works on iOS 17+ without touching the native
+  Xcode project. Android unaffected — its native plugin is properly linked and this path
+  never triggers there; verified on-device.
+- A proper permanent fix (adding CocoaPods back specifically for this plugin) is still an
+  option if native ML Kit scanning UX is wanted on iOS — flagged as a follow-up, not done
+  here since it requires Xcode to verify and none is available in this environment.
+
 ## 2026-08-08 (6) — Public-site (wpusa.online) now has the same profile editing as mobile
 
 - New **My Account → Edit Profile** page (previously didn't exist on the website at all):
