@@ -2,6 +2,20 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-08 (9) — Fixed: page titles overlapping the iPhone status bar on every tab
+
+- `.tab-content` (shared scroll container for Home/Events/Courses/Profile and everything
+  nested under them — Edit profile, Apply student, My courses/certificates/rsvps/
+  donations) had no top safe-area handling at all — only the bottom tab bar did. Each
+  page's own flat 20px top padding wasn't enough to clear the status bar / Dynamic
+  Island, so titles rendered underneath the clock/battery icons (e.g. "Events" overlapping
+  the time). Fixed once at the shared container instead of patching every page.
+- Verified no regression on Android (env() resolves to 0 there — screenshot confirms
+  pixel-identical layout).
+- Standalone pages with their own back button (Course/Event detail, Notifications,
+  Attendance, Certificate received) already had this handled from an earlier fix and
+  weren't touched, to avoid double-stacking the safe-area offset.
+
 ## 2026-08-08 (8) — Fixed the fix: web QR fallback still didn't open on a real iPhone
 
 - The BarcodeDetector-based fallback from (7) still showed "Camera scanning isn't
