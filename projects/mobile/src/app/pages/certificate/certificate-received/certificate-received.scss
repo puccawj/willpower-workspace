@@ -6,7 +6,7 @@
 
 .empty-note {
   padding: 24px 20px;
-  font: 400 13px var(--w-font-sans);
+  font: 400 15px var(--w-font-sans);
   color: var(--w-muted);
 }
 
@@ -16,11 +16,11 @@
 }
 
 .cert-congrats {
-  font: 400 22px var(--w-font-serif);
+  font: 400 25.5px var(--w-font-serif);
 }
 
 .cert-sub {
-  font: 400 12.5px var(--w-font-sans);
+  font: 400 14.5px var(--w-font-sans);
   color: var(--w-muted);
   margin-top: 4px;
 }
@@ -49,24 +49,24 @@
 }
 
 .cert-label {
-  font: 400 9px var(--w-font-sans);
+  font: 400 10.5px var(--w-font-sans);
   letter-spacing: 0.18em;
   margin-bottom: 14px;
 }
 
 .cert-name {
-  font: 500 19px var(--w-font-serif);
+  font: 500 22px var(--w-font-serif);
   font-style: italic;
   margin-bottom: 10px;
 }
 
 .cert-course {
-  font: 400 11px var(--w-font-sans);
+  font: 400 12.5px var(--w-font-sans);
   margin-bottom: 16px;
 }
 
 .cert-number {
-  font: 400 8px var(--w-font-sans);
+  font: 400 9px var(--w-font-sans);
   position: absolute;
   left: 20px;
   bottom: 14px;
@@ -75,7 +75,7 @@
 .download-btn {
   width: 100%;
   text-align: center;
-  font: 600 14px var(--w-font-sans);
+  font: 600 16px var(--w-font-sans);
   color: #fff;
   background: var(--w-accent);
   border: none;
@@ -92,7 +92,7 @@
 .share-btn {
   width: 100%;
   text-align: center;
-  font: 600 13px var(--w-font-sans);
+  font: 600 15px var(--w-font-sans);
   color: var(--w-ink);
   background: none;
   border: none;

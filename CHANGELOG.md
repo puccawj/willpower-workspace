@@ -2,6 +2,19 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-08 (1) — Mobile app text scaled up ~15%, this time without breaking anything
+
+- Follow-up to (7) below, which used `zoom` and broke Cloudflare Turnstile + `100vh`
+  pages. This time scaled every actual `font-size`/`font:` declaration across all 27
+  `.scss` files in the mobile project by 1.15× (via a one-off script, not by hand —
+  rounded to the nearest 0.5px), touching only text size, not box dimensions — so
+  nothing needs to reflow/resize except the text itself wrapping a little more inside
+  its existing box, which every layout here already tolerates (no fixed-height text
+  containers). Verified on Android across Home, course detail, Login (Cloudflare
+  Turnstile widget untouched, as expected — it's a cross-origin iframe, unaffected
+  either way since nothing here scales boxes), and the PIN unlock screen (still fills
+  the screen correctly, no `100vh` regression this time).
+
 ## 2026-08-06 (7) — Mobile app text/UI scale-up attempted, reverted — broke real pages
 
 - Requested for elderly users. Tried `zoom: 1.15` on `html` (every font-size in the app
