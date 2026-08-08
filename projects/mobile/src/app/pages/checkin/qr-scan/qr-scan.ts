@@ -26,6 +26,12 @@ export class QrScan implements OnDestroy {
   readonly isNative = Capacitor.isNativePlatform();
   readonly checking = signal(false);
   readonly error = signal('');
+  // @capacitor-mlkit/barcode-scanning only supports CocoaPods on iOS (no SPM build of
+  // Google's ML Kit SDK exists) and this project is pure-SPM, so the native plugin isn't
+  // linked into the iOS binary — BarcodeScanner.startScan() always throws there. Falling
+  // back to the browser-based <app-qr-camera> (Shape Detection API) instead of a dead end;
+  // that works from iOS 17 onward without touching the native project.
+  readonly nativeFailed = signal(false);
   private handledOnce = false;
   private listenerHandle?: { remove: () => void | Promise<void> };
 
@@ -36,7 +42,7 @@ export class QrScan implements OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.isNative) {
+    if (this.isNative && !this.nativeFailed()) {
       void BarcodeScanner.stopScan();
       document.body.classList.remove('scanner-active');
       void this.listenerHandle?.remove();
@@ -61,7 +67,10 @@ export class QrScan implements OnDestroy {
       });
       await BarcodeScanner.startScan();
     } catch {
-      this.error.set('Could not start the camera.');
+      document.body.classList.remove('scanner-active');
+      void this.listenerHandle?.remove();
+      this.listenerHandle = undefined;
+      this.nativeFailed.set(true);
     }
   }
 
@@ -88,7 +97,7 @@ export class QrScan implements OnDestroy {
 
   private onCheckinSuccess(res: { title: string; alreadyCheckedIn: boolean }, type: 'event' | 'session'): void {
     this.checking.set(false);
-    if (this.isNative) void BarcodeScanner.stopScan();
+    if (this.isNative && !this.nativeFailed()) void BarcodeScanner.stopScan();
     this.router.navigate(['/checkin/success'], {
       queryParams: { title: res.title, already: res.alreadyCheckedIn ? '1' : '', type },
     });
