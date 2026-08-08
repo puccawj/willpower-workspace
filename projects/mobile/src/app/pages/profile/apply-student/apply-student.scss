@@ -78,22 +78,33 @@
   color: var(--w-gold-deep);
 }
 
-.apply-file-label {
-  font: 400 calc(13px * var(--text-scale, 1)) var(--w-font-sans);
-  color: var(--w-muted-2);
+.file-picker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  border-radius: 8px;
+  border: 1px dashed var(--w-border-strong);
+  background: #fff;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
 
-  input {
-    display: block;
-    margin-top: 4px;
-    font: 400 calc(12.5px * var(--text-scale, 1)) var(--w-font-sans);
-    width: 100%;
+  &:active {
+    background: var(--w-bg-soft, #f2f0ea);
   }
 }
 
-.apply-file-name {
-  font: 400 calc(12.5px * var(--text-scale, 1)) var(--w-font-sans);
-  color: var(--w-muted);
-  margin: -4px 0 0;
+.file-picker-icon {
+  font-size: calc(17px * var(--text-scale, 1));
+  line-height: 1;
+}
+
+.file-picker-text {
+  font: 400 calc(14px * var(--text-scale, 1)) var(--w-font-sans);
+  color: var(--w-muted-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .apply-error {

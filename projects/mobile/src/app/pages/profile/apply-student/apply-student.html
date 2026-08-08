@@ -56,13 +56,12 @@
         <input class="apply-input" [ngModel]="lineId()" (ngModelChange)="lineId.set($event)" name="lineId" />
       </div>
       <div class="field-inline">
-        <label class="apply-file-label">
-          Photo (optional)
-          <input type="file" accept="image/*" #photoInput (change)="onPhotoFileSelected(photoInput)" />
+        <label class="muted-label">Photo (optional)</label>
+        <label class="file-picker">
+          <input type="file" accept="image/*" #photoInput (change)="onPhotoFileSelected(photoInput)" hidden />
+          <span class="file-picker-icon">📷</span>
+          <span class="file-picker-text">{{ photoFile()?.name ?? 'Choose a photo' }}</span>
         </label>
-        @if (photoFile(); as file) {
-          <p class="apply-file-name">{{ file.name }}</p>
-        }
       </div>
 
       @if (error()) {
