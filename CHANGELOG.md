@@ -2,6 +2,20 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-08 (4) — Optional photo upload on Become a Student
+
+- Applicants can attach a photo when applying to become a student, or skip it — reuses
+  the existing generic `/uploads` endpoint and the same upload pattern as donation proof
+  images. Editable later from Edit profile's Student application section while the
+  application is still pending.
+- New `photo_url` column on `student_applications`
+  (migration `2026-08-08-add-student-application-photo.sql`).
+- Admin panel's application review table (both list and card views) now shows the
+  uploaded photo as a thumbnail, linking to the full image.
+- Both backend and frontend now deployed to production and verified end-to-end on
+  Android: profile save, password change, and application submit/edit all confirmed
+  working against the live API.
+
 ## 2026-08-08 (3) — Users can now edit their own profile, password, and student application
 
 - New **Profile → Edit profile** page (mobile) with three independent sections:
