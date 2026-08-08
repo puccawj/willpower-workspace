@@ -15,12 +15,13 @@
 
   &.overlay {
     position: absolute;
-    // `max(16px, env(...))` wasn't enough clearance on iOS notch/status-bar devices —
-    // the button overlapped the system clock, unclickable there since it's outside the
-    // WebView's own hit-testing area. Fall back to a real status-bar-height estimate
-    // (44px) if the env() var isn't available, and add a bit of margin on top of it
-    // either way.
-    top: calc(env(safe-area-inset-top, 44px) + 8px);
+    // Still overlapping the iOS status bar clock after a first attempt using
+    // `env(safe-area-inset-top, 44px)` — that fallback only kicks in when the env() var
+    // is completely unsupported, not when it resolves to a too-small value, so it likely
+    // never applied at all. Force an actual guaranteed floor with max() instead —
+    // whichever of (a real fixed clearance) or (the safe-area inset plus margin) is
+    // larger always wins, regardless of what env() actually reports here.
+    top: max(54px, calc(env(safe-area-inset-top) + 8px));
     left: 16px;
     z-index: 2;
     margin-bottom: 0;
