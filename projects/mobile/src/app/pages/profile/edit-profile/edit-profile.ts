@@ -1,11 +1,13 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Observable, of, switchMap } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
 import {
   MeApiService,
   MyProfile,
   MyStudentApplication,
 } from '../../../core/services/me-api.service';
+import { UploadApiService } from '../../../core/services/upload-api.service';
 import { BackButton } from '../../../shared/back-button/back-button';
 
 function computeInitials(firstName: string, lastName: string): string {
@@ -29,6 +31,7 @@ const ROLE_LABELS: Record<string, string> = {
 export class EditProfile {
   private readonly auth = inject(AuthService);
   private readonly meApi = inject(MeApiService);
+  private readonly uploads = inject(UploadApiService);
 
   readonly loading = signal(true);
   readonly profile = signal<MyProfile | null>(null);
@@ -53,6 +56,7 @@ export class EditProfile {
   // Student application
   readonly application = signal<MyStudentApplication | null>(null);
   readonly appLineId = signal('');
+  readonly appPhotoFile = signal<File | null>(null);
   readonly appSaving = signal(false);
   readonly appSaved = signal(false);
   readonly appError = signal('');
@@ -148,20 +152,32 @@ export class EditProfile {
     });
   }
 
+  onAppPhotoFileSelected(input: HTMLInputElement): void {
+    this.appPhotoFile.set(input.files?.[0] ?? null);
+  }
+
   saveApplication(): void {
     this.appError.set('');
     this.appSaved.set(false);
 
     this.appSaving.set(true);
-    this.meApi
-      .updateStudentApplication({
-        lineId: this.appLineId().trim(),
-      })
+    const photoFile = this.appPhotoFile();
+    const photoUrl$: Observable<string | undefined> = photoFile ? this.uploads.uploadFile(photoFile) : of(undefined);
+    photoUrl$
+      .pipe(
+        switchMap((photoUrl) =>
+          this.meApi.updateStudentApplication({
+            lineId: this.appLineId().trim(),
+            photoUrl,
+          }),
+        ),
+      )
       .subscribe({
         next: (app) => {
           this.application.set(app);
           this.appSaving.set(false);
           this.appSaved.set(true);
+          this.appPhotoFile.set(null);
         },
         error: (err) => {
           this.appSaving.set(false);

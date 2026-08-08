@@ -14,6 +14,7 @@ export interface ApiStudentApplication {
   nickname: string;
   phone: string | null;
   lineId: string | null;
+  photoUrl: string | null;
   status: StudentApplicationStatus;
   reviewedBy: string | null;
   reviewedAt: string | null;

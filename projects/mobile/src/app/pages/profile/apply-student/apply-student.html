@@ -55,6 +55,15 @@
         <label class="muted-label">LINE ID (optional)</label>
         <input class="apply-input" [ngModel]="lineId()" (ngModelChange)="lineId.set($event)" name="lineId" />
       </div>
+      <div class="field-inline">
+        <label class="apply-file-label">
+          Photo (optional)
+          <input type="file" accept="image/*" #photoInput (change)="onPhotoFileSelected(photoInput)" />
+        </label>
+        @if (photoFile(); as file) {
+          <p class="apply-file-name">{{ file.name }}</p>
+        }
+      </div>
 
       @if (error()) {
         <p class="apply-error">{{ error() }}</p>

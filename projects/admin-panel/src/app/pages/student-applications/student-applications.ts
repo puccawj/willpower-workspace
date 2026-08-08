@@ -19,6 +19,7 @@ interface StudentApplicationRow {
   email: string;
   phone: string;
   lineId: string;
+  photoUrl: string | null;
   contactLabel: string;
   appliedLabel: string;
   status: 'pending' | 'approved' | 'rejected';
@@ -46,6 +47,7 @@ function toRow(a: ApiStudentApplication): StudentApplicationRow {
     email: a.email,
     phone: a.phone ?? '',
     lineId: a.lineId ?? '',
+    photoUrl: a.photoUrl,
     contactLabel: [a.phone, a.lineId ? `LINE: ${a.lineId}` : ''].filter(Boolean).join(' · ') || '—',
     appliedLabel: formatDateFull(new Date(a.createdAt)),
     status: a.status,

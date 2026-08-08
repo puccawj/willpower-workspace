@@ -92,6 +92,7 @@ export interface MyStudentApplication {
   nickname: string;
   phone: string | null;
   lineId: string | null;
+  photoUrl: string | null;
   status: StudentApplicationStatus;
   createdAt: string;
 }
@@ -103,6 +104,7 @@ export interface StudentApplicationRequest {
   nickname: string;
   phone?: string;
   lineId?: string;
+  photoUrl?: string;
 }
 
 export interface UpdateStudentApplicationRequest {
@@ -111,6 +113,7 @@ export interface UpdateStudentApplicationRequest {
   nickname?: string;
   phone?: string;
   lineId?: string;
+  photoUrl?: string;
 }
 
 export interface MyProfile {

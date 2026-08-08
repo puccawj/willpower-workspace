@@ -13,11 +13,18 @@
     <div class="card" style="padding:0;overflow:hidden">
       <table>
         <thead>
-          <tr><th>Name</th><th>Email</th><th>Contact</th><th>Applied</th><th>Status</th><th></th></tr>
+          <tr><th>Photo</th><th>Name</th><th>Email</th><th>Contact</th><th>Applied</th><th>Status</th><th></th></tr>
         </thead>
         <tbody>
           @for (a of ctrl.pageItems(); track a.id) {
             <tr class="row">
+              <td>
+                @if (a.photoUrl) {
+                  <a [href]="a.photoUrl" target="_blank" rel="noopener"><img [src]="a.photoUrl" alt="" class="applicant-photo" /></a>
+                } @else {
+                  <span class="muted-label">—</span>
+                }
+              </td>
               <td style="font-weight:500">{{ a.fullName }} <span class="muted-label">"{{ a.nickname }}"</span></td>
               <td>{{ a.email }}</td>
               <td>{{ a.contactLabel }}</td>
@@ -34,7 +41,7 @@
             </tr>
           }
           @if (!ctrl.pageItems().length) {
-            <tr><td colspan="6" class="state-empty">No {{ filter() === 'all' ? '' : filter() }} applications.</td></tr>
+            <tr><td colspan="7" class="state-empty">No {{ filter() === 'all' ? '' : filter() }} applications.</td></tr>
           }
         </tbody>
       </table>
@@ -44,6 +51,9 @@
       @for (a of ctrl.pageItems(); track a.id) {
         <div class="mcard">
           <div class="mcard-head">
+            @if (a.photoUrl) {
+              <a [href]="a.photoUrl" target="_blank" rel="noopener"><img [src]="a.photoUrl" alt="" class="applicant-photo" /></a>
+            }
             <h4 class="mcard-title">{{ a.fullName }} <span class="muted-label">"{{ a.nickname }}"</span></h4>
             <span class="badge badge-sm" [style.background]="a.statusColor">{{ a.statusLabel }}</span>
           </div>

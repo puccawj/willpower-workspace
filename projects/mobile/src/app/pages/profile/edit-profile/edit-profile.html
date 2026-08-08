@@ -106,6 +106,18 @@
             <label class="muted-label">LINE ID</label>
             <input class="edit-input" [ngModel]="appLineId()" (ngModelChange)="appLineId.set($event)" name="appLineId" />
           </div>
+          <div class="field-inline">
+            @if (app.photoUrl && !appPhotoFile()) {
+              <img [src]="app.photoUrl" alt="" class="app-photo-preview" />
+            }
+            <label class="edit-file-label">
+              {{ app.photoUrl ? 'Replace photo (optional)' : 'Photo (optional)' }}
+              <input type="file" accept="image/*" #appPhotoInput (change)="onAppPhotoFileSelected(appPhotoInput)" />
+            </label>
+            @if (appPhotoFile(); as file) {
+              <p class="edit-file-name">{{ file.name }}</p>
+            }
+          </div>
 
           @if (appError()) {
             <p class="edit-error">{{ appError() }}</p>
