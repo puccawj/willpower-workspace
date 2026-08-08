@@ -16,6 +16,7 @@
     @if (app.status === 'pending') {
       <div class="status-card status-pending">
         <p><strong>Application submitted.</strong> An admin will review it shortly — you'll be able to enroll in courses once approved.</p>
+        <a routerLink="/my/edit-profile" class="apply-edit-link">Edit your application →</a>
       </div>
     } @else if (app.status === 'rejected') {
       <div class="status-card status-rejected">
@@ -26,33 +27,41 @@
 
   @if (isGeneral() && (!application() || application()!.status === 'rejected')) {
     <form class="apply-form" (submit)="$event.preventDefault(); submit()">
+      <p class="apply-note">
+        Uses your name, nickname, phone, and email from your account profile — update those in
+        <a routerLink="/my/edit-profile">Edit profile</a> first if needed.
+      </p>
       <div class="field-inline">
-        <label class="muted-label">Email *</label>
-        <input class="form-input" type="email" [ngModel]="email()" (ngModelChange)="email.set($event)" name="email" required />
+        <label class="muted-label">Email</label>
+        <input class="form-input" [value]="profile()?.email ?? ''" disabled />
       </div>
       <div class="form-row">
         <div class="field-inline">
-          <label class="muted-label">Full name *</label>
-          <input class="form-input" [ngModel]="firstName()" (ngModelChange)="firstName.set($event)" name="firstName" required />
+          <label class="muted-label">Full name</label>
+          <input class="form-input" [value]="(profile()?.firstName ?? '') + ' ' + (profile()?.lastName ?? '')" disabled />
         </div>
         <div class="field-inline">
-          <label class="muted-label">Last name *</label>
-          <input class="form-input" [ngModel]="lastName()" (ngModelChange)="lastName.set($event)" name="lastName" required />
+          <label class="muted-label">Nickname</label>
+          <input class="form-input" [value]="profile()?.nickname ?? ''" disabled />
         </div>
-      </div>
-      <div class="field-inline">
-        <label class="muted-label">Nickname *</label>
-        <input class="form-input" [ngModel]="nickname()" (ngModelChange)="nickname.set($event)" name="nickname" required />
       </div>
       <div class="form-row">
         <div class="field-inline">
-          <label class="muted-label">Phone (optional)</label>
-          <input class="form-input" [ngModel]="phone()" (ngModelChange)="phone.set($event)" name="phone" />
+          <label class="muted-label">Phone</label>
+          <input class="form-input" [value]="profile()?.phoneNumber ?? ''" disabled />
         </div>
         <div class="field-inline">
           <label class="muted-label">LINE ID (optional)</label>
           <input class="form-input" [ngModel]="lineId()" (ngModelChange)="lineId.set($event)" name="lineId" />
         </div>
+      </div>
+      <div class="field-inline">
+        <label class="muted-label">Photo (optional)</label>
+        <label class="file-picker">
+          <input type="file" accept="image/*" #photoInput (change)="onPhotoFileSelected(photoInput)" hidden />
+          <span class="file-picker-icon">📷</span>
+          <span class="file-picker-text">{{ photoFile()?.name ?? 'Choose a photo' }}</span>
+        </label>
       </div>
 
       @if (error()) {

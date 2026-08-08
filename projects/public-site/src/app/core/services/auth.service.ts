@@ -92,6 +92,16 @@ export class AuthService {
     return this.session()?.token ?? null;
   }
 
+  updateUser(patch: Partial<StudentUser>): void {
+    const current = this.session();
+    if (!current) return;
+    const session: Session = { ...current, user: { ...current.user, ...patch } };
+    this.session.set(session);
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
+    }
+  }
+
   private callAndPersist(url: string, body: unknown, fallbackMessage: string): Observable<AuthOutcome> {
     return this.http.post<LoginResponse>(url, body).pipe(
       tap((res) => {

@@ -86,6 +86,13 @@ export type StudentApplicationStatus = 'pending' | 'approved' | 'rejected';
 
 export interface MyStudentApplication {
   id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  nickname: string;
+  phone: string | null;
+  lineId: string | null;
+  photoUrl: string | null;
   status: StudentApplicationStatus;
   createdAt: string;
 }
@@ -97,6 +104,42 @@ export interface StudentApplicationRequest {
   nickname: string;
   phone?: string;
   lineId?: string;
+  photoUrl?: string;
+}
+
+export interface UpdateStudentApplicationRequest {
+  firstName?: string;
+  lastName?: string;
+  nickname?: string;
+  phone?: string;
+  lineId?: string;
+  photoUrl?: string;
+}
+
+export interface MyProfile {
+  id: string;
+  firstName: string;
+  lastName: string;
+  nickname: string | null;
+  email: string;
+  phoneCountryCode: string | null;
+  phoneNumber: string | null;
+  role: string;
+  initials: string;
+  registrationSource: string;
+}
+
+export interface UpdateMyProfileRequest {
+  firstName?: string;
+  lastName?: string;
+  nickname?: string;
+  phoneCountryCode?: string;
+  phoneNumber?: string;
+}
+
+export interface ChangeMyPasswordRequest {
+  currentPassword: string;
+  newPassword: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -179,6 +222,22 @@ export class MeApiService {
 
   applyForStudent(dto: StudentApplicationRequest): Observable<MyStudentApplication> {
     return this.http.post<MyStudentApplication>(`${this.baseUrl}/student-application`, dto);
+  }
+
+  updateStudentApplication(dto: UpdateStudentApplicationRequest): Observable<MyStudentApplication> {
+    return this.http.patch<MyStudentApplication>(`${this.baseUrl}/student-application`, dto);
+  }
+
+  getProfile(): Observable<MyProfile> {
+    return this.http.get<MyProfile>(this.baseUrl);
+  }
+
+  updateProfile(dto: UpdateMyProfileRequest): Observable<MyProfile> {
+    return this.http.patch<MyProfile>(this.baseUrl, dto);
+  }
+
+  changePassword(dto: ChangeMyPasswordRequest): Observable<void> {
+    return this.http.patch<void>(`${this.baseUrl}/password`, dto);
   }
 
   loadAll(): void {

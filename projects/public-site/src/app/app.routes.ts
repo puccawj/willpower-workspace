@@ -12,6 +12,7 @@ import { Login } from './pages/login/login';
 import { Register } from './pages/register/register';
 import { MyShell } from './pages/my/my-shell/my-shell';
 import { MyDashboard } from './pages/my/my-dashboard/my-dashboard';
+import { EditProfile } from './pages/my/edit-profile/edit-profile';
 import { MyEvents } from './pages/my/my-events/my-events';
 import { MyCourses } from './pages/my/my-courses/my-courses';
 import { MyCertificates } from './pages/my/my-certificates/my-certificates';
@@ -38,6 +39,7 @@ export const routes: Routes = [
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
       { path: 'dashboard', component: MyDashboard },
+      { path: 'edit-profile', component: EditProfile },
       { path: 'events', component: MyEvents },
       { path: 'courses', component: MyCourses },
       { path: 'certificates', component: MyCertificates },
