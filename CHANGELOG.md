@@ -2,6 +2,22 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-08 (10) — Ad Hoc iOS distribution for devices TestFlight can't install on
+
+- TestFlight itself requires iOS 16+ — unrelated to this app, which targets iOS 15+ —
+  so a device stuck on an older iOS can't install TestFlight at all. Added an `adhoc`
+  CI build target that bypasses TestFlight entirely: registers the device via the App
+  Store Connect API (no manual Developer Portal clicking, just add it to
+  `ADHOC_DEVICES` in `ios/fastlane/Fastfile`), builds a signed Ad Hoc `.ipa`, and
+  publishes it to our own server at `https://wpusa.online/adhoc/` — opening the printed
+  `itms-services://` link in Safari on the device installs it directly.
+- New `/adhoc/` nginx location + volume mount on the production server for this — not
+  linked from the public site, verified it doesn't affect the existing public site, api,
+  or admin panel (all still return 200 after the nginx restart).
+- Needs a new `DEPLOY_SSH_KEY` GitHub secret (documented in `ios/SETUP.md`) before the
+  `adhoc` target can run — not yet set, since secrets can only be added by a repo admin
+  through the GitHub UI.
+
 ## 2026-08-08 (9) — Fixed: page titles overlapping the iPhone status bar on every tab
 
 - `.tab-content` (shared scroll container for Home/Events/Courses/Profile and everything
