@@ -68,9 +68,10 @@ platform :ios do
   # Devices that can install Ad Hoc builds directly (bypasses TestFlight, which itself
   # requires iOS 16+ — this doesn't). Add a device here, re-run this lane once, and its
   # test device installs from the link this lane prints, no App Store/TestFlight at all.
-  ADHOC_DEVICES = [
-    { name: "Pucca iPad", udid: "ae905033fb061b147bee272e6c67631a3ac1c9c9" },
-  ].freeze
+  # register_devices wants a Hash of { name => udid }, not an array.
+  ADHOC_DEVICES = {
+    "Pucca iPad" => "ae905033fb061b147bee272e6c67631a3ac1c9c9",
+  }.freeze
 
   desc "Build an Ad Hoc .ipa for registered test devices and publish it to our own server"
   lane :adhoc do
