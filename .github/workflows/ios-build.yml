@@ -173,13 +173,36 @@ jobs:
           </plist>
           PLIST
 
+          # iOS Safari generally refuses itms-services:// links typed/pasted directly
+          # into the address bar — only ones tapped from an actual page work reliably.
+          # This tiny page is that page: a plain HTML link, no JS needed.
+          cat > install.html <<HTML
+          <!doctype html>
+          <html>
+          <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+          <title>Install Willpower Institute (Ad Hoc)</title></head>
+          <body style="font-family:-apple-system,sans-serif;text-align:center;padding:60px 20px;">
+            <h1>Willpower Institute</h1>
+            <p>Ad Hoc test build — tap below on this device to install.</p>
+            <p>
+              <a href="itms-services://?action=download-manifest&amp;url=https://wpusa.online/adhoc/manifest.plist"
+                 style="display:inline-block;padding:14px 28px;background:#c6a24a;color:#fff;
+                        text-decoration:none;border-radius:8px;font-weight:600;">
+                Install
+              </a>
+            </p>
+            <p style="color:#888;font-size:13px;">Must be opened in Safari, not Chrome or another browser.</p>
+          </body>
+          </html>
+          HTML
+
           curl -sS -f -X POST -H "Authorization: Bearer $ADHOC_UPLOAD_TOKEN" \
             -F "file=@build/App.ipa" https://api.wpusa.online/internal/adhoc-upload/App.ipa
           curl -sS -f -X POST -H "Authorization: Bearer $ADHOC_UPLOAD_TOKEN" \
             -F "file=@manifest.plist" https://api.wpusa.online/internal/adhoc-upload/manifest.plist
+          curl -sS -f -X POST -H "Authorization: Bearer $ADHOC_UPLOAD_TOKEN" \
+            -F "file=@install.html" https://api.wpusa.online/internal/adhoc-upload/install.html
 
           echo "### 📲 Ad Hoc install link" >> $GITHUB_STEP_SUMMARY
-          echo "Open this on the registered device's **Safari** (not Chrome — itms-services links only work in Safari) to install directly, no TestFlight needed:" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          echo "itms-services://?action=download-manifest&url=https://wpusa.online/adhoc/manifest.plist" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "Open this on the registered device's **Safari** (not Chrome) and tap **Install** — typing the raw itms-services:// link into the address bar directly won't work on iOS:" >> $GITHUB_STEP_SUMMARY
+          echo "https://wpusa.online/adhoc/install.html" >> $GITHUB_STEP_SUMMARY

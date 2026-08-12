@@ -57,15 +57,16 @@ opened in Safari, hosted on our own server instead of Apple's.
    the small profile it offers — no Mac or cable needed).
 2. Trigger the workflow with **build_target = adhoc**. This registers the device via the
    App Store Connect API, regenerates the Ad Hoc provisioning profile to cover it,
-   builds, and uploads the `.ipa` + a `manifest.plist` over HTTPS to
-   `api.wpusa.online/internal/adhoc-upload/` (token-gated — see
+   builds, and uploads the `.ipa` + `manifest.plist` + a tiny `install.html` landing
+   page over HTTPS to `api.wpusa.online/internal/adhoc-upload/` (token-gated — see
    `api/src/adhoc-upload/`), which writes them into `~/willpower/adhoc-dist/` on the
    production server, served at `https://wpusa.online/adhoc/` (a location added to
    `nginx/default.conf` on the server specifically for this, not linked from the public
    site).
-3. Open the run's Job Summary for an `itms-services://` link — open that **in Safari on
-   the registered device** (must be Safari; other browsers don't handle that URL scheme)
-   to trigger a native install prompt directly.
+3. Open the run's Job Summary for the `https://wpusa.online/adhoc/install.html` link —
+   open that **in Safari on the registered device** (must be Safari) and tap **Install**.
+   iOS Safari generally refuses `itms-services://` links typed or pasted directly into
+   the address bar, so this page exists purely to give it a real link to tap instead.
 
 Re-running with build_target = adhoc for a later code change re-uses the same device
 list and overwrites the same `.ipa`/manifest on the server — the install link doesn't
