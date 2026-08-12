@@ -2,6 +2,25 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-12 (1) — LINE ID and photo stay editable in Edit Profile after approval
+
+- LINE ID and photo previously lived only on the student application record, editable
+  while status was `pending` — once an admin approved the application, the edit form
+  disappeared and both became permanently locked with no way to update them again.
+- Promoted both to the account profile itself (new `line_id`/`photo_url` columns on
+  `users`, migration `2026-08-12-add-user-lineid-photo.sql`), alongside nickname/phone
+  which were already there. Now always editable in **Edit Profile → Your details**,
+  regardless of application status, on both mobile and the website
+  (https://wpusa.online).
+- **Become a Student** now shows LINE ID and photo read-only, pulled from the profile —
+  like name/nickname/phone already were — instead of asking for them again. Edit
+  Profile's "Student application" section dropped its now-redundant edit form entirely,
+  showing only status text.
+- Verified end-to-end on production (both Android via CDP and the website via
+  Playwright): fields render and save correctly in Edit Profile for an already-approved
+  account, Become a Student displays the same saved value read-only, and the Student
+  application section shows no form. Zero console errors.
+
 ## 2026-08-08 (10) — Ad Hoc iOS distribution for devices TestFlight can't install on
 
 - TestFlight itself requires iOS 16+ — unrelated to this app, which targets iOS 15+ —
