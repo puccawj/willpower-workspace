@@ -6,10 +6,14 @@ name: iOS build → TestFlight
 on:
   workflow_dispatch:
     inputs:
-      bootstrap_certs:
-        description: "One-time: generate + push the initial signing certificate to the match repo"
-        type: boolean
-        default: false
+      build_target:
+        description: "What to build"
+        type: choice
+        options:
+          - testflight
+          - adhoc
+          - bootstrap_certs
+        default: testflight
 
 jobs:
   build:
@@ -79,7 +83,7 @@ jobs:
           bundler-cache: true
 
       - name: Bootstrap signing certificate (manual, one-time)
-        if: ${{ inputs.bootstrap_certs }}
+        if: ${{ inputs.build_target == 'bootstrap_certs' }}
         working-directory: ios
         env:
           MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
@@ -93,7 +97,7 @@ jobs:
         run: bundle exec fastlane ios bootstrap_certs
 
       - name: Build and upload to TestFlight
-        if: ${{ !inputs.bootstrap_certs }}
+        if: ${{ inputs.build_target == 'testflight' }}
         working-directory: ios
         env:
           MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
@@ -105,3 +109,76 @@ jobs:
           APPLE_DEVELOPER_TEAM_ID: ${{ secrets.APPLE_DEVELOPER_TEAM_ID }}
           APP_STORE_CONNECT_TEAM_ID: ${{ secrets.APP_STORE_CONNECT_TEAM_ID }}
         run: bundle exec fastlane ios beta
+
+      - name: Build Ad Hoc .ipa for registered test devices
+        # Installs directly on devices registered in ADHOC_DEVICES (Fastfile), bypassing
+        # TestFlight entirely — for devices stuck on an iOS version too old for the
+        # TestFlight app itself (it requires iOS 16+; this app's own minimum is iOS 15).
+        if: ${{ inputs.build_target == 'adhoc' }}
+        working-directory: ios
+        env:
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
+          APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_KEY_CONTENT }}
+          APPLE_DEVELOPER_TEAM_ID: ${{ secrets.APPLE_DEVELOPER_TEAM_ID }}
+        run: bundle exec fastlane ios adhoc
+
+      - name: Publish Ad Hoc build to our own server
+        # No TestFlight/App Store involved at all — scp's the signed .ipa plus a
+        # manifest.plist straight to the same server hosting api.wpusa.online, behind the
+        # new /adhoc/ nginx location. Opening the itms-services:// link this step prints
+        # in Safari on a registered device triggers a native install prompt directly.
+        if: ${{ inputs.build_target == 'adhoc' }}
+        working-directory: ios
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H 47.130.132.126 >> ~/.ssh/known_hosts 2>/dev/null
+
+          cat > manifest.plist <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>items</key>
+            <array>
+              <dict>
+                <key>assets</key>
+                <array>
+                  <dict>
+                    <key>kind</key>
+                    <string>software-package</string>
+                    <key>url</key>
+                    <string>https://wpusa.online/adhoc/App.ipa</string>
+                  </dict>
+                </array>
+                <key>metadata</key>
+                <dict>
+                  <key>bundle-identifier</key>
+                  <string>org.willpowerinstitute.app</string>
+                  <key>bundle-version</key>
+                  <string>${{ github.run_number }}</string>
+                  <key>kind</key>
+                  <string>software</string>
+                  <key>title</key>
+                  <string>Willpower Institute (Ad Hoc)</string>
+                </dict>
+              </dict>
+            </array>
+          </dict>
+          </plist>
+          PLIST
+
+          scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no build/App.ipa manifest.plist ubuntu@47.130.132.126:~/willpower/adhoc-dist/
+
+          echo "### 📲 Ad Hoc install link" >> $GITHUB_STEP_SUMMARY
+          echo "Open this on the registered device's **Safari** (not Chrome — itms-services links only work in Safari) to install directly, no TestFlight needed:" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "itms-services://?action=download-manifest&url=https://wpusa.online/adhoc/manifest.plist" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY

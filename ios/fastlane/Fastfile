@@ -64,4 +64,63 @@ platform :ios do
     )
     match(type: "appstore", api_key: api_key, readonly: false, git_basic_authorization: ENV["MATCH_GIT_BASIC_AUTHORIZATION"])
   end
+
+  # Devices that can install Ad Hoc builds directly (bypasses TestFlight, which itself
+  # requires iOS 16+ — this doesn't). Add a device here, re-run this lane once, and its
+  # test device installs from the link this lane prints, no App Store/TestFlight at all.
+  ADHOC_DEVICES = [
+    { name: "Pucca iPad", udid: "ae905033fb061b147bee272e6c67631a3ac1c9c9" },
+  ].freeze
+
+  desc "Build an Ad Hoc .ipa for registered test devices and publish it to our own server"
+  lane :adhoc do
+    setup_ci
+
+    api_key = app_store_connect_api_key(
+      key_id: ENV["APP_STORE_CONNECT_KEY_ID"],
+      issuer_id: ENV["APP_STORE_CONNECT_ISSUER_ID"],
+      key_content: ENV["APP_STORE_CONNECT_KEY_CONTENT"],
+      is_key_content_base64: true,
+    )
+
+    # Registering an already-registered UDID is a harmless no-op, so it's safe to always
+    # run this against the full list rather than tracking which devices are new.
+    register_devices(devices: ADHOC_DEVICES, api_key: api_key)
+
+    # force_for_new_devices regenerates the Ad Hoc profile automatically if it doesn't
+    # already cover every currently-registered device — without it, a newly-registered
+    # device would still fail to install even though its UDID is on file.
+    match(
+      type: "adhoc",
+      api_key: api_key,
+      readonly: false,
+      force_for_new_devices: true,
+      git_basic_authorization: ENV["MATCH_GIT_BASIC_AUTHORIZATION"],
+    )
+
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path: "App/App.xcodeproj",
+      team_id: ENV["APPLE_DEVELOPER_TEAM_ID"],
+      code_sign_identity: "Apple Distribution",
+      bundle_identifier: "org.willpowerinstitute.app",
+      profile_name: "match AdHoc org.willpowerinstitute.app",
+    )
+
+    build_number = ENV["GITHUB_RUN_NUMBER"] || Time.now.strftime("%Y%m%d%H%M")
+    increment_build_number(xcodeproj: "App/App.xcodeproj", build_number: build_number)
+
+    build_app(
+      project: "App/App.xcodeproj",
+      scheme: "App",
+      export_method: "ad-hoc",
+      output_directory: "build",
+      output_name: "App.ipa",
+      export_options: {
+        provisioningProfiles: {
+          "org.willpowerinstitute.app" => "match AdHoc org.willpowerinstitute.app",
+        },
+      },
+    )
+  end
 end
