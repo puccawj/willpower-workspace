@@ -15,7 +15,7 @@ set these as **GitHub repo secrets** (Settings → Secrets and variables → Act
 | `MATCH_PASSWORD` | Any passphrase you make up — encrypts the certificate before it's pushed to the certs repo |
 | `MATCH_GIT_BASIC_AUTHORIZATION` | Required because the certs repo above is private and `actions/checkout` only authenticates the main repo, not other ones `match` needs to `git clone`. Create a GitHub **classic** Personal Access Token (Settings → Developer settings → Personal access tokens → Generate new token (classic), scope: `repo`), then base64-encode `<github-username>:<token>` — e.g. `printf '%s' "puccawj:ghp_xxxx" \| base64` (Mac/Linux) or `[Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes("puccawj:ghp_xxxx"))` (PowerShell) |
 | `APPETIZE_API_TOKEN` | Optional — only needed to test builds in-browser via [appetize.io](https://appetize.io) without an iPhone. Get it from your Appetize account (Settings → API). Every run uploads a simulator build and prints a test link in the run's Job Summary. |
-| `DEPLOY_SSH_KEY` | Only needed for the **adhoc** build target (below). The private key content of `D:/aws-key/willpower-usa.pem` (or whichever key SSHes into the production server as `ubuntu@47.130.132.126`) — paste the whole file including the `-----BEGIN...` / `-----END...` lines. Used only to `scp` the Ad Hoc `.ipa` there; never touches TestFlight secrets. |
+| `ADHOC_UPLOAD_TOKEN` | Only needed for the **adhoc** build target (below). A random string (already generated and set as `ADHOC_UPLOAD_TOKEN` in the production server's `.env` — copy the same value here so CI can authenticate to it: `POST /internal/adhoc-upload/:filename` on the API, gated by this token). Not an SSH key — the GitHub-hosted runner's IP can't reach the server's SSH port at all (it's locked to specific IPs, confirmed by a real "Operation timed out" failure), so this uploads over HTTPS to the API instead. |
 
 ## Also required before the app will build correctly
 
@@ -57,8 +57,10 @@ opened in Safari, hosted on our own server instead of Apple's.
    the small profile it offers — no Mac or cable needed).
 2. Trigger the workflow with **build_target = adhoc**. This registers the device via the
    App Store Connect API, regenerates the Ad Hoc provisioning profile to cover it,
-   builds, and `scp`s the `.ipa` + a `manifest.plist` to `~/willpower/adhoc-dist/` on the
-   production server (served at `https://wpusa.online/adhoc/` — a location added to
+   builds, and uploads the `.ipa` + a `manifest.plist` over HTTPS to
+   `api.wpusa.online/internal/adhoc-upload/` (token-gated — see
+   `api/src/adhoc-upload/`), which writes them into `~/willpower/adhoc-dist/` on the
+   production server, served at `https://wpusa.online/adhoc/` (a location added to
    `nginx/default.conf` on the server specifically for this, not linked from the public
    site).
 3. Open the run's Job Summary for an `itms-services://` link — open that **in Safari on
