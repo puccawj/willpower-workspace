@@ -14,9 +14,16 @@ Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 - New `/adhoc/` nginx location + volume mount on the production server for this — not
   linked from the public site, verified it doesn't affect the existing public site, api,
   or admin panel (all still return 200 after the nginx restart).
-- Needs a new `DEPLOY_SSH_KEY` GitHub secret (documented in `ios/SETUP.md`) before the
-  `adhoc` target can run — not yet set, since secrets can only be added by a repo admin
-  through the GitHub UI.
+- The GitHub-hosted CI runner can't reach the server's SSH port at all (locked to
+  specific IPs, doesn't include GitHub's ever-changing runner IPs — confirmed by a real
+  "Operation timed out" failure), so publishing goes over HTTPS instead: a new
+  token-gated `POST /internal/adhoc-upload/:filename` endpoint (`api/src/adhoc-upload/`)
+  writes the uploaded `.ipa`/`manifest.plist` into the same server directory nginx
+  serves. Verified directly: valid upload succeeds, wrong token → 401, disallowed
+  filename → 400, uploaded file correctly serves back through `/adhoc/`.
+- Needs a new `ADHOC_UPLOAD_TOKEN` GitHub secret (documented in `ios/SETUP.md`, value
+  already generated and set on the server) before the `adhoc` target can run — not yet
+  set on GitHub, since secrets can only be added by a repo admin through the GitHub UI.
 
 ## 2026-08-08 (9) — Fixed: page titles overlapping the iPhone status bar on every tab
 
