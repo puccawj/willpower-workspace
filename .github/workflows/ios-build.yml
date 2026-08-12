@@ -139,7 +139,10 @@ jobs:
           mkdir -p ~/.ssh
           echo "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H 47.130.132.126 >> ~/.ssh/known_hosts 2>/dev/null
+          # scp below already uses StrictHostKeyChecking=no, so no need to pre-populate
+          # known_hosts via ssh-keyscan — and under `bash -e`, a failed ssh-keyscan (e.g.
+          # network hiccup) would silently kill this whole step with no visible error,
+          # since its stderr was being thrown away.
 
           cat > manifest.plist <<PLIST
           <?xml version="1.0" encoding="UTF-8"?>
