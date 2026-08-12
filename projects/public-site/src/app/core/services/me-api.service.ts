@@ -124,6 +124,8 @@ export interface MyProfile {
   email: string;
   phoneCountryCode: string | null;
   phoneNumber: string | null;
+  lineId: string | null;
+  photoUrl: string | null;
   role: string;
   initials: string;
   registrationSource: string;
@@ -135,6 +137,8 @@ export interface UpdateMyProfileRequest {
   nickname?: string;
   phoneCountryCode?: string;
   phoneNumber?: string;
+  lineId?: string;
+  photoUrl?: string;
 }
 
 export interface ChangeMyPasswordRequest {

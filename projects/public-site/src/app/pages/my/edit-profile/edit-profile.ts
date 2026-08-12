@@ -37,11 +37,15 @@ export class EditProfile {
   readonly loading = signal(true);
   readonly profile = signal<MyProfile | null>(null);
 
-  // Profile fields
+  // Profile fields — nickname, phone, LINE ID, and photo all live on the account
+  // profile itself, so they stay editable here regardless of student application
+  // status instead of getting locked once an application is approved.
   readonly firstName = signal('');
   readonly lastName = signal('');
   readonly nickname = signal('');
   readonly phoneNumber = signal('');
+  readonly lineId = signal('');
+  readonly photoFile = signal<File | null>(null);
   readonly profileSaving = signal(false);
   readonly profileError = signal('');
 
@@ -52,12 +56,9 @@ export class EditProfile {
   readonly passwordSaving = signal(false);
   readonly passwordError = signal('');
 
-  // Student application
+  // Student application — status only; its personal-info fields all come from the
+  // profile above now, nothing left here to edit.
   readonly application = signal<MyStudentApplication | null>(null);
-  readonly appLineId = signal('');
-  readonly appPhotoFile = signal<File | null>(null);
-  readonly appSaving = signal(false);
-  readonly appError = signal('');
 
   readonly canChangePassword = () => this.profile()?.registrationSource === 'self';
   readonly roleLabel = () => ROLE_LABELS[this.auth.currentUser()?.role ?? ''] ?? this.auth.currentUser()?.role ?? '';
@@ -70,19 +71,19 @@ export class EditProfile {
         this.lastName.set(p.lastName);
         this.nickname.set(p.nickname ?? '');
         this.phoneNumber.set(p.phoneNumber ?? '');
+        this.lineId.set(p.lineId ?? '');
         this.loading.set(false);
       },
       error: () => this.loading.set(false),
     });
 
     this.meApi.myStudentApplication().subscribe({
-      next: (app) => {
-        this.application.set(app);
-        if (app) {
-          this.appLineId.set(app.lineId ?? '');
-        }
-      },
+      next: (app) => this.application.set(app),
     });
+  }
+
+  onPhotoFileSelected(input: HTMLInputElement): void {
+    this.photoFile.set(input.files?.[0] ?? null);
   }
 
   saveProfile(): void {
@@ -93,17 +94,26 @@ export class EditProfile {
     }
 
     this.profileSaving.set(true);
-    this.meApi
-      .updateProfile({
-        firstName: this.firstName().trim(),
-        lastName: this.lastName().trim(),
-        nickname: this.nickname().trim(),
-        phoneNumber: this.phoneNumber().trim(),
-      })
+    const photoFile = this.photoFile();
+    const photoUrl$: Observable<string | undefined> = photoFile ? this.uploads.uploadFile(photoFile) : of(undefined);
+    photoUrl$
+      .pipe(
+        switchMap((photoUrl) =>
+          this.meApi.updateProfile({
+            firstName: this.firstName().trim(),
+            lastName: this.lastName().trim(),
+            nickname: this.nickname().trim(),
+            phoneNumber: this.phoneNumber().trim(),
+            lineId: this.lineId().trim(),
+            photoUrl,
+          }),
+        ),
+      )
       .subscribe({
         next: (p) => {
           this.profile.set(p);
           this.profileSaving.set(false);
+          this.photoFile.set(null);
           this.auth.updateUser({
             name: `${p.firstName} ${p.lastName}`.trim(),
             initials: computeInitials(p.firstName, p.lastName),
@@ -150,40 +160,5 @@ export class EditProfile {
         this.toast.show(message, 'error');
       },
     });
-  }
-
-  onAppPhotoFileSelected(input: HTMLInputElement): void {
-    this.appPhotoFile.set(input.files?.[0] ?? null);
-  }
-
-  saveApplication(): void {
-    this.appError.set('');
-
-    this.appSaving.set(true);
-    const photoFile = this.appPhotoFile();
-    const photoUrl$: Observable<string | undefined> = photoFile ? this.uploads.uploadFile(photoFile) : of(undefined);
-    photoUrl$
-      .pipe(
-        switchMap((photoUrl) =>
-          this.meApi.updateStudentApplication({
-            lineId: this.appLineId().trim(),
-            photoUrl,
-          }),
-        ),
-      )
-      .subscribe({
-        next: (app) => {
-          this.application.set(app);
-          this.appSaving.set(false);
-          this.appPhotoFile.set(null);
-          this.toast.show('Application updated.', 'success');
-        },
-        error: (err) => {
-          this.appSaving.set(false);
-          const message = err?.error?.message ?? 'Could not save your application right now.';
-          this.appError.set(message);
-          this.toast.show(message, 'error');
-        },
-      });
   }
 }

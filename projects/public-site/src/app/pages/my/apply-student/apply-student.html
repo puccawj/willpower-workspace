@@ -28,8 +28,8 @@
   @if (isGeneral() && (!application() || application()!.status === 'rejected')) {
     <form class="apply-form" (submit)="$event.preventDefault(); submit()">
       <p class="apply-note">
-        Uses your name, nickname, phone, and email from your account profile — update those in
-        <a routerLink="/my/edit-profile">Edit profile</a> first if needed.
+        Uses your name, nickname, phone, LINE ID, and photo from your account profile —
+        update those in <a routerLink="/my/edit-profile">Edit profile</a> first if needed.
       </p>
       <div class="field-inline">
         <label class="muted-label">Email</label>
@@ -51,18 +51,16 @@
           <input class="form-input" [value]="profile()?.phoneNumber ?? ''" disabled />
         </div>
         <div class="field-inline">
-          <label class="muted-label">LINE ID (optional)</label>
-          <input class="form-input" [ngModel]="lineId()" (ngModelChange)="lineId.set($event)" name="lineId" />
+          <label class="muted-label">LINE ID</label>
+          <input class="form-input" [value]="profile()?.lineId ?? ''" disabled />
         </div>
       </div>
-      <div class="field-inline">
-        <label class="muted-label">Photo (optional)</label>
-        <label class="file-picker">
-          <input type="file" accept="image/*" #photoInput (change)="onPhotoFileSelected(photoInput)" hidden />
-          <span class="file-picker-icon">📷</span>
-          <span class="file-picker-text">{{ photoFile()?.name ?? 'Choose a photo' }}</span>
-        </label>
-      </div>
+      @if (profile()?.photoUrl) {
+        <div class="field-inline">
+          <label class="muted-label">Photo</label>
+          <img [src]="profile()?.photoUrl" alt="" class="apply-photo-preview" />
+        </div>
+      }
 
       @if (error()) {
         <p class="form-error">{{ error() }}</p>
