@@ -28,6 +28,11 @@ Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
   was far too small for an iOS app bundle. Added `client_max_body_size 200m;` to the
   `api.wpusa.online` server block. Verified with a real 5MB upload (201) plus confirmed
   no other server (public site, admin) was affected by the nginx reload.
+- Fixed "address is invalid" when opening the raw `itms-services://` link: iOS Safari
+  refuses that scheme typed/pasted directly into the address bar, it only reliably
+  triggers from a link actually tapped on a page. CI now generates and uploads a tiny
+  `install.html` landing page (styled Install button → same manifest.plist) alongside
+  the `.ipa`; the Job Summary now points to that page's URL instead of the raw link.
 
 ## 2026-08-08 (9) — Fixed: page titles overlapping the iPhone status bar on every tab
 
