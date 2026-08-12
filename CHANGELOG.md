@@ -24,6 +24,10 @@ Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 - Needs a new `ADHOC_UPLOAD_TOKEN` GitHub secret (documented in `ios/SETUP.md`, value
   already generated and set on the server) before the `adhoc` target can run — not yet
   set on GitHub, since secrets can only be added by a repo admin through the GitHub UI.
+- Fixed a 413 on the actual `.ipa` upload: nginx's default `client_max_body_size` (1MB)
+  was far too small for an iOS app bundle. Added `client_max_body_size 200m;` to the
+  `api.wpusa.online` server block. Verified with a real 5MB upload (201) plus confirmed
+  no other server (public site, admin) was affected by the nginx reload.
 
 ## 2026-08-08 (9) — Fixed: page titles overlapping the iPhone status bar on every tab
 
