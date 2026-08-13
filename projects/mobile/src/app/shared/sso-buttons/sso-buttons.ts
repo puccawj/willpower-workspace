@@ -36,10 +36,6 @@ export class SsoButtons implements OnInit {
 
   readonly googleConfigured = !!environment.googleClientId;
   readonly facebookConfigured = !!environment.facebookAppId;
-  // Apple's native Sign In With Apple flow only works on iOS without extra server
-  // infrastructure (Android needs a web-redirect server per the plugin's own docs,
-  // which this app doesn't have) — App Store guideline 4.8 only requires it there anyway.
-  readonly appleConfigured = Capacitor.getPlatform() === 'ios';
 
   async ngOnInit(): Promise<void> {
     if (this.googleConfigured) {
@@ -61,14 +57,6 @@ export class SsoButtons implements OnInit {
         });
       } catch (err) {
         console.error('Facebook SocialLogin.initialize failed:', err);
-      }
-    }
-
-    if (this.appleConfigured) {
-      try {
-        await SocialLogin.initialize({ apple: { clientId: 'org.willpowerinstitute.app' } });
-      } catch (err) {
-        console.error('Apple SocialLogin.initialize failed:', err);
       }
     }
   }
@@ -107,24 +95,6 @@ export class SsoButtons implements OnInit {
       });
     } catch (err) {
       this.failure.emit(errorMessage(err, 'Facebook sign-in was cancelled.'));
-    }
-  }
-
-  async continueWithApple(): Promise<void> {
-    try {
-      const { result } = await SocialLogin.login({ provider: 'apple', options: { scopes: ['email', 'name'] } });
-      const idToken = result.idToken;
-      if (!idToken) {
-        this.failure.emit('Apple sign-in was cancelled.');
-        return;
-      }
-      const fullName = [result.profile.givenName, result.profile.familyName].filter(Boolean).join(' ') || undefined;
-      this.auth.loginWithApple(idToken, fullName, this.mode === 'register').subscribe((res) => {
-        if (res.ok) this.success.emit();
-        else this.failure.emit(res.message);
-      });
-    } catch (err) {
-      this.failure.emit(errorMessage(err, 'Apple sign-in was cancelled.'));
     }
   }
 }

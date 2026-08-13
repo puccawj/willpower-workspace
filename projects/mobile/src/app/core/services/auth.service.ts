@@ -88,14 +88,6 @@ export class AuthService {
     );
   }
 
-  loginWithApple(idToken: string, fullName: string | undefined, allowCreate: boolean): Observable<AuthOutcome> {
-    return this.callAndPersist(
-      `${environment.apiUrl}/auth/apple`,
-      { idToken, fullName, allowCreate },
-      'Apple sign-in failed.',
-    );
-  }
-
   logout(): void {
     this.session.set(null);
     void Preferences.remove({ key: STORAGE_KEY });

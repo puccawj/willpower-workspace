@@ -20,7 +20,8 @@ set these as **GitHub repo secrets** (Settings → Secrets and variables → Act
 ## Also required before the app will build correctly
 
 1. **App ID** — create `org.willpowerinstitute.app` in Apple Developer Portal → Identifiers,
-   with capabilities: **Push Notifications**, **Sign In with Apple**.
+   with capability: **Push Notifications**. (Sign In with Apple was removed from the app —
+   no capability needed for it.)
 2. **APNs key** — Developer Portal → Keys → create one with "Apple Push Notifications
    service" enabled, then upload it in Firebase Console → Project Settings → Cloud
    Messaging → Apple app configuration. Without this, push notifications silently fail
