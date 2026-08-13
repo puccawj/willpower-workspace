@@ -2,6 +2,15 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-13 (1) — Removed Sign in with Apple
+
+- Dropped the Apple button from mobile's login/register (public-site never had one),
+  `POST /auth/apple` and its identity-token verification on the backend, and the unused
+  `com.apple.developer.applesignin` iOS entitlement. Google/Facebook sign-in unaffected.
+- **Flag:** App Store guideline 4.8 requires offering Sign in with Apple whenever other
+  third-party sign-in (Google/Facebook) is offered — this was a deliberate product
+  decision, noting it here in case it affects a future App Store submission.
+
 ## 2026-08-12 (1) — LINE ID and photo stay editable in Edit Profile after approval
 
 - LINE ID and photo previously lived only on the student application record, editable
