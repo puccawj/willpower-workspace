@@ -71,7 +71,11 @@ export class EventDetail {
 
   readonly eventEnded = computed(() => this.event()?.when === 'past');
 
+  /** Rating is only allowed once the event is over and the user actually checked in — see attendance.service.ts assertCanRate. */
+  readonly canRate = computed(() => this.eventEnded() && this.checkedIn());
+
   readonly rsvpClosed = computed(() => {
+    if (this.checkedIn()) return true;
     if (this.eventEnded()) return true;
     const cutoff = this.event()?.rsvpCutoffAt;
     return !!cutoff && new Date() > new Date(cutoff);
@@ -117,7 +121,7 @@ export class EventDetail {
       this.router.navigate(['/login'], { queryParams: { returnUrl: `/events/${this.eventId}` } });
       return;
     }
-    if (!this.myStars()) return;
+    if (!this.myStars() || !this.canRate()) return;
 
     this.ratingSaving.set(true);
     this.ratingSaved.set(false);

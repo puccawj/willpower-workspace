@@ -35,7 +35,13 @@
         <div class="section-heading rsvp-heading">Will you attend?</div>
         @if (rsvpClosed()) {
           <p class="rsvp-closed-note">
-            {{ eventEnded() ? 'This event has already ended.' : 'RSVPs closed on ' + rsvpCutoffLabel() + '.' }}
+            {{
+              checkedIn()
+                ? 'You’re already checked in — RSVP can no longer be changed.'
+                : eventEnded()
+                  ? 'This event has already ended.'
+                  : 'RSVPs closed on ' + rsvpCutoffLabel() + '.'
+            }}
           </p>
         } @else {
           <div class="rsvp-list">
@@ -67,7 +73,7 @@
         }
       </div>
 
-      @if (isLoggedIn()) {
+      @if (isLoggedIn() && canRate()) {
         <div class="rsvp-card rating-card">
           <div class="section-heading">Rate this event</div>
           <div class="rating-input" (mouseleave)="setHoverStars(0)">
@@ -92,6 +98,16 @@
           @if (ratingSaved()) {
             <p class="rating-saved-note">Thanks for your feedback!</p>
           }
+        </div>
+      } @else if (isLoggedIn() && !eventEnded()) {
+        <div class="rsvp-card rating-card">
+          <div class="section-heading">Rate this event</div>
+          <p class="muted-label">You can rate this event after it ends.</p>
+        </div>
+      } @else if (isLoggedIn() && eventEnded() && !checkedIn()) {
+        <div class="rsvp-card rating-card">
+          <div class="section-heading">Rate this event</div>
+          <p class="muted-label">Only attendees who checked in can rate this event.</p>
         </div>
       }
 

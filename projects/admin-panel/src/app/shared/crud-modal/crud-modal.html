@@ -8,11 +8,12 @@
 
       <div class="dialog-fields" [class.two-col]="cfg.fields.length > 4">
         @for (f of cfg.fields; track f.key) {
+          @if (isFieldVisible(f)) {
           <div class="field" [class.field-full]="f.type === 'image' || f.type === 'textarea'">
             <label class="field-label">
               {{ f.label }}
-              @if (f.hint && f.type !== 'image') {
-                <span class="field-hint-inline">{{ f.hint }}</span>
+              @if (fieldHint(f) && f.type !== 'image') {
+                <span class="field-hint-inline">{{ fieldHint(f) }}</span>
               }
             </label>
             @switch (f.type) {
@@ -207,6 +208,7 @@
               }
             }
           </div>
+          }
         }
       </div>
 

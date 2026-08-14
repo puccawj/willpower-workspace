@@ -180,7 +180,12 @@ export class PdfService {
    * fit the page and distorting it whenever the upload isn't already A4-landscape shaped.
    */
   private async fetchImageAsDataUri(url: string, targetAspect: number): Promise<{ dataUri: string; format: string }> {
-    const res = await fetch(url);
+    // Force a fresh network fetch — this exact URL is often already in the HTTP cache from a plain,
+    // non-CORS <img> preview shown moments earlier (e.g. the certificate preview modal, or the
+    // Certificate Templates thumbnail/designer). Reusing that cached response here fails the CORS
+    // check even though the resource itself is publicly readable, since it wasn't originally
+    // fetched in CORS mode.
+    const res = await fetch(url, { cache: 'reload' });
     const blob = await res.blob();
     const bitmap = await createImageBitmap(blob);
 

@@ -54,6 +54,21 @@ export class CrudModal {
     this.modal.setFieldValue(key, value);
   }
 
+  isFieldVisible(field: FieldDef): boolean {
+    const values = this.modal.config()?.values;
+    if (!values || !field.hiddenWhen) return true;
+    return !field.hiddenWhen(values);
+  }
+
+  fieldHint(field: FieldDef): string | undefined {
+    const values = this.modal.config()?.values;
+    if (values && field.hintWhen) {
+      const dynamic = field.hintWhen(values);
+      if (dynamic !== undefined) return dynamic;
+    }
+    return field.hint;
+  }
+
   onImageSelected(key: string, input: HTMLInputElement): void {
     const file = input.files?.[0];
     if (!file) return;

@@ -67,8 +67,8 @@ export class CertificateTemplateApiService {
   }
 
   /** Persists just the drag-designer's field positions/kicker text for a template. */
-  saveLayout(id: string, layoutConfig: CertLayoutConfig): Observable<ApiCertificateTemplate> {
-    return this.http.patch<ApiCertificateTemplate>(`${this.baseUrl}/${id}`, { layoutConfig });
+  saveLayout(id: string, layoutConfig: CertLayoutConfig) {
+    return this.http.patch<ApiCertificateTemplate>(`${this.baseUrl}/${id}`, { layoutConfig }).pipe(switchMap(() => this.load()));
   }
 
   findActiveForBranch(branchId: string | null, type: ApiTemplateType = 'certificate'): Observable<ApiCertificateTemplate | null> {

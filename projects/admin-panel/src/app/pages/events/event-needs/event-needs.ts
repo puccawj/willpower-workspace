@@ -88,8 +88,19 @@ export class EventNeeds {
       fields: [
         { key: 'title', label: 'Title', type: 'text' },
         { key: 'type', label: 'Type', type: 'select', options: ['Goods', 'Money'] },
-        { key: 'unit', label: 'Unit (e.g. bags, pieces) — goods only', type: 'text' },
-        { key: 'targetQuantity', label: 'Target quantity', type: 'number', min: 0 },
+        {
+          key: 'unit',
+          label: 'Unit (e.g. bags, pieces)',
+          type: 'text',
+          hiddenWhen: (v) => String(v['type']).toLowerCase() === 'money',
+        },
+        {
+          key: 'targetQuantity',
+          label: 'Amount',
+          type: 'number',
+          min: 0,
+          hintWhen: (v) => (String(v['type']).toLowerCase() === 'money' ? 'in USD ($)' : undefined),
+        },
       ],
       isEdit: false,
       values: { title: '', type: 'Goods', unit: '', targetQuantity: 1 },
@@ -124,8 +135,19 @@ export class EventNeeds {
       fields: [
         { key: 'title', label: 'Title', type: 'text' },
         { key: 'type', label: 'Type', type: 'select', options: ['Goods', 'Money'] },
-        { key: 'unit', label: 'Unit (e.g. bags, pieces) — goods only', type: 'text' },
-        { key: 'targetQuantity', label: 'Target quantity', type: 'number', min: 0 },
+        {
+          key: 'unit',
+          label: 'Unit (e.g. bags, pieces)',
+          type: 'text',
+          hiddenWhen: (v) => String(v['type']).toLowerCase() === 'money',
+        },
+        {
+          key: 'targetQuantity',
+          label: 'Amount',
+          type: 'number',
+          min: 0,
+          hintWhen: (v) => (String(v['type']).toLowerCase() === 'money' ? 'in USD ($)' : undefined),
+        },
       ],
       isEdit: true,
       values: {

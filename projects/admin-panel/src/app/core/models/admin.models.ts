@@ -174,4 +174,8 @@ export interface FieldDef {
   readonly?: boolean;
   /** For type 'number': the HTML `min` attribute (e.g. 0 to disallow negative quantities). */
   min?: number;
+  /** Hides this field entirely when it returns true for the modal's current values (e.g. unit doesn't apply to money needs). */
+  hiddenWhen?: (values: Record<string, string | number>) => boolean;
+  /** Overrides `hint` with a value computed from the modal's current values; return undefined to fall back to `hint`. */
+  hintWhen?: (values: Record<string, string | number>) => string | undefined;
 }

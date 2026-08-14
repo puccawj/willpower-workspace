@@ -8,7 +8,7 @@
 
       <div class="cert-canvas">
         @if (req.data.backgroundImageUrl) {
-          <img [src]="req.data.backgroundImageUrl" alt="" class="cert-canvas-bg" />
+          <img [src]="req.data.backgroundImageUrl" alt="" class="cert-canvas-bg" crossorigin="anonymous" />
         }
         <div class="cert-canvas-frame"></div>
 
