@@ -2,6 +2,33 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-15 (1) — Course Offering redesign, phase 1
+
+**Admin panel:**
+- Class Schedule's session calendar gets full add/edit/delete UI (custom
+  date/time per session), replacing the old auto-generated read-only list.
+- Add Student now shows a "this student hasn't completed the prerequisite —
+  enroll anyway?" confirmation instead of silently bypassing (or blindly
+  failing) the prerequisite check.
+- Enrollment roster's pass/fail coloring uses each course's real passing %
+  instead of hardcoded 80/60 thresholds.
+
+**Public-site + mobile:**
+- Course list groups multiple offerings of the same course into one card
+  with a date/branch picker, instead of one card per offering.
+- Enrolling shows a confirm step (dates, session count, ✓/✗ prerequisite
+  status) before submitting, plus a persistent "you're enrolled" banner and
+  a per-offering-scoped error message if it fails.
+- Unified QR check-in to a single "scan first, resolve after" flow on
+  public-site, matching mobile.
+- My Courses shows each course's real passing % and, once a certificate has
+  been issued for a completed course, a direct link to view it.
+- Public-site's course offering details split into Schedule/Give/Reviews
+  tabs; the prerequisite note reflects whether the logged-in student has
+  actually completed it, instead of always showing the generic requirement.
+- Mobile gained a confirm-dialog/toast system (previously public-site only)
+  to support the enroll confirm flow.
+
 ## 2026-08-13 (1) — Removed Sign in with Apple
 
 - Dropped the Apple button from mobile's login/register (public-site never had one),
