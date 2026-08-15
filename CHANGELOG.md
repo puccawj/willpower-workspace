@@ -2,6 +2,31 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-15 (2) — Course Offering redesign, phase 2
+
+**Admin panel:**
+- New **Course Overview** page (`/courses/:id`) — course template details plus
+  every offering scheduled from it, with "+ New Offering" quick-create. The
+  Courses list's "▦ View offerings" button now goes here instead of dumping
+  into the unfiltered global Schedule page.
+- New **Offering Workspace** page (`/courses/:id/offerings/:offeringId`) —
+  Overview / Sessions / Roster / Needs / Certificates in one page with tabs,
+  so admins no longer re-pick the same offering from a dropdown on 4
+  different pages. Old standalone Schedule/Enrollment/Certificates/Course
+  Needs routes still work, unchanged, for anything still linking to them.
+- New reusable relational-picker component (typeahead with a real, styleable
+  dropdown — not a native `<datalist>`) replacing the lowercase-string-match
+  comboboxes for Course/Branch/Instructor (Schedule) and Add Student
+  (Enrollment); wired in as a new `type: 'typeahead'` field on the shared
+  CRUD modal framework.
+- Schedule conflict check (same instructor/branch, overlapping dates) is now
+  a blocking pre-save confirmation with an explicit "Save Anyway" override,
+  instead of a toast that fired after the offering was already created.
+- Offering Workspace's Overview tab shows a client-side computed
+  draft→scheduled→ongoing→completed status badge (from today's date vs.
+  start/end), alongside the still-manual stored status — display only, not
+  written back to the database.
+
 ## 2026-08-15 (1) — Course Offering redesign, phase 1
 
 **Admin panel:**

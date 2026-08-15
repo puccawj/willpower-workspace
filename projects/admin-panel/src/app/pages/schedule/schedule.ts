@@ -1,6 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, of, tap } from 'rxjs';
+import { Observable, from, of, switchMap, tap, throwError } from 'rxjs';
 import { CourseApiService } from '../../core/services/course-api.service';
 import { BranchApiService } from '../../core/services/branch-api.service';
 import { UserApiService } from '../../core/services/user-api.service';
@@ -92,7 +92,7 @@ function toRow(o: ApiOffering): OfferingRow {
   };
 }
 
-function sessionFields(): FieldDef[] {
+export function sessionFields(): FieldDef[] {
   return [
     { key: 'sessionDate', label: 'Session date', type: 'date' },
     { key: 'startTime', label: 'Start time', type: 'text', hint: '24-hour HH:mm, e.g. 18:00' },
@@ -102,11 +102,15 @@ function sessionFields(): FieldDef[] {
   ];
 }
 
-function buildFields(courseTitles: string[], branchNames: string[], instructorNames: string[]): FieldDef[] {
+function buildFields(
+  courseOptions: { id: string; label: string }[],
+  branchOptions: { id: string; label: string }[],
+  instructorOptions: { id: string; label: string }[],
+): FieldDef[] {
   return [
-    { key: 'course', label: 'Course', type: 'combobox', options: courseTitles },
-    { key: 'branch', label: 'Branch', type: 'select', options: branchNames },
-    { key: 'instructor', label: 'Instructor', type: 'combobox', options: instructorNames },
+    { key: 'course', label: 'Course', type: 'typeahead', relOptions: courseOptions },
+    { key: 'branch', label: 'Branch', type: 'typeahead', relOptions: branchOptions },
+    { key: 'instructor', label: 'Instructor', type: 'typeahead', relOptions: instructorOptions, hint: 'Optional' },
     { key: 'startDate', label: 'Start date', type: 'date' },
     { key: 'endDate', label: 'End date', type: 'date' },
     { key: 'capacity', label: 'Capacity', type: 'number' },
@@ -137,27 +141,12 @@ export class Schedule {
   readonly error = this.api.error;
   readonly statusColors = STATUS_COLOR;
 
-  private readonly courseNames = computed(() => this.courseApi.courses().map((c) => c.title));
-  private readonly courseNameToId = computed(() => {
-    const map = new Map<string, string>();
-    this.courseApi.courses().forEach((c) => map.set(c.title.toLowerCase(), c.id));
-    return map;
-  });
-
-  private readonly branchNames = computed(() => this.branchApi.branches().map((b) => b.name));
-  private readonly branchNameToId = computed(() => {
-    const map = new Map<string, string>();
-    this.branchApi.branches().forEach((b) => map.set(b.name.toLowerCase(), b.id));
-    return map;
-  });
-
+  private readonly courseOptions = computed(() => this.courseApi.courses().map((c) => ({ id: c.id, label: c.title })));
+  private readonly branchOptions = computed(() => this.branchApi.branches().map((b) => ({ id: b.id, label: b.name })));
   private readonly instructors = computed(() => this.userApi.users().filter((u) => u.role === 'instructor'));
-  private readonly instructorNames = computed(() => this.instructors().map((u) => `${u.firstName} ${u.lastName}`));
-  private readonly instructorNameToId = computed(() => {
-    const map = new Map<string, string>();
-    this.instructors().forEach((u) => map.set(`${u.firstName} ${u.lastName}`.toLowerCase(), u.id));
-    return map;
-  });
+  private readonly instructorOptions = computed(() =>
+    this.instructors().map((u) => ({ id: u.id, label: `${u.firstName} ${u.lastName}` })),
+  );
 
   private readonly rows = computed<OfferingRow[]>(() => this.api.offerings().map(toRow));
 
@@ -289,10 +278,9 @@ export class Schedule {
   }
 
   private toPayload(values: Record<string, string | number>): OfferingPayload {
-    const courseId = this.courseNameToId().get(String(values['course'] ?? '').trim().toLowerCase()) ?? '';
-    const branchId = this.branchNameToId().get(String(values['branch'] ?? '').trim().toLowerCase()) ?? '';
-    const instructorName = String(values['instructor'] ?? '').trim();
-    const instructorId = instructorName ? this.instructorNameToId().get(instructorName.toLowerCase()) : undefined;
+    const courseId = String(values['course'] ?? '').trim();
+    const branchId = String(values['branch'] ?? '').trim();
+    const instructorId = String(values['instructor'] ?? '').trim();
 
     const payload: OfferingPayload = {
       courseId,
@@ -312,34 +300,47 @@ export class Schedule {
     return payload;
   }
 
-  private warnConflicts(values: Record<string, string | number>, excludingId: string | null): void {
+  private checkConflicts(values: Record<string, string | number>, excludingId: string | null): OfferingRow[] {
     const start = new Date(String(values['startDate']));
     const end = new Date(String(values['endDate']));
-    if (isNaN(start.getTime()) || isNaN(end.getTime())) return;
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) return [];
 
-    const instructorName = String(values['instructor'] ?? '').trim().toLowerCase();
-    const branchName = String(values['branch'] ?? '').trim().toLowerCase();
+    const instructorId = String(values['instructor'] ?? '').trim();
+    const branchId = String(values['branch'] ?? '').trim();
 
-    const conflicts = this.rows().filter((o) => {
+    return this.rows().filter((o) => {
       if (o.id === excludingId) return false;
       const oStart = new Date(o.startDate);
       const oEnd = new Date(o.endDate);
       const overlaps = start <= oEnd && oStart <= end;
       if (!overlaps) return false;
-      return o.instructorName.toLowerCase() === instructorName || o.branchName.toLowerCase() === branchName;
-    });
-
-    conflicts.forEach((c) => {
-      const reason = c.instructorName.toLowerCase() === instructorName ? 'same instructor' : 'same branch';
-      this.toast.show(
-        `Schedule conflict: overlaps with "${c.courseTitle}" (${c.branchName} · ${c.instructorName}, ${c.dateRangeLabel}) — ${reason}.`,
-        'warning',
-        6000,
-      );
+      return (!!instructorId && o.instructorId === instructorId) || o.branchId === branchId;
     });
   }
 
-  /** The 'branch' select's options are a static snapshot taken when the modal opens — make sure
+  /** Blocking pre-save conflict check — instead of a toast fired after the save already went through,
+   * this asks for an explicit "create anyway" before the API call happens at all. Resolves false if the
+   * admin declines, in which case the caller should abort the save. */
+  private async confirmNoBlockingConflicts(values: Record<string, string | number>, excludingId: string | null): Promise<boolean> {
+    const conflicts = this.checkConflicts(values, excludingId);
+    if (!conflicts.length) return true;
+
+    const instructorId = String(values['instructor'] ?? '').trim();
+    const lines = conflicts
+      .map((c) => {
+        const reason = instructorId && c.instructorId === instructorId ? 'same instructor' : 'same branch';
+        return `"${c.courseTitle}" (${c.branchName} · ${c.instructorName}, ${c.dateRangeLabel}) — ${reason}`;
+      })
+      .join('; ');
+
+    return this.confirmSvc.ask(`Schedule conflict: overlaps with ${lines}.`, {
+      title: 'Schedule Conflict',
+      confirmLabel: 'Create Anyway',
+      danger: false,
+    });
+  }
+
+  /** The 'branch' picker's options are a static snapshot taken when the modal opens — make sure
    * branches have actually loaded first, so a fast click right after navigating here doesn't open
    * the modal with an empty branch list. */
   private ensureBranchesLoaded(): Observable<unknown> {
@@ -350,11 +351,11 @@ export class Schedule {
     this.ensureBranchesLoaded().subscribe(() => {
       this.modal.open({
         title: 'Add Class Offering',
-        fields: buildFields(this.courseNames(), this.branchNames(), this.instructorNames()),
+        fields: buildFields(this.courseOptions(), this.branchOptions(), this.instructorOptions()),
         isEdit: false,
         values: {
-          course: this.courseNames()[0] ?? '',
-          branch: this.branchNames()[0] ?? '',
+          course: this.courseOptions()[0]?.id ?? '',
+          branch: this.branchOptions()[0]?.id ?? '',
           instructor: '',
           startDate: '',
           endDate: '',
@@ -363,10 +364,15 @@ export class Schedule {
           mode: 'Onsite',
           status: 'Draft',
         },
-        onSave: (values) => {
-          this.warnConflicts(values, null);
-          return this.api.create(this.toPayload(values)).pipe(tap({ error: (err) => this.showError(err, 'Failed to create offering.') }));
-        },
+        onSave: (values) =>
+          from(this.confirmNoBlockingConflicts(values, null)).pipe(
+            switchMap((ok) => (ok ? this.api.create(this.toPayload(values)) : throwError(() => new Error('conflict-declined')))),
+            tap({
+              error: (err) => {
+                if ((err as Error)?.message !== 'conflict-declined') this.showError(err, 'Failed to create offering.');
+              },
+            }),
+          ),
       });
     });
   }
@@ -375,12 +381,12 @@ export class Schedule {
     this.ensureBranchesLoaded().subscribe(() => {
       this.modal.open({
         title: 'Edit Class Offering',
-        fields: buildFields(this.courseNames(), this.branchNames(), this.instructorNames()),
+        fields: buildFields(this.courseOptions(), this.branchOptions(), this.instructorOptions()),
         isEdit: true,
         values: {
-          course: row.courseTitle,
-          branch: row.branchName,
-          instructor: row.instructorName === 'Unassigned' ? '' : row.instructorName,
+          course: row.courseId,
+          branch: row.branchId,
+          instructor: row.instructorId ?? '',
           startDate: row.startDate,
           endDate: row.endDate,
           capacity: row.capacity,
@@ -388,10 +394,15 @@ export class Schedule {
           mode: row.modeLabel,
           status: row.statusLabel,
         },
-        onSave: (values) => {
-          this.warnConflicts(values, row.id);
-          return this.api.update(row.id, this.toPayload(values)).pipe(tap({ error: (err) => this.showError(err, 'Failed to update offering.') }));
-        },
+        onSave: (values) =>
+          from(this.confirmNoBlockingConflicts(values, row.id)).pipe(
+            switchMap((ok) => (ok ? this.api.update(row.id, this.toPayload(values)) : throwError(() => new Error('conflict-declined')))),
+            tap({
+              error: (err) => {
+                if ((err as Error)?.message !== 'conflict-declined') this.showError(err, 'Failed to update offering.');
+              },
+            }),
+          ),
         onDelete: () =>
           this.api.remove(row.id).pipe(tap({ error: (err) => this.showError(err, 'Failed to delete offering.') })),
       });

@@ -5,6 +5,7 @@ import { COUNTRIES, CountryDialCode } from '../../core/data/countries';
 import { TIMEZONES } from '../../core/data/timezones';
 import { CrudModalService } from '../../core/services/crud-modal.service';
 import { FieldDef } from '../../core/models/admin.models';
+import { Typeahead } from '../typeahead/typeahead';
 
 const DEFAULT_COUNTRY_ISO = 'TH';
 export const MULTISELECT_DELIM = '||';
@@ -28,7 +29,7 @@ const PRIMARY_ISO_FOR_DIAL: Record<string, string> = {
 
 @Component({
   selector: 'app-crud-modal',
-  imports: [FormsModule],
+  imports: [FormsModule, Typeahead],
   templateUrl: './crud-modal.html',
   styleUrl: './crud-modal.scss',
 })
@@ -52,6 +53,11 @@ export class CrudModal {
 
   onFieldChange(key: string, value: string): void {
     this.modal.setFieldValue(key, value);
+  }
+
+  fieldValueString(field: FieldDef): string {
+    const raw = this.modal.config()?.values[field.key];
+    return raw === undefined || raw === null ? '' : String(raw);
   }
 
   isFieldVisible(field: FieldDef): boolean {

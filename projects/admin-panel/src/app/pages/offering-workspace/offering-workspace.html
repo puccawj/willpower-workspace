@@ -1,0 +1,262 @@
+<button type="button" class="link-muted back-link" (click)="goCourse()">← {{ course()?.title || 'Course' }}</button>
+
+@if (offeringLoading() && !offering()) {
+  <div class="state-loading card pad">Loading offering…</div>
+} @else if (offering(); as o) {
+  <div class="card pad workspace-head">
+    <div>
+      <h2 class="summary-title">{{ o.courseTitle }} — {{ o.branchName }}</h2>
+      <div class="muted-label">
+        {{ o.instructorName ?? 'Unassigned' }} · {{ dateRangeLabel() }} · {{ o.mode === 'onsite' ? 'Onsite' : 'Online' }}
+        · {{ o.enrolledCount }}/{{ o.capacity ?? 0 }} enrolled
+      </div>
+    </div>
+    <span class="badge" [style.background]="effectiveStatusColor()" title="Computed from today's date vs. start/end — not written back to the record">{{ effectiveStatusLabel() }}</span>
+  </div>
+
+  <app-filter-tabs [options]="tabOptions" [active]="activeTab()" [select]="selectTab"></app-filter-tabs>
+
+  <div class="tab-panel">
+    @switch (activeTab()) {
+      @case ('overview') {
+        <div class="card pad">
+          <div class="page-toolbar">
+            <h3 class="section-title">Offering details</h3>
+            @if (!roleService.isInstructor()) {
+              <button type="button" class="icon-btn" (click)="editOverview()" title="Edit offering">✎</button>
+            }
+          </div>
+          <div class="detail-grid">
+            <div><div class="muted-label">Branch</div><div>{{ o.branchName }}</div></div>
+            <div><div class="muted-label">Instructor</div><div>{{ o.instructorName ?? 'Unassigned' }}</div></div>
+            <div><div class="muted-label">Dates</div><div>{{ dateRangeLabel() }}</div></div>
+            <div><div class="muted-label">Capacity</div><div>{{ o.enrolledCount }} / {{ o.capacity ?? 0 }}</div></div>
+            <div><div class="muted-label">Mode</div><div>{{ o.mode === 'onsite' ? 'Onsite' : 'Online' }}</div></div>
+            <div><div class="muted-label">Location</div><div>{{ o.location || '—' }}</div></div>
+            <div><div class="muted-label">Status (manual)</div><div>{{ o.status }}</div></div>
+            <div><div class="muted-label">Status (computed)</div><div>{{ effectiveStatusLabel() }}</div></div>
+          </div>
+        </div>
+      }
+
+      @case ('sessions') {
+        <div class="card pad">
+          <div class="page-toolbar">
+            <div>
+              <h3 class="section-title">Sessions</h3>
+              <span class="muted-label">{{ sessions().length }} of {{ course()?.totalSessions ?? 0 }} sessions added</span>
+            </div>
+            @if (!roleService.isInstructor()) {
+              <button type="button" class="btn btn-solid" (click)="addSession()">+ Add Session</button>
+            }
+          </div>
+          <div class="session-list">
+            @for (s of sessions(); track s.id) {
+              <div class="session-row">
+                <div class="session-date">
+                  <div class="session-day">{{ s.sessionDate.slice(8, 10) }}</div>
+                  <div class="session-mon">{{ s.sessionDate.slice(5, 7) }}</div>
+                </div>
+                <div class="session-info">
+                  <div class="session-topic">Session {{ s.sessionNo }}{{ s.topic ? ' — ' + s.topic : '' }}</div>
+                  <div class="muted-label">{{ s.startTime.slice(0, 5) }}–{{ s.endTime.slice(0, 5) }}{{ s.location ? ' · ' + s.location : '' }}</div>
+                </div>
+                @if (!roleService.isInstructor()) {
+                  <div class="action-group">
+                    <button type="button" class="icon-btn" (click)="editSession(s)" title="Edit session">✎</button>
+                    <button type="button" class="icon-btn icon-btn-danger" (click)="deleteSession(s)" title="Delete session">🗑</button>
+                  </div>
+                }
+              </div>
+            }
+            @if (!sessions().length) {
+              <div class="muted-cell" style="padding:14px 0">No sessions added yet — click "+ Add Session" to build the schedule.</div>
+            }
+          </div>
+        </div>
+      }
+
+      @case ('roster') {
+        <div class="card pad session-banner">
+          <div class="field-inline">
+            <label class="muted-label">Session</label>
+            <select class="form-input" [ngModel]="selectedSessionId()" (ngModelChange)="selectSession($event)">
+              @for (s of sessions(); track s.id) {
+                <option [value]="s.id">Session {{ s.sessionNo }} — {{ s.sessionDate }}</option>
+              }
+            </select>
+          </div>
+          <div class="action-group">
+            <button type="button" class="btn btn-outline" (click)="addStudent()">+ Add Student</button>
+            <button type="button" class="btn btn-outline" (click)="openQrDialog()" [disabled]="!selectedSessionId()">▤ Show check-in QR</button>
+          </div>
+        </div>
+
+        @if (qrOpen()) {
+          <div class="qr-overlay" (click)="closeQrDialog()">
+            <div class="qr-dialog" (click)="$event.stopPropagation()">
+              <div class="qr-dialog-head">
+                <h3 class="qr-dialog-title">Check-in QR code</h3>
+                <span class="qr-dialog-close" (click)="closeQrDialog()">×</span>
+              </div>
+              <p class="muted-label qr-dialog-hint">
+                Display this in the classroom — students scan it with their own phone to check themselves in for
+                Session {{ selectedSession()?.sessionNo }} — {{ selectedSession()?.sessionDate }}.
+              </p>
+              @if (qrLoading()) {
+                <p class="muted-label">Loading…</p>
+              } @else if (qrError()) {
+                <p class="qr-camera-error">{{ qrError() }}</p>
+              } @else if (qrDataUrl(); as url) {
+                <img [src]="url" alt="Session check-in QR code" class="qr-display-img" />
+              }
+            </div>
+          </div>
+        }
+
+        @if (rosterError()) {
+          <div class="state-error card">{{ rosterError() }}</div>
+        } @else if (rosterLoading()) {
+          <div class="state-loading card">Loading roster…</div>
+        } @else {
+          <div class="card" style="padding:0;overflow:hidden;margin-top:14px">
+            <table>
+              <thead><tr><th>Student</th><th>Enrolled</th><th>Cumulative attendance</th><th>This session</th><th></th></tr></thead>
+              <tbody>
+                @for (e of roster(); track e.userId) {
+                  <tr class="row">
+                    <td>
+                      <div class="name-cell">
+                        <div class="avatar-sm" [style.background]="e.avatarColor">{{ e.initials }}</div>{{ e.name }}
+                      </div>
+                    </td>
+                    <td>{{ e.enrolledLabel }}</td>
+                    <td style="width:180px">
+                      <div class="pct-row">
+                        <div class="pct-track"><div class="pct-fill" [style.width.%]="e.pctValue" [style.background]="e.pctColor"></div></div>
+                        <span class="pct-label">{{ e.pctLabel }}</span>
+                      </div>
+                    </td>
+                    <td><span class="badge" [style.background]="e.presentColor">{{ e.presentLabel }}</span></td>
+                    <td>
+                      <div class="action-group">
+                        <button type="button" class="icon-btn icon-btn-accent" (click)="toggleAttendance(e)" [title]="e.present ? 'Mark absent' : 'Mark present'">{{ e.present ? '↺' : '☑' }}</button>
+                        <button type="button" class="icon-btn" style="color:var(--w-red)" (click)="removeEnrollment(e)" title="Remove enrollment">✕</button>
+                      </div>
+                    </td>
+                  </tr>
+                }
+                @if (!roster().length) {
+                  <tr><td colspan="5" class="muted-cell" style="text-align:center;padding:20px">No students enrolled yet — click "+ Add Student" to enroll one.</td></tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      }
+
+      @case ('needs') {
+        <div class="page-toolbar">
+          <h3 class="section-title">Donation needs</h3>
+          @if (!roleService.isInstructor()) {
+            <button type="button" class="btn btn-solid" (click)="addNeed()">+ Add Need</button>
+          }
+        </div>
+        @if (needsError()) {
+          <div class="state-error card">{{ needsError() }}</div>
+        } @else if (needsLoading()) {
+          <div class="state-loading card">Loading needs…</div>
+        } @else {
+          <div class="need-rows">
+            @for (row of needRows(); track row.id) {
+              <div class="card need-row">
+                <div class="need-row-head">
+                  <div>
+                    <div class="need-title">{{ row.title }}</div>
+                    <div class="muted-label">{{ row.sessionLabel }} · {{ row.type === 'money' ? 'Funds' : 'Goods' }}</div>
+                  </div>
+                  <div class="action-group">
+                    <button type="button" class="icon-btn" (click)="editNeed(row)" title="Edit">✎</button>
+                  </div>
+                </div>
+                <div class="pct-row">
+                  <div class="pct-track"><div class="pct-fill" [style.width.%]="row.pct" [style.background]="row.pct >= 100 ? 'var(--w-green)' : 'var(--w-gold)'"></div></div>
+                  <span class="pct-label">{{ row.progressLabel }}</span>
+                </div>
+              </div>
+            }
+            @if (!needRows().length) {
+              <div class="card state-empty">No needs added yet — click "+ Add Need" to create the first wishlist item.</div>
+            }
+          </div>
+        }
+      }
+
+      @case ('certificates') {
+        <div class="card pad session-banner">
+          <div>
+            <div class="muted-label">Passing criteria: ≥ {{ certPassingPercent() }}% attendance</div>
+            @if (templateLoaded()) {
+              <div class="active-template-indicator">
+                @if (activeTemplate(); as tpl) {
+                  @if (tpl.backgroundImageUrl) {
+                    <img [src]="tpl.backgroundImageUrl" alt="" class="active-template-thumb" />
+                  }
+                  <span class="muted-label">Using template: <strong>{{ tpl.name }}</strong></span>
+                } @else {
+                  <span class="muted-label" style="color:var(--w-red)">No active template for this branch</span>
+                }
+              </div>
+            }
+          </div>
+          <button type="button" class="btn btn-solid" (click)="bulkIssue()">Generate all eligible</button>
+        </div>
+
+        @if (certError()) {
+          <div class="state-error card">{{ certError() }}</div>
+        } @else if (certLoading()) {
+          <div class="state-loading card">Loading students…</div>
+        } @else {
+          <div class="card" style="padding:0;overflow:hidden;margin-top:14px">
+            <table>
+              <thead><tr><th>Student</th><th>Attendance</th><th>Eligible</th><th>Certificate no.</th><th>Status</th><th></th></tr></thead>
+              <tbody>
+                @for (c of certRows(); track c.userId) {
+                  <tr class="row">
+                    <td style="font-weight:500">{{ c.name }}</td>
+                    <td>{{ c.pctLabel }}</td>
+                    <td><span class="badge" [style.background]="c.eligibleColor">{{ c.eligibleLabel }}</span></td>
+                    <td class="muted-cell">{{ c.certNo }}</td>
+                    <td>{{ c.issueLabel }}</td>
+                    <td>
+                      <div class="action-group">
+                        @if (c.issued) {
+                          <button type="button" class="icon-btn icon-btn-accent" (click)="viewCertificate(c)" title="View certificate">👁</button>
+                          <button type="button" class="icon-btn icon-btn-danger" (click)="voidCertificate(c)" title="Void certificate">↺</button>
+                        } @else {
+                          <button
+                            type="button"
+                            class="icon-btn"
+                            [style.color]="c.actionColor"
+                            [disabled]="!c.eligible"
+                            [title]="c.eligible ? 'Issue certificate' : 'Not yet eligible'"
+                            (click)="toggleCertificate(c)"
+                          >{{ c.actionIcon }}</button>
+                        }
+                      </div>
+                    </td>
+                  </tr>
+                }
+                @if (!certRows().length) {
+                  <tr><td colspan="6" class="muted-cell" style="text-align:center;padding:20px">No students enrolled in this offering.</td></tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      }
+    }
+  </div>
+} @else {
+  <div class="state-error card pad">Offering not found.</div>
+}

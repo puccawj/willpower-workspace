@@ -1,0 +1,25 @@
+<div class="typeahead">
+  <input
+    class="form-input"
+    type="text"
+    autocomplete="off"
+    [disabled]="disabled()"
+    [ngModel]="query()"
+    (ngModelChange)="onInput($event)"
+    (focus)="onFocus()"
+    (blur)="onBlur()"
+    [placeholder]="placeholder()"
+  />
+  @if (open() && filtered().length) {
+    <div class="typeahead-list">
+      @for (opt of filtered(); track opt.id) {
+        <div class="typeahead-option" [class.selected]="opt.id === value()" (mousedown)="select(opt)">{{ opt.label }}</div>
+      }
+    </div>
+  }
+  @if (open() && !filtered().length) {
+    <div class="typeahead-list">
+      <div class="typeahead-empty">No matches</div>
+    </div>
+  }
+</div>

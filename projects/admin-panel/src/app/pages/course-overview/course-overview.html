@@ -1,0 +1,65 @@
+<button type="button" class="link-muted back-link" (click)="goCourses()">← All courses</button>
+
+@if (loadingCourse()) {
+  <div class="state-loading card pad">Loading course…</div>
+} @else if (course(); as c) {
+  <div class="card pad summary-card">
+    <div class="summary-main">
+      @if (c.imageUrl) {
+        <img [src]="c.imageUrl" alt="" class="summary-thumb" (click)="viewCover()" />
+      }
+      <div>
+        <h2 class="summary-title">{{ c.title }}</h2>
+        <div class="muted-label">{{ c.category || 'Uncategorized' }} · {{ c.totalSessions }} sessions · {{ passingPercent() }}% to pass</div>
+        @if (c.description) {
+          <p class="summary-desc">{{ c.description }}</p>
+        }
+        @if (prerequisiteTitles()) {
+          <div class="muted-label">Requires: {{ prerequisiteTitles() }}</div>
+        }
+        @if (syllabusLines().length) {
+          <ul class="syllabus-list">
+            @for (line of syllabusLines(); track line) {
+              <li>{{ line }}</li>
+            }
+          </ul>
+        }
+      </div>
+    </div>
+    @if (!roleService.isInstructor()) {
+      <button type="button" class="icon-btn" (click)="editCourse()" title="Edit course">✎</button>
+    }
+  </div>
+}
+
+<div class="page-toolbar">
+  <h3 class="section-title">Offerings</h3>
+  @if (!roleService.isInstructor()) {
+    <button type="button" class="btn btn-solid" (click)="newOffering()">+ New Offering</button>
+  }
+</div>
+
+@if (error()) {
+  <div class="state-error card">{{ error() }}</div>
+} @else if (loading()) {
+  <div class="state-loading card">Loading offerings…</div>
+} @else if (!offerings().length) {
+  <div class="card state-empty">No offerings yet for this course — click "+ New Offering" to schedule the first one.</div>
+} @else {
+  <div class="cardgrid">
+    @for (o of offerings(); track o.id) {
+      <div class="mcard offering-card" (click)="goWorkspace(o)">
+        <div class="mcard-head">
+          <h4 class="mcard-title mcard-title-sans">{{ o.branchName }}</h4>
+          <span class="badge badge-sm" [style.background]="o.statusColor">{{ o.statusLabel }}</span>
+        </div>
+        <div class="muted-label">{{ o.instructorName }}</div>
+        <div class="muted-label mcard-meta">{{ o.dateRangeLabel }} · {{ o.modeLabel }}</div>
+        <div class="mcard-row">
+          <span>{{ o.enrolledCount }}/{{ o.capacity }} enrolled</span>
+          <span class="link-accent">Open workspace →</span>
+        </div>
+      </div>
+    }
+  </div>
+}

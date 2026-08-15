@@ -83,8 +83,8 @@ export class Courses {
     this.toast.show(message, 'error');
   }
 
-  goSchedule(): void {
-    this.router.navigate(['/schedule']);
+  goOverview(row: CourseRow): void {
+    this.router.navigate(['/courses', row.id]);
   }
 
   goNeeds(row: CourseRow): void {

@@ -1,0 +1,44 @@
+:host {
+  display: block;
+}
+
+.typeahead {
+  position: relative;
+}
+
+.typeahead-list {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 50;
+  max-height: 220px;
+  overflow-y: auto;
+  padding: 6px;
+  border: 1px solid var(--w-border-strong);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 12px 30px -12px rgba(36, 28, 21, 0.35);
+}
+
+.typeahead-option {
+  font: 400 13px var(--w-font-sans);
+  cursor: pointer;
+  padding: 8px 10px;
+  border-radius: 6px;
+
+  &:hover {
+    background: var(--w-bg-alt);
+  }
+
+  &.selected {
+    background: var(--w-bg-alt);
+    font-weight: 600;
+  }
+}
+
+.typeahead-empty {
+  font: 400 12px var(--w-font-sans);
+  color: var(--w-muted);
+  padding: 8px 10px;
+}

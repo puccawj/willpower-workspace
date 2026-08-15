@@ -145,22 +145,20 @@ export class Enrollment {
     const candidates = this.userApi
       .users()
       .filter((u) => !enrolledIds.has(u.id))
-      .map((u) => ({ label: `${u.firstName} ${u.lastName} (${u.email})`, id: u.id }));
+      .map((u) => ({ id: u.id, label: `${u.firstName} ${u.lastName} (${u.email})` }));
 
     if (candidates.length === 0) {
       this.toast.show('No more users available to enroll.', 'warning');
       return;
     }
 
-    const labelToId = new Map(candidates.map((c) => [c.label, c.id]));
-
     this.modal.open({
       title: 'Add Student',
-      fields: [{ key: 'student', label: 'Student', type: 'combobox', options: candidates.map((c) => c.label) }],
+      fields: [{ key: 'student', label: 'Student', type: 'typeahead', relOptions: candidates }],
       isEdit: false,
       values: { student: '' },
       onSave: (values) => {
-        const userId = labelToId.get(String(values['student'] ?? ''));
+        const userId = String(values['student'] ?? '');
         if (!userId) {
           this.toast.show('Please pick a student from the list.', 'error');
           return throwError(() => new Error('invalid-student'));

@@ -155,13 +155,16 @@ export type FieldType =
   | 'timezone'
   | 'email'
   | 'password'
-  | 'multiselect';
+  | 'multiselect'
+  | 'typeahead';
 
 export interface FieldDef {
   key: string;
   label: string;
   type: FieldType;
   options?: string[];
+  /** For type 'typeahead': the id/label pairs to search over — the field's value is the selected `id`. */
+  relOptions?: { id: string; label: string }[];
   /** For type 'phone': the values-key that stores the dial code (e.g. 'phoneCountryCode'). `key` stores the number itself. */
   countryKey?: string;
   /** For type 'combobox': another field's key whose current value narrows this field's options (e.g. city depends on country). */

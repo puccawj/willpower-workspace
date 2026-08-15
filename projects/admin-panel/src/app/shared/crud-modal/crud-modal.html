@@ -103,6 +103,14 @@
                   }
                 </datalist>
               }
+              @case ('typeahead') {
+                <app-typeahead
+                  [options]="f.relOptions ?? []"
+                  [value]="fieldValueString(f)"
+                  [placeholder]="'Search ' + f.label.toLowerCase() + '…'"
+                  (valueChange)="onFieldChange(f.key, $event)"
+                ></app-typeahead>
+              }
               @case ('timezone') {
                 <input
                   class="form-input"
