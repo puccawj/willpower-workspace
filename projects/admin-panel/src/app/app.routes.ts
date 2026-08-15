@@ -12,8 +12,6 @@ import { Users } from './pages/users/users';
 import { StudentApplications } from './pages/student-applications/student-applications';
 import { Branches } from './pages/branches/branches';
 import { Courses } from './pages/courses/courses';
-import { CourseOverview } from './pages/course-overview/course-overview';
-import { OfferingWorkspace } from './pages/offering-workspace/offering-workspace';
 import { CourseNeeds } from './pages/courses/course-needs/course-needs';
 import { CoursePhotos } from './pages/courses/course-photos/course-photos';
 import { CourseFeedback } from './pages/courses/course-feedback/course-feedback';
@@ -119,13 +117,13 @@ export const routes: Routes = [
       },
       {
         path: 'courses/:id',
-        component: CourseOverview,
+        loadComponent: () => import('./pages/course-overview/course-overview').then((m) => m.CourseOverview),
         canActivate: [roleAccessGuard],
         data: { title: 'Course Overview', subtitle: 'Course template details and every offering scheduled from it', allow: ['superadmin', 'admin', 'instructor'] },
       },
       {
         path: 'courses/:id/offerings/:offeringId',
-        component: OfferingWorkspace,
+        loadComponent: () => import('./pages/offering-workspace/offering-workspace').then((m) => m.OfferingWorkspace),
         canActivate: [roleAccessGuard],
         data: { title: 'Offering Workspace', subtitle: 'Overview, sessions, roster, needs, and certificates — all in one place', allow: ['superadmin', 'admin', 'instructor'] },
       },
