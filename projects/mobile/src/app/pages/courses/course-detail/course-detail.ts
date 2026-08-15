@@ -16,6 +16,8 @@ import {
 import { MeApiService } from '../../../core/services/me-api.service';
 import { RatingApiService, RatingSummary } from '../../../core/services/rating-api.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { ConfirmService } from '../../../core/services/confirm.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { ImageViewerService } from '../../../core/services/image-viewer.service';
 import { UploadApiService } from '../../../core/services/upload-api.service';
 import { BackButton } from '../../../shared/back-button/back-button';
@@ -35,6 +37,8 @@ export class CourseDetail {
   private readonly auth = inject(AuthService);
   private readonly uploads = inject(UploadApiService);
   private readonly imageViewer = inject(ImageViewerService);
+  private readonly confirmService = inject(ConfirmService);
+  private readonly toast = inject(ToastService);
 
   readonly courseId = this.route.snapshot.paramMap.get('id')!;
   /** Which offering the visitor arrived to view (via Home/Courses list) — null shows every offering. */
@@ -74,6 +78,14 @@ export class CourseDetail {
   readonly myEnrollment = computed(
     () => this.meApi.enrollments().find((e) => this.offerings().some((o) => o.id === e.offeringId)) ?? null,
   );
+
+  /** First session date for the offering behind the current enrollment — drives the persistent "you're enrolled" banner. */
+  readonly myEnrollmentFirstSessionDate = computed(() => {
+    const enrollment = this.myEnrollment();
+    if (!enrollment) return null;
+    const offering = this.offerings().find((o) => o.id === enrollment.offeringId);
+    return offering ? this.shortDate(offering.startDate) : null;
+  });
 
   offeringEnded(offering: PublicOffering): boolean {
     const end = new Date(offering.endDate);
@@ -296,15 +308,44 @@ export class CourseDetail {
     });
   }
 
-  enrollIn(offeringId: string): void {
+  /** Whether the current student already has a completed enrollment in every prerequisite course, by title. */
+  readonly prerequisitesMet = computed(() => {
+    const required = this.course()?.prerequisiteTitles ?? [];
+    if (!required.length) return true;
+    const completedTitles = new Set(
+      this.meApi
+        .enrollments()
+        .filter((e) => e.status === 'completed')
+        .map((e) => e.courseTitle),
+    );
+    return required.every((t) => completedTitles.has(t));
+  });
+
+  async enrollIn(offering: PublicOffering): Promise<void> {
     if (!this.auth.isLoggedIn()) {
       this.router.navigate(['/login'], { queryParams: { returnUrl: `/courses/${this.courseId}` } });
       return;
     }
-    this.enrollingOfferingId.set(offeringId);
+
+    const course = this.course();
+    const required = course?.prerequisiteTitles ?? [];
+    const prereqLine = required.length
+      ? `${this.prerequisitesMet() ? '✓' : '✗'} Prerequisite${required.length > 1 ? 's' : ''}: ${required.join(', ')}`
+      : '✓ No prerequisites required';
+
+    const confirmed = await this.confirmService.ask(
+      `${course?.title ?? ''}\n${offering.branchName} · ${offering.startDate} – ${offering.endDate}\n${course?.sessions ?? ''}\n${prereqLine}`,
+      { title: 'Confirm your enrollment', confirmLabel: 'Enroll' },
+    );
+    if (!confirmed) return;
+
+    this.enrollingOfferingId.set(offering.id);
     this.enrollError.set('');
-    this.meApi.enrollSelf(offeringId).subscribe({
-      next: () => this.enrollingOfferingId.set(null),
+    this.meApi.enrollSelf(offering.id).subscribe({
+      next: () => {
+        this.enrollingOfferingId.set(null);
+        this.toast.show(`You're enrolled in ${course?.title ?? 'the course'}!`, 'success');
+      },
       error: (err) => {
         this.enrollingOfferingId.set(null);
         this.enrollError.set(err?.error?.message ?? 'Could not enroll you right now.');

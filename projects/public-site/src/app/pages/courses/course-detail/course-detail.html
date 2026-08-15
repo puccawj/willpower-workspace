@@ -20,9 +20,15 @@
         <p class="detail-body">{{ c.desc }}</p>
 
         @if (c.prerequisiteTitles.length) {
-          <p class="prerequisite-note">
-            <span><strong>Prerequisite required:</strong> you must have completed {{ c.prerequisiteTitles.join(', ') }} before enrolling in this course.</span>
-          </p>
+          @if (isLoggedIn() && prerequisitesMet()) {
+            <p class="prerequisite-note prerequisite-note-met">
+              <span>✓ You've completed the prerequisite: {{ c.prerequisiteTitles.join(', ') }}.</span>
+            </p>
+          } @else {
+            <p class="prerequisite-note">
+              <span><strong>Prerequisite required:</strong> you must have completed {{ c.prerequisiteTitles.join(', ') }} before enrolling in this course.</span>
+            </p>
+          }
         }
 
         <div class="offerings-section">
@@ -75,24 +81,51 @@
                             type="button"
                             class="btn btn-outline btn-sm"
                             [disabled]="enrollingOfferingId() === o.id"
-                            (click)="enrollIn(o.id)"
+                            (click)="enrollIn(o)"
                           >
                             {{ enrollingOfferingId() === o.id ? 'Enrolling…' : 'Enroll' }}
                           </button>
                         }
                       }
                       <button type="button" class="details-toggle-btn" (click)="toggleOfferingDetails(o.id)">
-                        {{ expandedOfferingId() === o.id ? 'Hide details ▴' : 'Details ▾' }}
+                        {{ expandedOfferingId() === o.id ? 'Hide details ▴' : 'Schedule, Give & Reviews ▾' }}
                       </button>
                     </div>
                   </div>
 
-                  @if (enrollError() && enrollingOfferingId() === null) {
-                    <p class="offering-error">{{ enrollError() }}</p>
+                  @if (justEnrolledOfferingId() === o.id) {
+                    <div class="enrolled-banner">
+                      You're enrolled — first session: {{ shortDate(o.startDate) }}
+                    </div>
+                  }
+
+                  @if (enrollErrorFor(o.id) && enrollingOfferingId() === null) {
+                    <p class="offering-error">{{ enrollErrorFor(o.id) }}</p>
                   }
 
                   @if (expandedOfferingId() === o.id) {
                     <div class="offering-card-body">
+                      <div class="details-tabs">
+                        <button type="button" class="details-tab-btn" [class.active]="detailsTab() === 'schedule'" (click)="setDetailsTab('schedule')">Schedule</button>
+                        <button type="button" class="details-tab-btn" [class.active]="detailsTab() === 'give'" (click)="setDetailsTab('give')">Give</button>
+                        <button type="button" class="details-tab-btn" [class.active]="detailsTab() === 'reviews'" (click)="setDetailsTab('reviews')">Reviews</button>
+                      </div>
+
+                      @if (detailsTab() === 'schedule') {
+                        <div class="offering-schedule-tab">
+                          <div class="fact"><div class="fact-label">Branch</div><div class="fact-value">{{ o.branchName }} · {{ o.mode }}</div></div>
+                          <div class="fact"><div class="fact-label">Dates</div><div class="fact-value">{{ o.startDate }} – {{ o.endDate }}</div></div>
+                          @if (formatSchedule(o.scheduleSummary); as schedule) {
+                            <div class="fact"><div class="fact-label">Weekly schedule</div><div class="fact-value">{{ schedule }}</div></div>
+                          }
+                          @if (o.location) {
+                            <div class="fact"><div class="fact-label">Location</div><div class="fact-value">{{ o.location }}</div></div>
+                          }
+                          <div class="fact"><div class="fact-label">Seats</div><div class="fact-value">{{ o.spotsLeft === null ? 'Open enrollment' : o.spotsLeft + ' seats left' }}</div></div>
+                        </div>
+                      }
+
+                      @if (detailsTab() === 'give') {
                       @if (offeringEnded(o)) {
                         <p class="rsvp-closed-note">This class has already ended — donations are closed.</p>
                       } @else if (isLoggedIn()) {
@@ -250,7 +283,9 @@
                           }
                         </div>
                       }
+                      }
 
+                      @if (detailsTab() === 'reviews') {
                       @if (isLoggedIn()) {
                         <div class="rating-card">
                           <div class="aside-heading">Rate this class</div>
@@ -284,6 +319,11 @@
                             <p class="rating-saved-note">Thanks for your feedback!</p>
                           }
                         </div>
+                      } @else {
+                        <p class="rsvp-closed-note">
+                          <a routerLink="/login" [queryParams]="{ returnUrl: '/courses/' + c.id }">Log in</a> to rate this class.
+                        </p>
+                      }
                       }
                     </div>
                   }

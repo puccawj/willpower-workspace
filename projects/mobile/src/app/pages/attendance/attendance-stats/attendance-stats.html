@@ -9,12 +9,19 @@
         <div class="donut-hole">{{ e.attendancePercent }}%</div>
       </div>
     </div>
+    <div class="pass-mark-note" [class.pass]="e.isPassing">
+      Pass mark {{ +e.passingPercent }}% — {{ e.isPassing ? 'passing ✓' : 'not yet passing' }}
+    </div>
 
     <div class="stat-row">
       <div class="stat"><div class="stat-value">{{ e.sessionsAttended }}</div><div class="stat-label">Attended</div></div>
       <div class="stat"><div class="stat-value">{{ missedCount() }}</div><div class="stat-label">Missed</div></div>
       <div class="stat"><div class="stat-value">{{ e.sessionsTotal }}</div><div class="stat-label">Total</div></div>
     </div>
+
+    @if (e.status === 'completed' && certificate(); as cert) {
+      <a [routerLink]="['/certificate', cert.id]" class="certificate-link">🎓 View your certificate</a>
+    }
 
     <div class="log-title">Session log</div>
     <div class="log-list">

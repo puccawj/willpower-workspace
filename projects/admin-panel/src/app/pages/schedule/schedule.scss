@@ -7,6 +7,14 @@
 }
 
 .calendar-title {
+  margin-bottom: 4px;
+}
+
+.calendar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
   margin-bottom: 16px;
 }
 

@@ -10,8 +10,10 @@ import {
   ApiOfferingStatus,
   OfferingApiService,
   OfferingPayload,
+  SessionPayload,
 } from '../../core/services/offering-api.service';
 import { CrudModalService } from '../../core/services/crud-modal.service';
+import { ConfirmService } from '../../core/services/confirm.service';
 import { RoleService } from '../../core/services/role.service';
 import { ToastService } from '../../core/services/toast.service';
 import { ListController } from '../../core/list-controller';
@@ -36,6 +38,7 @@ interface OfferingRow {
   statusKey: ApiOfferingStatus;
   statusLabel: string;
   statusColor: string;
+  totalSessions: number;
 }
 
 const STATUS_COLOR: Record<ApiOfferingStatus, string> = {
@@ -85,7 +88,18 @@ function toRow(o: ApiOffering): OfferingRow {
     statusKey: o.status,
     statusLabel: STATUS_LABEL[o.status],
     statusColor: STATUS_COLOR[o.status],
+    totalSessions: o.totalSessions,
   };
+}
+
+function sessionFields(): FieldDef[] {
+  return [
+    { key: 'sessionDate', label: 'Session date', type: 'date' },
+    { key: 'startTime', label: 'Start time', type: 'text', hint: '24-hour HH:mm, e.g. 18:00' },
+    { key: 'endTime', label: 'End time', type: 'text', hint: '24-hour HH:mm, e.g. 20:00' },
+    { key: 'topic', label: 'Topic', type: 'text', hint: 'Optional' },
+    { key: 'location', label: 'Location', type: 'text', hint: 'Optional — defaults to the offering location' },
+  ];
 }
 
 function buildFields(courseTitles: string[], branchNames: string[], instructorNames: string[]): FieldDef[] {
@@ -114,6 +128,7 @@ export class Schedule {
   private readonly branchApi = inject(BranchApiService);
   private readonly userApi = inject(UserApiService);
   private readonly modal = inject(CrudModalService);
+  private readonly confirmSvc = inject(ConfirmService);
   private readonly toast = inject(ToastService);
   private readonly router = inject(Router);
   readonly roleService = inject(RoleService);
@@ -171,9 +186,105 @@ export class Schedule {
 
   viewSessions(row: OfferingRow): void {
     this.selectedOfferingId.set(row.id);
-    this.api.listSessions(row.id).subscribe({
+    this.refreshSessions(row.id);
+  }
+
+  private refreshSessions(offeringId: string): void {
+    this.api.listSessions(offeringId).subscribe({
       next: (rows) => this.sessions.set(rows),
       error: (err) => this.showError(err, 'Failed to load session calendar.'),
+    });
+  }
+
+  private toSessionPayload(values: Record<string, string | number>): SessionPayload {
+    const payload: SessionPayload = {
+      sessionDate: String(values['sessionDate'] ?? ''),
+      startTime: String(values['startTime'] ?? '').trim(),
+      endTime: String(values['endTime'] ?? '').trim(),
+    };
+    const topic = String(values['topic'] ?? '').trim();
+    const location = String(values['location'] ?? '').trim();
+    if (topic) payload.topic = topic;
+    if (location) payload.location = location;
+    return payload;
+  }
+
+  addSession(): void {
+    const offeringId = this.selectedOfferingId();
+    if (!offeringId) return;
+
+    this.modal.open({
+      title: 'Add Session',
+      fields: sessionFields(),
+      isEdit: false,
+      values: { sessionDate: '', startTime: '', endTime: '', topic: '', location: '' },
+      onSave: (values) =>
+        this.api.addSession(offeringId, this.toSessionPayload(values)).pipe(
+          tap({
+            next: () => this.refreshSessions(offeringId),
+            error: (err) => this.showError(err, 'Failed to add session.'),
+          }),
+        ),
+    });
+  }
+
+  editSession(session: ApiCourseSession): void {
+    const offeringId = this.selectedOfferingId();
+    if (!offeringId) return;
+
+    this.modal.open({
+      title: `Edit Session ${session.sessionNo}`,
+      fields: sessionFields(),
+      isEdit: true,
+      values: {
+        sessionDate: session.sessionDate,
+        startTime: session.startTime.slice(0, 5),
+        endTime: session.endTime.slice(0, 5),
+        topic: session.topic ?? '',
+        location: session.location ?? '',
+      },
+      onSave: (values) =>
+        this.api.updateSession(offeringId, session.id, this.toSessionPayload(values)).pipe(
+          tap({
+            next: () => this.refreshSessions(offeringId),
+            error: (err) => this.showError(err, 'Failed to update session.'),
+          }),
+        ),
+      onDelete: () => this.removeSession(offeringId, session),
+    });
+  }
+
+  private async removeSession(offeringId: string, session: ApiCourseSession): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      this.api.removeSession(offeringId, session.id).subscribe({
+        next: () => {
+          this.refreshSessions(offeringId);
+          resolve();
+        },
+        error: (err) => {
+          this.showError(err, 'Failed to delete session.');
+          reject(err);
+        },
+      });
+    });
+  }
+
+  async deleteSession(session: ApiCourseSession): Promise<void> {
+    const offeringId = this.selectedOfferingId();
+    if (!offeringId) return;
+
+    const confirmed = await this.confirmSvc.ask(
+      `Delete session ${session.sessionNo} (${session.sessionDate})? Any attendance recorded for it will be removed too.`,
+      { title: 'Delete Session', confirmLabel: 'Delete', danger: true },
+    );
+    if (!confirmed) return;
+
+    this.api.removeSession(offeringId, session.id).subscribe({
+      next: () => {
+        this.toast.show(`Session ${session.sessionNo} deleted.`, 'success');
+        this.refreshSessions(offeringId);
+      },
+      error: (err) => this.showError(err, 'Failed to delete session.'),
     });
   }
 

@@ -71,7 +71,15 @@
 
   <div class="card pad calendar-card">
     @if (selectedOffering(); as sel) {
-      <h3 class="section-title calendar-title">Session calendar — {{ sel.courseTitle }} ({{ sel.branchName }} · {{ sel.instructorName }})</h3>
+      <div class="calendar-head">
+        <div>
+          <h3 class="section-title calendar-title">Sessions — {{ sel.courseTitle }} ({{ sel.branchName }} · {{ sel.instructorName }})</h3>
+          <span class="muted-label">{{ sessions().length }} of {{ sel.totalSessions }} sessions added</span>
+        </div>
+        @if (!roleService.isInstructor()) {
+          <button type="button" class="btn btn-solid" (click)="addSession()">+ Add Session</button>
+        }
+      </div>
       <div class="session-list">
         @for (s of sessions(); track s.id) {
           <div class="session-row">
@@ -83,14 +91,20 @@
               <div class="session-topic">Session {{ s.sessionNo }}{{ s.topic ? ' — ' + s.topic : '' }}</div>
               <div class="muted-label">{{ s.startTime.slice(0, 5) }}–{{ s.endTime.slice(0, 5) }}{{ s.location ? ' · ' + s.location : '' }}</div>
             </div>
+            @if (!roleService.isInstructor()) {
+              <div class="action-group">
+                <button type="button" class="icon-btn" (click)="editSession(s)" title="Edit session">✎</button>
+                <button type="button" class="icon-btn icon-btn-danger" (click)="deleteSession(s)" title="Delete session">🗑</button>
+              </div>
+            }
           </div>
         }
         @if (!sessions().length) {
-          <div class="muted-cell" style="padding:14px 0">No sessions found for this offering.</div>
+          <div class="muted-cell" style="padding:14px 0">No sessions added yet — click "+ Add Session" to build the schedule.</div>
         }
       </div>
     } @else {
-      <p class="muted-label">Click the calendar icon on an offering above to view its session schedule.</p>
+      <p class="muted-label">Click the calendar icon on an offering above to view and edit its sessions.</p>
     }
   </div>
 }

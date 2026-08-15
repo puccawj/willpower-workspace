@@ -12,6 +12,8 @@ export interface ApiEnrollmentRow {
   attendedSessions: number;
   totalSessions: number;
   attendancePercent: number;
+  passingPercent: number;
+  isPassing: boolean;
   presentThisSession: boolean;
 }
 
@@ -47,9 +49,11 @@ export class EnrollmentApiService {
     );
   }
 
-  enroll(offeringId: string, userId: string, sessionId?: string) {
+  enroll(offeringId: string, userId: string, sessionId?: string, force?: boolean) {
+    const body: { userId: string; force?: boolean } = { userId };
+    if (force) body.force = true;
     return this.http
-      .post<void>(`${this.baseUrl(offeringId)}/enrollments`, { userId })
+      .post<void>(`${this.baseUrl(offeringId)}/enrollments`, body)
       .pipe(switchMap(() => this.load(offeringId, sessionId)));
   }
 

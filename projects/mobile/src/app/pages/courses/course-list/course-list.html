@@ -1,5 +1,9 @@
 <div class="list-page">
   <h1 class="page-title">Courses</h1>
+  <p class="page-lede">
+    Each card below is one scheduled class offering. Open a class to view its syllabus, weekly schedule, and to
+    enroll or donate.
+  </p>
 
   @if (loading()) {
     <p class="empty-note">Loading courses…</p>
@@ -7,28 +11,54 @@
     <p class="empty-note">No courses to show right now.</p>
   } @else {
     <div class="course-col">
-      @for (o of offerings(); track o.offeringId) {
-        <a [routerLink]="['/courses', o.courseId]" [queryParams]="{ offering: o.offeringId }" class="course-card">
-          <div class="course-card-img">
-            <img [src]="o.img" alt="" />
-            <div class="img-ribbon-corner">
-              <div class="img-ribbon">{{ o.branchCity || o.branchName }}<br />{{ o.shortStartDate }}</div>
+      @for (group of courseGroups(); track group.courseId) {
+        @let o = group.offerings[0];
+        <div class="course-card">
+          <a [routerLink]="['/courses', o.courseId]" [queryParams]="{ offering: o.offeringId }" class="course-card-link">
+            <div class="course-card-img">
+              <img [src]="group.img" alt="" />
+              <div class="img-ribbon-corner">
+                <div class="img-ribbon">{{ o.branchCity || o.branchName }}<br />{{ o.shortStartDate }}</div>
+              </div>
             </div>
-          </div>
-          <div class="course-card-body">
-            <div class="course-level">{{ o.branchName }} · {{ o.format }}</div>
-            <div class="course-title">{{ o.title }}</div>
-            <div class="course-open">
-              {{ o.shortStartDate }} · {{ o.open }}
-              @if (ratingFor(o.offeringId).count) {
-                · ★ {{ ratingFor(o.offeringId).average }} ({{ ratingFor(o.offeringId).count }})
+            <div class="course-card-body">
+              <div class="course-level">{{ o.branchName }} · {{ o.format }}</div>
+              <div class="course-title">{{ group.title }}</div>
+              <div class="course-open">
+                {{ o.shortStartDate }} · {{ o.open }}
+                @if (ratingFor(o.offeringId).count) {
+                  · ★ {{ ratingFor(o.offeringId).average }} ({{ ratingFor(o.offeringId).count }})
+                }
+              </div>
+              @if (group.prerequisiteTitles.length) {
+                <span class="prereq-pill" [title]="'Requires: ' + group.prerequisiteTitles.join(', ')">Requires {{ group.prerequisiteTitles[0] }}</span>
               }
             </div>
-            @if (o.prerequisiteTitles.length) {
-              <span class="prereq-pill" [title]="'Requires: ' + o.prerequisiteTitles.join(', ')">Requires {{ o.prerequisiteTitles[0] }}</span>
+          </a>
+          @if (group.offerings.length > 1) {
+            <button type="button" class="offerings-toggle" (click)="toggleGroup(group.courseId, $event)">
+              {{ group.offerings.length }} sessions available — choose a date/branch
+              <span class="chev" [class.open]="expandedCourseId() === group.courseId">▾</span>
+            </button>
+            @if (expandedCourseId() === group.courseId) {
+              <div class="offerings-panel">
+                @for (alt of group.offerings; track alt.offeringId) {
+                  <a
+                    [routerLink]="['/courses', alt.courseId]"
+                    [queryParams]="{ offering: alt.offeringId }"
+                    class="offering-row"
+                  >
+                    <span>
+                      <span class="offering-branch">{{ alt.branchName }}</span>
+                      <div class="offering-dates">{{ alt.startDate }} – {{ alt.endDate }}</div>
+                    </span>
+                    <span class="offering-dates">{{ alt.spotsLeft ?? '—' }} seats left</span>
+                  </a>
+                }
+              </div>
             }
-          </div>
-        </a>
+          }
+        </div>
       }
     </div>
   }

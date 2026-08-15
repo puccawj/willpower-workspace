@@ -47,6 +47,15 @@ export interface OfferingPayload {
   status?: ApiOfferingStatus;
 }
 
+export interface SessionPayload {
+  sessionDate?: string;
+  startTime?: string;
+  endTime?: string;
+  topic?: string;
+  location?: string;
+  sessionNo?: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class OfferingApiService {
   private readonly http = inject(HttpClient);
@@ -75,6 +84,19 @@ export class OfferingApiService {
 
   listSessions(offeringId: string) {
     return this.http.get<ApiCourseSession[]>(`${this.baseUrl}/${offeringId}/sessions`);
+  }
+
+  /** Returns the raw HTTP call — sessions aren't tracked in the `offerings` signal, so callers refresh their own local session list after. */
+  addSession(offeringId: string, payload: SessionPayload) {
+    return this.http.post<ApiCourseSession>(`${this.baseUrl}/${offeringId}/sessions`, payload);
+  }
+
+  updateSession(offeringId: string, sessionId: string, payload: SessionPayload) {
+    return this.http.patch<ApiCourseSession>(`${this.baseUrl}/${offeringId}/sessions/${sessionId}`, payload);
+  }
+
+  removeSession(offeringId: string, sessionId: string) {
+    return this.http.delete<void>(`${this.baseUrl}/${offeringId}/sessions/${sessionId}`);
   }
 
   create(payload: OfferingPayload) {

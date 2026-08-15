@@ -44,6 +44,28 @@
   margin-bottom: 4px;
 }
 
+.attendance-track {
+  height: 6px;
+  background: var(--w-border);
+  border-radius: 5px;
+  overflow: hidden;
+  margin: 8px 0 4px;
+}
+
+.attendance-fill {
+  height: 100%;
+  background: var(--w-gold, #c9a24b);
+
+  &.pass {
+    background: var(--w-green, #2e7d4f);
+  }
+}
+
+.certificate-inline-row {
+  color: var(--w-gold-deep, #a97e1f);
+  font: 600 calc(13.5px * var(--text-scale, 1)) var(--w-font-sans);
+}
+
 .pill {
   font: 600 calc(12px * var(--text-scale, 1)) var(--w-font-sans);
   text-transform: uppercase;

@@ -8,7 +8,14 @@
       <a [routerLink]="['/attendance', e.offeringId]" class="row">
         <div class="row-title">{{ e.courseTitle }}</div>
         <div class="row-meta">{{ e.branchName }} · {{ e.attendancePercent }}% attendance</div>
+        <div class="attendance-track">
+          <div class="attendance-fill" [style.width.%]="e.attendancePercent" [class.pass]="e.isPassing"></div>
+        </div>
+        <div class="row-meta">Pass mark {{ +e.passingPercent }}%</div>
       </a>
+      @if (e.status === 'completed' && certificateForOffering(e.offeringId)) {
+        <a [routerLink]="['/profile/certificates']" class="row certificate-inline-row">🎓 View your certificate</a>
+      }
     }
   </div>
 }

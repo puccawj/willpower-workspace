@@ -8,21 +8,22 @@
     </p>
 
     <div class="grid-2 g2">
-      @for (o of offerings(); track o.offeringId) {
+      @for (group of courseGroups(); track group.courseId) {
+        @let o = group.offerings[0];
         <div class="course-card-lg">
           <div class="course-img">
-            <img [src]="o.img" alt="" />
+            <img [src]="group.img" alt="" />
             <div class="img-ribbon-corner">
               <div class="img-ribbon">{{ o.branchName }}<br />{{ o.shortStartDate }}</div>
             </div>
           </div>
           <div class="course-body">
             <div class="course-tags">
-              <span class="eyebrow small inline">{{ o.level }}</span>
+              <span class="eyebrow small inline">{{ group.level }}</span>
               <span class="course-format">· {{ o.format }}</span>
             </div>
             <h3 class="course-title-lg">
-              <a [routerLink]="['/courses', o.courseId]" [queryParams]="{ offering: o.offeringId }" class="course-title-link">{{ o.title }}</a>
+              <a [routerLink]="['/courses', o.courseId]" [queryParams]="{ offering: o.offeringId }" class="course-title-link">{{ group.title }}</a>
             </h3>
             @if (ratingFor(o.offeringId).count) {
               <div class="list-rating">
@@ -32,8 +33,8 @@
                 <span class="list-rating-text">{{ ratingFor(o.offeringId).average }} ({{ ratingFor(o.offeringId).count }})</span>
               </div>
             }
-            @if (o.prerequisiteTitles.length) {
-              <span class="prereq-pill" [title]="'Requires: ' + o.prerequisiteTitles.join(', ')">Requires {{ o.prerequisiteTitles.join(', ') }}</span>
+            @if (group.prerequisiteTitles.length) {
+              <span class="prereq-pill" [title]="'Requires: ' + group.prerequisiteTitles.join(', ')">Requires {{ group.prerequisiteTitles.join(', ') }}</span>
             }
             <p class="course-desc-lg">{{ o.branchName }} &middot; {{ o.startDate }} – {{ o.endDate }}</p>
             @if (formatSchedule(o.scheduleSummary); as sched) {
@@ -50,6 +51,30 @@
             <div class="course-foot">
               <span class="open-label">{{ o.open }}</span>
             </div>
+
+            @if (group.offerings.length > 1) {
+              <button type="button" class="offerings-toggle" (click)="toggleGroup(group.courseId)">
+                {{ group.offerings.length }} sessions available — choose a date/branch
+                <span class="chev" [class.open]="expandedCourseId() === group.courseId">▾</span>
+              </button>
+              @if (expandedCourseId() === group.courseId) {
+                <div class="offerings-panel">
+                  @for (alt of group.offerings; track alt.offeringId) {
+                    <a
+                      [routerLink]="['/courses', alt.courseId]"
+                      [queryParams]="{ offering: alt.offeringId }"
+                      class="offering-row"
+                    >
+                      <span>
+                        <span class="offering-branch">{{ alt.branchName }}</span>
+                        <div class="offering-dates">{{ alt.startDate }} – {{ alt.endDate }}</div>
+                      </span>
+                      <span class="offering-dates">{{ alt.spotsLeft ?? '—' }} seats left</span>
+                    </a>
+                  }
+                </div>
+              }
+            }
           </div>
         </div>
       } @empty {

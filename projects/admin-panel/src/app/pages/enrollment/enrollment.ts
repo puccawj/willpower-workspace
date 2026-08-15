@@ -2,7 +2,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { map, throwError } from 'rxjs';
+import { Observable, catchError, from, map, switchMap, throwError } from 'rxjs';
 import { avatarColorFor, initialsOf } from '../../core/services/admin-data.service';
 import { ApiCourseSession, OfferingApiService } from '../../core/services/offering-api.service';
 import { ApiEnrollmentRow, EnrollmentApiService } from '../../core/services/enrollment-api.service';
@@ -38,7 +38,7 @@ function toRow(e: ApiEnrollmentRow): EnrollmentRow {
     enrolledLabel: new Date(e.enrolledAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
     pctLabel: `${e.attendancePercent}%`,
     pctValue: e.attendancePercent,
-    pctColor: e.attendancePercent >= 80 ? 'var(--w-green)' : e.attendancePercent >= 60 ? 'var(--w-gold)' : 'var(--w-red)',
+    pctColor: e.isPassing ? 'var(--w-green)' : e.attendancePercent >= e.passingPercent * 0.75 ? 'var(--w-gold)' : 'var(--w-red)',
     present: e.presentThisSession,
     presentLabel: e.presentThisSession ? 'Present' : 'Absent',
     presentColor: e.presentThisSession ? 'var(--w-green)' : 'var(--w-red)',
@@ -165,9 +165,35 @@ export class Enrollment {
           this.toast.show('Please pick a student from the list.', 'error');
           return throwError(() => new Error('invalid-student'));
         }
-        return this.enrollmentApi.enroll(this.selectedOfferingId(), userId, this.selectedSessionId());
+        return this.enrollWithPrerequisiteOverride(userId);
       },
     });
+  }
+
+  /** Attempts a normal enroll; if it fails on the missing-prerequisite check, offers an explicit
+   * admin override ("enroll anyway") and retries with `force: true` if confirmed. */
+  private enrollWithPrerequisiteOverride(userId: string): Observable<unknown> {
+    const offeringId = this.selectedOfferingId();
+    const sessionId = this.selectedSessionId();
+    return this.enrollmentApi.enroll(offeringId, userId, sessionId).pipe(
+      catchError((err) => {
+        const message = (err as { error?: { message?: string } })?.error?.message ?? '';
+        if (!/not completed/i.test(message)) return throwError(() => err);
+
+        return from(
+          this.confirmSvc.ask("This student hasn't completed the prerequisite — enroll anyway?", {
+            title: 'Missing Prerequisite',
+            confirmLabel: 'Enroll Anyway',
+            danger: false,
+          }),
+        ).pipe(
+          switchMap((confirmed) => {
+            if (!confirmed) return throwError(() => err);
+            return this.enrollmentApi.enroll(offeringId, userId, sessionId, true);
+          }),
+        );
+      }),
+    );
   }
 
   // ---- QR check-in ----

@@ -29,10 +29,12 @@ export interface MyEnrollment {
   sessionsAttended: number;
   attendancePercent: number;
   passingPercent: string;
+  isPassing: boolean;
 }
 
 export interface MyCertificate {
   id: string;
+  offeringId: string | null;
   courseTitle: string | null;
   templateName: string;
   certificateNo: string;

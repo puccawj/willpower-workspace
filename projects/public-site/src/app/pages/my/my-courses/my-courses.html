@@ -1,5 +1,25 @@
 <div class="section-block">
-  <h2 class="block-title my-courses-title">Your learning</h2>
+  <div class="my-courses-head">
+    <h2 class="block-title my-courses-title">Your learning</h2>
+    @if (enrollments().length) {
+      <button type="button" class="btn btn-outline btn-sm" (click)="openScan()">Scan to check in</button>
+    }
+  </div>
+
+  @if (scanOpen()) {
+    <div class="scan-modal-backdrop" (click)="closeScan()">
+      <div class="scan-modal" (click)="$event.stopPropagation()">
+        <p class="muted-label">Scan the QR code at your class or event to check in.</p>
+        <app-qr-camera [enabled]="scanOpen()" (detected)="onCodeDetected($event)"></app-qr-camera>
+        <button type="button" class="btn btn-outline btn-sm" [disabled]="scanSubmitting()" (click)="closeScan()">
+          {{ scanSubmitting() ? 'Checking in…' : 'Cancel' }}
+        </button>
+        @if (scanError()) {
+          <p class="session-qr-error">{{ scanError() }}</p>
+        }
+      </div>
+    </div>
+  }
 
   @if (enrollments().length) {
     <div class="course-rows">
@@ -14,11 +34,17 @@
           </div>
           <div class="attendance-row">
             <div class="attendance-track">
-              <div class="attendance-fill" [style.width.%]="e.attendancePercent" [class.pass]="e.attendancePercent >= +e.passingPercent"></div>
+              <div class="attendance-fill" [style.width.%]="e.attendancePercent" [class.pass]="e.isPassing"></div>
             </div>
             <span class="attendance-label">{{ e.attendancePercent }}% attendance</span>
           </div>
           <div class="muted-label">{{ e.sessionsAttended }} / {{ e.sessionsTotal }} sessions attended · Pass mark {{ +e.passingPercent }}%</div>
+
+          @if (e.status === 'completed' && certificateForOffering(e.offeringId); as cert) {
+            <a [routerLink]="['/my/certificates']" class="certificate-inline-link">
+              🎓 View your certificate
+            </a>
+          }
 
           @if (e.status === 'enrolled') {
             <button type="button" class="btn btn-outline btn-sm sessions-toggle" (click)="toggleSessions(e.offeringId)">
@@ -42,24 +68,10 @@
                       </div>
                       @if (s.checkedIn) {
                         <span class="muted-label">Checked in ✓</span>
-                      } @else if (scanSessionId() !== s.id) {
-                        <button type="button" class="btn btn-outline btn-sm" (click)="openScan(s.id)">
-                          Scan to check in
-                        </button>
+                      } @else {
+                        <span class="muted-label">Not checked in — use "Scan to check in" above</span>
                       }
                     </div>
-
-                    @if (scanSessionId() === s.id) {
-                      <div class="session-scan">
-                        <app-qr-camera [enabled]="scanSessionId() === s.id" (detected)="onCodeDetected($event)"></app-qr-camera>
-                        <button type="button" class="btn btn-outline btn-sm" [disabled]="scanSubmitting()" (click)="closeScan()">
-                          {{ scanSubmitting() ? 'Checking in…' : 'Cancel' }}
-                        </button>
-                        @if (scanError()) {
-                          <p class="session-qr-error">{{ scanError() }}</p>
-                        }
-                      </div>
-                    }
                   }
                 }
               </div>

@@ -14,5 +14,10 @@ export class MyCourses {
 
   constructor() {
     this.meApi.loadEnrollments().subscribe();
+    this.meApi.loadCertificates().subscribe();
+  }
+
+  certificateForOffering(offeringId: string) {
+    return this.meApi.certificates().find((c) => c.offeringId === offeringId) ?? null;
   }
 }

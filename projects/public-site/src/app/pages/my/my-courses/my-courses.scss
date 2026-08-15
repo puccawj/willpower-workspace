@@ -6,6 +6,43 @@
   margin-bottom: 16px;
 }
 
+.my-courses-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.scan-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(36, 28, 21, 0.55);
+  z-index: 210;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.scan-modal {
+  background: var(--w-bg);
+  border-radius: 14px;
+  max-width: 420px;
+  width: 100%;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 30px 70px -30px rgba(36, 28, 21, 0.5);
+}
+
+.certificate-inline-link {
+  display: inline-block;
+  margin: 4px 0 4px;
+  font: 600 13px var(--w-font-sans);
+  color: var(--w-gold-deep);
+}
+
 .course-rows {
   display: flex;
   flex-direction: column;

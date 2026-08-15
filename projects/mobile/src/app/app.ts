@@ -3,6 +3,8 @@ import { Router, RouterOutlet } from '@angular/router';
 import { App as CapacitorApp } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
 import { PhotoViewer } from './shared/photo-viewer/photo-viewer';
+import { ToastHost } from './shared/toast-host/toast-host';
+import { ConfirmDialog } from './shared/confirm-dialog/confirm-dialog';
 
 const EXIT_HINT_WINDOW_MS = 2000;
 
@@ -117,7 +119,7 @@ function setupKeyboardAvoidance(): () => void {
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, PhotoViewer],
+  imports: [RouterOutlet, PhotoViewer, ToastHost, ConfirmDialog],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })

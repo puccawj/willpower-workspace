@@ -65,8 +65,12 @@ export class CourseDetail {
   readonly offeringsError = signal('');
   readonly enrollingOfferingId = signal<string | null>(null);
   readonly enrolledOfferingIds = signal<Set<string>>(new Set());
-  readonly enrollError = signal('');
+  /** Scoped per-offering (not one shared page-level message) so an enroll failure on one card never leaks onto another. */
+  readonly enrollErrors = signal<Map<string, string>>(new Map());
+  /** Drives the persistent "You're enrolled — first session: <date>" banner after a successful enroll. */
+  readonly justEnrolledOfferingId = signal<string | null>(null);
   readonly expandedOfferingId = signal<string | null>(null);
+  readonly detailsTab = signal<'schedule' | 'give' | 'reviews'>('schedule');
 
   readonly formatSchedule = formatSchedule;
   readonly shortDate = shortDate;
@@ -90,23 +94,65 @@ export class CourseDetail {
 
   toggleOfferingDetails(offeringId: string): void {
     this.expandedOfferingId.set(this.expandedOfferingId() === offeringId ? null : offeringId);
+    this.detailsTab.set('schedule');
   }
 
-  enrollIn(offeringId: string): void {
+  setDetailsTab(tab: 'schedule' | 'give' | 'reviews'): void {
+    this.detailsTab.set(tab);
+  }
+
+  enrollErrorFor(offeringId: string): string {
+    return this.enrollErrors().get(offeringId) ?? '';
+  }
+
+  /** Whether the current student already has a completed enrollment in every prerequisite course, by title. */
+  readonly prerequisitesMet = computed(() => {
+    const required = this.course()?.prerequisiteTitles ?? [];
+    if (!required.length) return true;
+    const completedTitles = new Set(
+      this.meApi
+        .enrollments()
+        .filter((e) => e.status === 'completed')
+        .map((e) => e.courseTitle),
+    );
+    return required.every((t) => completedTitles.has(t));
+  });
+
+  async enrollIn(offering: PublicOffering): Promise<void> {
     if (!this.auth.isLoggedIn()) {
       this.router.navigate(['/login'], { queryParams: { returnUrl: `/courses/${this.id()}` } });
       return;
     }
-    this.enrollingOfferingId.set(offeringId);
-    this.enrollError.set('');
-    this.meApi.enrollSelf(offeringId).subscribe({
+
+    const course = this.course();
+    const required = course?.prerequisiteTitles ?? [];
+    const prereqLine = required.length
+      ? `${this.prerequisitesMet() ? '✓' : '✗'} Prerequisite${required.length > 1 ? 's' : ''}: ${required.join(', ')}`
+      : '✓ No prerequisites required';
+
+    const confirmed = await this.confirmService.ask(
+      `${course?.title ?? ''}\n${offering.branchName} · ${offering.startDate} – ${offering.endDate}\n${course?.sessions ?? ''}\n${prereqLine}`,
+      { title: 'Confirm your enrollment', confirmLabel: 'Enroll' },
+    );
+    if (!confirmed) return;
+
+    this.enrollingOfferingId.set(offering.id);
+    this.enrollErrors.update((m) => {
+      const next = new Map(m);
+      next.delete(offering.id);
+      return next;
+    });
+    this.meApi.enrollSelf(offering.id).subscribe({
       next: () => {
         this.enrollingOfferingId.set(null);
-        this.enrolledOfferingIds.update((set) => new Set(set).add(offeringId));
+        this.enrolledOfferingIds.update((set) => new Set(set).add(offering.id));
+        this.justEnrolledOfferingId.set(offering.id);
+        this.toast.show(`You're enrolled in ${course?.title ?? 'the course'}!`, 'success');
       },
       error: (err) => {
         this.enrollingOfferingId.set(null);
-        this.enrollError.set(err?.error?.message ?? 'Could not enroll you right now.');
+        const message = err?.error?.message ?? 'Could not enroll you right now.';
+        this.enrollErrors.update((m) => new Map(m).set(offering.id, message));
       },
     });
   }
@@ -304,8 +350,10 @@ export class CourseDetail {
       const id = this.id();
       this.offerings.set([]);
       this.enrolledOfferingIds.set(new Set());
-      this.enrollError.set('');
+      this.enrollErrors.set(new Map());
+      this.justEnrolledOfferingId.set(null);
       this.expandedOfferingId.set(null);
+      this.detailsTab.set('schedule');
       this.needs.set([]);
       this.donations.set([]);
       this.photos.set([]);
@@ -395,6 +443,7 @@ export class CourseDetail {
 
       if (this.auth.isLoggedIn()) {
         this.refreshDonations(id);
+        this.meApi.loadEnrollments().subscribe();
       }
     });
   }
