@@ -56,6 +56,8 @@ export interface PublicOffering {
   endDate: string;
   spotsLeft: number | null;
   scheduleSummary: PublicOfferingScheduleSlot[];
+  status: 'published' | 'completed';
+  isOpenForEnrollment: boolean;
 }
 
 interface ApiPublicCourseOfferingCard {
@@ -72,6 +74,8 @@ interface ApiPublicCourseOfferingCard {
   spotsLeft: number | null;
   scheduleSummary: PublicOfferingScheduleSlot[];
   prerequisiteTitles: string[];
+  status: 'published' | 'completed';
+  isOpenForEnrollment: boolean;
 }
 
 export interface PublicCourseOfferingCard {
@@ -90,6 +94,8 @@ export interface PublicCourseOfferingCard {
   open: string;
   scheduleSummary: PublicOfferingScheduleSlot[];
   prerequisiteTitles: string[];
+  status: 'published' | 'completed';
+  isOpenForEnrollment: boolean;
 }
 
 export interface PublicCourseNeed {
@@ -201,9 +207,11 @@ function toPublicCourseOfferingCard(row: ApiPublicCourseOfferingCard, index: num
     endDate: row.endDate,
     shortStartDate: shortDate(row.startDate),
     spotsLeft: row.spotsLeft,
-    open: row.spotsLeft === null || row.spotsLeft > 0 ? 'Open for enrollment' : 'Full',
+    open: row.status === 'completed' ? 'Completed' : row.spotsLeft === null || row.spotsLeft > 0 ? 'Open for enrollment' : 'Full',
     scheduleSummary: row.scheduleSummary,
     prerequisiteTitles: row.prerequisiteTitles ?? [],
+    status: row.status,
+    isOpenForEnrollment: row.isOpenForEnrollment,
   };
 }
 

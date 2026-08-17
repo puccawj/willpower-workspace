@@ -83,7 +83,9 @@
                     @if (isLoggedIn() && isStudent()) {
                       @if (enrolledOfferingIds().has(o.id)) {
                         <span class="offering-enrolled">Enrolled ✓</span>
-                      } @else {
+                      } @else if (o.status === 'completed') {
+                        <span class="offering-enrolled">Completed</span>
+                      } @else if (o.isOpenForEnrollment) {
                         <button
                           type="button"
                           class="offering-enroll-btn"
@@ -92,6 +94,8 @@
                         >
                           {{ enrollingOfferingId() === o.id ? 'Enrolling…' : 'Enroll' }}
                         </button>
+                      } @else {
+                        <span class="offering-enrolled">Full</span>
                       }
                     }
                     <button type="button" class="details-toggle-btn" (click)="toggleOfferingDetails(o.id)">
