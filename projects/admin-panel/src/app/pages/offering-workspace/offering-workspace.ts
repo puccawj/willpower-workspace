@@ -318,14 +318,14 @@ export class OfferingWorkspace {
     });
     if (!conflicts.length) return true;
 
-    const lines = conflicts
-      .map((c) => {
-        const reason = instructorId && c.instructorId === instructorId ? 'same instructor' : 'same branch';
-        return `"${c.courseTitle}" (${c.branchName} · ${c.instructorName ?? 'Unassigned'}, ${formatDate(c.startDate)}–${formatDate(c.endDate)}) — ${reason}`;
-      })
-      .join('; ');
+    const sameInstructor = conflicts.filter((c) => instructorId && c.instructorId === instructorId).map((c) => c.courseTitle);
+    const sameBranchOnly = conflicts.filter((c) => !(instructorId && c.instructorId === instructorId)).map((c) => c.courseTitle);
 
-    return this.confirmSvc.ask(`Schedule conflict: overlaps with ${lines}.`, {
+    const parts: string[] = [];
+    if (sameInstructor.length) parts.push(`Same instructor: ${sameInstructor.join(', ')}`);
+    if (sameBranchOnly.length) parts.push(`Same branch: ${sameBranchOnly.join(', ')}`);
+
+    return this.confirmSvc.ask(parts.join('. '), {
       title: 'Schedule Conflict',
       confirmLabel: 'Save Anyway',
       danger: false,
