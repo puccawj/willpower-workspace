@@ -63,6 +63,11 @@ export class Typeahead {
   }
 
   onFocus(): void {
+    // Clear the pre-filled text (the current selection's label) so the dropdown shows every
+    // option on focus instead of being immediately filtered down to just the one already-typed
+    // match — otherwise clicking a field that already has a value looks like it has no other
+    // options at all.
+    this.query.set('');
     this.updateListPosition();
     this.open.set(true);
   }
