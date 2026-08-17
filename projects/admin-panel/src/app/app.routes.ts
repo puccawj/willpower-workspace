@@ -15,7 +15,6 @@ import { Courses } from './pages/courses/courses';
 import { CourseNeeds } from './pages/courses/course-needs/course-needs';
 import { CoursePhotos } from './pages/courses/course-photos/course-photos';
 import { CourseFeedback } from './pages/courses/course-feedback/course-feedback';
-import { Schedule } from './pages/schedule/schedule';
 import { Enrollment } from './pages/enrollment/enrollment';
 import { Certificates } from './pages/certificates/certificates';
 import { CertificateRegistry } from './pages/certificate-registry/certificate-registry';
@@ -113,7 +112,7 @@ export const routes: Routes = [
         path: 'courses',
         component: Courses,
         canActivate: [roleAccessGuard],
-        data: { title: 'Manage Course', subtitle: 'Subject templates and passing criteria', allow: ['superadmin', 'admin', 'instructor'] },
+        data: { title: 'Manage Course', subtitle: 'Subject templates and every offering scheduled across them', allow: ['superadmin', 'admin', 'instructor'] },
       },
       {
         path: 'courses/:id',
@@ -145,12 +144,9 @@ export const routes: Routes = [
         canActivate: [roleAccessGuard],
         data: { title: 'Course Feedback', subtitle: 'Member star ratings and private notes across this course\'s offerings', allow: ['superadmin', 'admin'] },
       },
-      {
-        path: 'schedule',
-        component: Schedule,
-        canActivate: [roleAccessGuard],
-        data: { title: 'All Offerings', subtitle: 'Browse every course offering across all courses', allow: ['superadmin', 'admin', 'instructor'] },
-      },
+      // All Offerings is now a tab on Manage Course rather than its own page — redirect any old
+      // bookmarks/links instead of leaving them 404.
+      { path: 'schedule', redirectTo: 'courses' },
       {
         path: 'enrollment',
         component: Enrollment,

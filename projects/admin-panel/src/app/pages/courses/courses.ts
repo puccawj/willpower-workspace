@@ -1,7 +1,8 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, from, map, of, switchMap, tap, throwError } from 'rxjs';
 import { ApiCourse, CourseApiService, CoursePayload } from '../../core/services/course-api.service';
+import { ApiOffering, ApiOfferingStatus, OfferingApiService } from '../../core/services/offering-api.service';
 import { CrudModalService } from '../../core/services/crud-modal.service';
 import { MULTISELECT_DELIM } from '../../shared/crud-modal/crud-modal';
 import { ImageViewerService } from '../../core/services/image-viewer.service';
@@ -11,7 +12,72 @@ import { ToastService } from '../../core/services/toast.service';
 import { UploadApiService } from '../../core/services/upload-api.service';
 import { ListController } from '../../core/list-controller';
 import { TableToolbar } from '../../shared/table-toolbar/table-toolbar';
+import { FilterTabs } from '../../shared/filter-tabs/filter-tabs';
 import { FieldDef } from '../../core/models/admin.models';
+
+type View = 'courses' | 'offerings';
+
+interface OfferingRow {
+  id: string;
+  code: string | null;
+  courseId: string;
+  courseTitle: string;
+  courseActive: boolean;
+  branchName: string;
+  instructorName: string;
+  startDate: string;
+  endDate: string;
+  dateRangeLabel: string;
+  capacity: number;
+  location: string;
+  enrolledCount: number;
+  modeLabel: string;
+  statusKey: ApiOfferingStatus;
+  statusLabel: string;
+  statusColor: string;
+  totalSessions: number;
+}
+
+const OFFERING_STATUS_COLOR: Record<ApiOfferingStatus, string> = {
+  draft: 'var(--w-muted)',
+  published: 'var(--w-green)',
+  completed: 'var(--w-ink-soft)',
+  cancelled: 'var(--w-red)',
+};
+
+const OFFERING_STATUS_LABEL: Record<ApiOfferingStatus, string> = {
+  draft: 'Draft',
+  published: 'Published',
+  completed: 'Completed',
+  cancelled: 'Cancelled',
+};
+
+function formatDate(iso: string): string {
+  return new Date(`${iso}T00:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function toOfferingRow(o: ApiOffering): OfferingRow {
+  return {
+    id: o.id,
+    code: o.code,
+    courseId: o.courseId,
+    courseTitle: o.courseTitle,
+    courseActive: o.courseStatus === 'active',
+    branchName: o.branchName,
+    instructorName: o.instructorName ?? 'Unassigned',
+    startDate: o.startDate,
+    endDate: o.endDate,
+    dateRangeLabel: `${formatDate(o.startDate)} – ${formatDate(o.endDate)}`,
+    capacity: o.capacity ?? 0,
+    location: o.location ?? '',
+    enrolledCount: o.enrolledCount,
+    modeLabel: o.mode === 'onsite' ? 'Onsite' : 'Online',
+    statusKey: o.status,
+    statusLabel: OFFERING_STATUS_LABEL[o.status],
+    statusColor: OFFERING_STATUS_COLOR[o.status],
+    totalSessions: o.totalSessions,
+  };
+}
 
 interface CourseRow {
   id: string;
@@ -51,12 +117,13 @@ function toRow(c: ApiCourse, titleById: Map<string, string>): CourseRow {
 
 @Component({
   selector: 'app-courses',
-  imports: [TableToolbar],
+  imports: [TableToolbar, FilterTabs],
   templateUrl: './courses.html',
   styleUrl: './courses.scss',
 })
 export class Courses {
   private readonly api = inject(CourseApiService);
+  private readonly offeringApi = inject(OfferingApiService);
   private readonly modal = inject(CrudModalService);
   private readonly confirmSvc = inject(ConfirmService);
   private readonly toast = inject(ToastService);
@@ -69,6 +136,15 @@ export class Courses {
   readonly loading = this.api.loading;
   readonly error = this.api.error;
 
+  readonly view = signal<View>('courses');
+  readonly viewOptions = [
+    { key: 'courses', label: 'Courses' },
+    { key: 'offerings', label: 'All Offerings' },
+  ];
+  selectView = (key: string): void => {
+    this.view.set(key as View);
+  };
+
   private readonly titleById = computed(() => new Map(this.api.courses().map((c) => [c.id, c.title])));
   private readonly idByTitle = computed(() => new Map(this.api.courses().map((c) => [c.title.toLowerCase(), c.id])));
 
@@ -76,8 +152,16 @@ export class Courses {
 
   readonly ctrl = new ListController<CourseRow>(this.rows);
 
+  // ---- All Offerings (merged in from the old standalone page) ----
+  readonly offeringsLoading = this.offeringApi.loading;
+  readonly offeringsError = this.offeringApi.error;
+  readonly offeringStatusColors = OFFERING_STATUS_COLOR;
+  private readonly offeringRows = computed<OfferingRow[]>(() => this.offeringApi.offerings().map(toOfferingRow));
+  readonly offeringCtrl = new ListController<OfferingRow>(this.offeringRows);
+
   constructor() {
     this.api.load().subscribe();
+    this.offeringApi.load().subscribe();
   }
 
   private showError(err: unknown, fallback: string): void {
@@ -87,6 +171,14 @@ export class Courses {
 
   goOverview(row: CourseRow): void {
     this.router.navigate(['/courses', row.id]);
+  }
+
+  goOfferingEnrollment(row: OfferingRow): void {
+    this.router.navigate(['/courses', row.courseId, 'offerings', row.id], { queryParams: { tab: 'roster' } });
+  }
+
+  goOfferingWorkspace(row: OfferingRow): void {
+    this.router.navigate(['/courses', row.courseId, 'offerings', row.id]);
   }
 
   goNeeds(row: CourseRow): void {
