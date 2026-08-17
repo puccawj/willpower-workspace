@@ -43,11 +43,27 @@ type Tab = 'overview' | 'sessions' | 'roster' | 'needs' | 'certificates';
 
 const WHOLE_COURSE = 'Not session-specific';
 
-function sessionFields(): FieldDef[] {
+/** Every 15 minutes across the day, e.g. '00:00', '00:15', ... '23:45' — for the Start/End time
+ * dropdowns, so admins pick a time instead of typing HH:mm by hand. */
+function timeOptions(): string[] {
+  const options: string[] = [];
+  for (let h = 0; h < 24; h++) {
+    for (let m = 0; m < 60; m += 15) {
+      options.push(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`);
+    }
+  }
+  return options;
+}
+
+/** extraTimes ensures an existing session's saved time is selectable even if it falls off the
+ * 15-minute grid (e.g. an odd time from before this was a dropdown) — otherwise the <select>'s
+ * bound value would match no <option> and silently render blank. */
+function sessionFields(extraTimes: string[] = []): FieldDef[] {
+  const times = Array.from(new Set([...timeOptions(), ...extraTimes])).sort();
   return [
     { key: 'sessionDate', label: 'Session date', type: 'date' },
-    { key: 'startTime', label: 'Start time', type: 'text', hint: '24-hour HH:mm, e.g. 18:00' },
-    { key: 'endTime', label: 'End time', type: 'text', hint: '24-hour HH:mm, e.g. 20:00' },
+    { key: 'startTime', label: 'Start time', type: 'select', options: times },
+    { key: 'endTime', label: 'End time', type: 'select', options: times },
     { key: 'topic', label: 'Topic', type: 'text', hint: 'Optional' },
     { key: 'location', label: 'Location', type: 'text', hint: 'Optional — defaults to the offering location' },
   ];
@@ -423,7 +439,7 @@ export class OfferingWorkspace {
       title: 'Add Session',
       fields: sessionFields(),
       isEdit: false,
-      values: { sessionDate: '', startTime: '', endTime: '', topic: '', location: '' },
+      values: { sessionDate: '', startTime: '18:00', endTime: '20:00', topic: '', location: '' },
       onSave: (values) =>
         this.offeringApi.addSession(offeringId, this.toSessionPayload(values)).pipe(
           tap({
@@ -437,14 +453,16 @@ export class OfferingWorkspace {
   editSession(session: ApiCourseSession): void {
     const offeringId = this.offeringId();
     if (!offeringId) return;
+    const startTime = session.startTime.slice(0, 5);
+    const endTime = session.endTime.slice(0, 5);
     this.modal.open({
       title: `Edit Session ${session.sessionNo}`,
-      fields: sessionFields(),
+      fields: sessionFields([startTime, endTime]),
       isEdit: true,
       values: {
         sessionDate: session.sessionDate,
-        startTime: session.startTime.slice(0, 5),
-        endTime: session.endTime.slice(0, 5),
+        startTime,
+        endTime,
         topic: session.topic ?? '',
         location: session.location ?? '',
       },
