@@ -1,158 +1,86 @@
-@if (!roleService.isInstructor() && view() === 'courses') {
+@if (!roleService.isInstructor()) {
   <div class="page-toolbar toolbar-end">
     <button type="button" class="btn btn-solid" (click)="addCourse()">+ New Course</button>
   </div>
 }
 
-<app-filter-tabs [options]="viewOptions" [active]="view()" [select]="selectView"></app-filter-tabs>
-
-@if (view() === 'courses') {
-  @if (error()) {
-    <div class="state-error card">{{ error() }}</div>
-  } @else if (loading()) {
-    <div class="state-loading card">Loading courses…</div>
-  } @else {
-    <app-table-toolbar [controller]="ctrl" slot="top"></app-table-toolbar>
-
-    @if (ctrl.effectiveView() === 'table') {
-      <div class="card" style="padding:0;overflow:hidden">
-        <table>
-          <thead><tr><th>Course</th><th>Category</th><th>Sessions</th><th>Passing %</th><th>Offerings</th><th>Status</th><th></th></tr></thead>
-          <tbody>
-            @for (c of ctrl.pageItems(); track c.id) {
-              <tr class="row">
-                <td>
-                  <div style="font-weight:500">{{ c.title }}</div>
-                  @if (c.prerequisiteCourseIds.length) {
-                    <div class="muted-label">Requires: {{ c.prerequisiteTitles.split(multiselectDelim).join(', ') }}</div>
-                  }
-                </td>
-                <td>{{ c.category }}</td>
-                <td>{{ c.totalSessions }}</td>
-                <td>{{ c.passingLabel }}</td>
-                <td>{{ c.offeringsCount }}</td>
-                <td><span class="badge" [style.background]="c.statusColor">{{ c.statusLabel }}</span></td>
-                <td>
-                  <div class="action-group">
-                    <button type="button" class="icon-btn icon-btn-accent" (click)="goOverview(c)" title="View offerings">▦</button>
-                    @if (!roleService.isInstructor()) {
-                      <button type="button" class="icon-btn" (click)="goNeeds(c)" title="Donation needs">🎁</button>
-                      <button type="button" class="icon-btn" (click)="goPhotos(c)" title="Photos">🖼</button>
-                      <button type="button" class="icon-btn" (click)="goFeedback(c)" title="Feedback">★</button>
-                      <button type="button" class="icon-btn" (click)="editCourse(c)" title="Edit">✎</button>
-                    }
-                  </div>
-                </td>
-              </tr>
-            }
-            @if (!ctrl.pageItems().length) {
-              <tr><td colspan="7" class="muted-cell" style="text-align:center;padding:20px">No courses yet.</td></tr>
-            }
-          </tbody>
-        </table>
-      </div>
-    } @else {
-      <div class="cardgrid">
-        @for (c of ctrl.pageItems(); track c.id) {
-          <div class="mcard">
-            @if (c.imageUrl) {
-              <img [src]="c.imageUrl" alt="" class="mcard-thumb" (click)="viewCover(c)" />
-            }
-            <div class="mcard-head">
-              <h4 class="mcard-title">{{ c.title }}</h4>
-              <span class="badge badge-sm" [style.background]="c.statusColor">{{ c.statusLabel }}</span>
-            </div>
-            <div class="muted-label mcard-meta">{{ c.category }}</div>
-            @if (c.prerequisiteCourseIds.length) {
-              <div class="muted-label">Requires: {{ c.prerequisiteTitles.split(multiselectDelim).join(', ') }}</div>
-            }
-            <div class="course-facts">
-              <span>{{ c.totalSessions }} sessions</span>
-              <span>{{ c.passingLabel }} to pass</span>
-              <span>{{ c.offeringsCount }} offerings</span>
-            </div>
-            <div class="mcard-actions action-group">
-              <button type="button" class="icon-btn icon-btn-accent" (click)="goOverview(c)" title="View offerings">▦</button>
-              @if (!roleService.isInstructor()) {
-                <button type="button" class="icon-btn" (click)="goNeeds(c)" title="Donation needs">🎁</button>
-                <button type="button" class="icon-btn" (click)="goPhotos(c)" title="Photos">🖼</button>
-                <button type="button" class="icon-btn" (click)="goFeedback(c)" title="Feedback">★</button>
-                <button type="button" class="icon-btn" (click)="editCourse(c)" title="Edit">✎</button>
-              }
-            </div>
-          </div>
-        }
-      </div>
-    }
-
-    <app-table-toolbar [controller]="ctrl" slot="bottom"></app-table-toolbar>
-  }
+@if (error()) {
+  <div class="state-error card">{{ error() }}</div>
+} @else if (loading()) {
+  <div class="state-loading card">Loading courses…</div>
 } @else {
-  @if (offeringsError()) {
-    <div class="state-error card">{{ offeringsError() }}</div>
-  } @else if (offeringsLoading()) {
-    <div class="state-loading card">Loading class offerings…</div>
-  } @else {
-    <app-table-toolbar [controller]="offeringCtrl" slot="top"></app-table-toolbar>
+  <app-table-toolbar [controller]="ctrl" slot="top"></app-table-toolbar>
 
-    @if (offeringCtrl.effectiveView() === 'table') {
-      <div class="card" style="padding:0;overflow:hidden">
-        <table>
-          <thead><tr><th>Course</th><th>Branch</th><th>Instructor</th><th>Dates</th><th>Enrolled</th><th>Mode</th><th>Status</th><th></th></tr></thead>
-          <tbody>
-            @for (o of offeringCtrl.pageItems(); track o.id) {
-              <tr class="row">
-                <td style="font-weight:500">{{ o.courseTitle }}{{ o.code ? ' — ' + o.code : '' }}</td>
-                <td>{{ o.branchName }}</td>
-                <td>{{ o.instructorName }}</td>
-                <td>{{ o.dateRangeLabel }}</td>
-                <td>{{ o.enrolledCount }} / {{ o.capacity }}</td>
-                <td>{{ o.modeLabel }}</td>
-                <td>
-                  <span class="badge" [style.background]="offeringStatusColors[o.statusKey]">{{ o.statusLabel }}</span>
-                  @if (!o.courseActive) {
-                    <span class="badge" style="background:var(--w-muted)" title="The parent course is Inactive — this offering doesn't show on the public site regardless of its own status.">Course inactive</span>
+  @if (ctrl.effectiveView() === 'table') {
+    <div class="card" style="padding:0;overflow:hidden">
+      <table>
+        <thead><tr><th>Course</th><th>Category</th><th>Sessions</th><th>Passing %</th><th>Offerings</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+          @for (c of ctrl.pageItems(); track c.id) {
+            <tr class="row">
+              <td>
+                <div style="font-weight:500">{{ c.title }}</div>
+                @if (c.prerequisiteCourseIds.length) {
+                  <div class="muted-label">Requires: {{ c.prerequisiteTitles.split(multiselectDelim).join(', ') }}</div>
+                }
+              </td>
+              <td>{{ c.category }}</td>
+              <td>{{ c.totalSessions }}</td>
+              <td>{{ c.passingLabel }}</td>
+              <td>{{ c.offeringsCount }}</td>
+              <td><span class="badge" [style.background]="c.statusColor">{{ c.statusLabel }}</span></td>
+              <td>
+                <div class="action-group">
+                  <button type="button" class="icon-btn icon-btn-accent" (click)="goOverview(c)" title="View offerings">▦</button>
+                  @if (!roleService.isInstructor()) {
+                    <button type="button" class="icon-btn" (click)="goNeeds(c)" title="Donation needs">🎁</button>
+                    <button type="button" class="icon-btn" (click)="goPhotos(c)" title="Photos">🖼</button>
+                    <button type="button" class="icon-btn" (click)="goFeedback(c)" title="Feedback">★</button>
+                    <button type="button" class="icon-btn" (click)="editCourse(c)" title="Edit">✎</button>
                   }
-                </td>
-                <td>
-                  <div class="action-group">
-                    <button type="button" class="icon-btn icon-btn-accent" (click)="goOfferingEnrollment(o)" title="Enrollment & Attendance">☑</button>
-                    <button type="button" class="icon-btn" (click)="goOfferingWorkspace(o)" title="Open workspace">▤</button>
-                  </div>
-                </td>
-              </tr>
-            }
-            @if (!offeringCtrl.pageItems().length) {
-              <tr><td colspan="8" class="muted-cell" style="text-align:center;padding:20px">No class offerings yet — create one from a course's "View offerings" page.</td></tr>
-            }
-          </tbody>
-        </table>
-      </div>
-    } @else {
-      <div class="cardgrid">
-        @for (o of offeringCtrl.pageItems(); track o.id) {
-          <div class="mcard">
-            <div class="mcard-head">
-              <h4 class="mcard-title">{{ o.courseTitle }}{{ o.code ? ' — ' + o.code : '' }}</h4>
-              <span class="badge badge-sm" [style.background]="offeringStatusColors[o.statusKey]">{{ o.statusLabel }}</span>
-            </div>
-            @if (!o.courseActive) {
-              <div class="muted-label" style="color:var(--w-muted)">🔒 Course inactive — hidden from public site</div>
-            }
-            <div class="muted-label">{{ o.branchName }} · {{ o.instructorName }}</div>
-            <div class="muted-label mcard-meta">{{ o.dateRangeLabel }} · {{ o.modeLabel }}</div>
-            <div class="mcard-row">
-              <span>{{ o.enrolledCount }}/{{ o.capacity }} enrolled</span>
-              <div class="mcard-actions action-group">
-                <button type="button" class="icon-btn icon-btn-accent" (click)="goOfferingEnrollment(o)" title="Enrollment & Attendance">☑</button>
-                <button type="button" class="icon-btn" (click)="goOfferingWorkspace(o)" title="Open workspace">▤</button>
-              </div>
-            </div>
+                </div>
+              </td>
+            </tr>
+          }
+          @if (!ctrl.pageItems().length) {
+            <tr><td colspan="7" class="muted-cell" style="text-align:center;padding:20px">No courses yet.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <div class="cardgrid">
+      @for (c of ctrl.pageItems(); track c.id) {
+        <div class="mcard">
+          @if (c.imageUrl) {
+            <img [src]="c.imageUrl" alt="" class="mcard-thumb" (click)="viewCover(c)" />
+          }
+          <div class="mcard-head">
+            <h4 class="mcard-title">{{ c.title }}</h4>
+            <span class="badge badge-sm" [style.background]="c.statusColor">{{ c.statusLabel }}</span>
           </div>
-        }
-      </div>
-    }
-
-    <app-table-toolbar [controller]="offeringCtrl" slot="bottom"></app-table-toolbar>
+          <div class="muted-label mcard-meta">{{ c.category }}</div>
+          @if (c.prerequisiteCourseIds.length) {
+            <div class="muted-label">Requires: {{ c.prerequisiteTitles.split(multiselectDelim).join(', ') }}</div>
+          }
+          <div class="course-facts">
+            <span>{{ c.totalSessions }} sessions</span>
+            <span>{{ c.passingLabel }} to pass</span>
+            <span>{{ c.offeringsCount }} offerings</span>
+          </div>
+          <div class="mcard-actions action-group">
+            <button type="button" class="icon-btn icon-btn-accent" (click)="goOverview(c)" title="View offerings">▦</button>
+            @if (!roleService.isInstructor()) {
+              <button type="button" class="icon-btn" (click)="goNeeds(c)" title="Donation needs">🎁</button>
+              <button type="button" class="icon-btn" (click)="goPhotos(c)" title="Photos">🖼</button>
+              <button type="button" class="icon-btn" (click)="goFeedback(c)" title="Feedback">★</button>
+              <button type="button" class="icon-btn" (click)="editCourse(c)" title="Edit">✎</button>
+            }
+          </div>
+        </div>
+      }
+    </div>
   }
+
+  <app-table-toolbar [controller]="ctrl" slot="bottom"></app-table-toolbar>
 }

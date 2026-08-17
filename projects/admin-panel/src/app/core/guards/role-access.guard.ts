@@ -5,7 +5,7 @@ import { Role } from '../models/admin.models';
 
 /**
  * Reads `data.allow: Role[]` off the matched route. Instructor accounts are
- * scoped to Manage Course (which also has the All Offerings tab) / Enrollment & Attendance only
+ * scoped to Manage Course / All Offerings / Enrollment & Attendance only
  * (per the permission matrix in Willpower-Institute-Requirement-Summary-TH.md);
  * everything else is superadmin/admin only.
  */

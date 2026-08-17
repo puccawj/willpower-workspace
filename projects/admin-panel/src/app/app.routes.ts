@@ -112,7 +112,7 @@ export const routes: Routes = [
         path: 'courses',
         component: Courses,
         canActivate: [roleAccessGuard],
-        data: { title: 'Manage Course', subtitle: 'Subject templates and every offering scheduled across them', allow: ['superadmin', 'admin', 'instructor'] },
+        data: { title: 'Manage Course', subtitle: 'Subject templates — title, syllabus, sessions, prerequisites', allow: ['superadmin', 'admin', 'instructor'] },
       },
       {
         path: 'courses/:id',
@@ -144,9 +144,12 @@ export const routes: Routes = [
         canActivate: [roleAccessGuard],
         data: { title: 'Course Feedback', subtitle: 'Member star ratings and private notes across this course\'s offerings', allow: ['superadmin', 'admin'] },
       },
-      // All Offerings is now a tab on Manage Course rather than its own page — redirect any old
-      // bookmarks/links instead of leaving them 404.
-      { path: 'schedule', redirectTo: 'courses' },
+      {
+        path: 'schedule',
+        loadComponent: () => import('./pages/all-offerings/all-offerings').then((m) => m.AllOfferings),
+        canActivate: [roleAccessGuard],
+        data: { title: 'All Offerings', subtitle: 'Every class offering across every course — sorted by course', allow: ['superadmin', 'admin', 'instructor'] },
+      },
       {
         path: 'enrollment',
         component: Enrollment,
