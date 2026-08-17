@@ -72,6 +72,15 @@ const STATUS_LABEL: Record<ApiOfferingStatus, string> = {
   completed: 'Completed',
   cancelled: 'Cancelled',
 };
+/** Maps an offering's status to the exact option string in STATUS_OPTIONS — distinct from
+ * STATUS_LABEL (which reads naturally as a badge, e.g. "Published") because the <select>'s
+ * bound value must exactly match one of its own <option> values or the browser shows it blank. */
+const STATUS_TO_OPTION: Record<ApiOfferingStatus, string> = {
+  draft: 'Draft',
+  published: 'Publish',
+  completed: 'Completed',
+  cancelled: 'Cancelled',
+};
 
 function formatDate(iso: string): string {
   return new Date(`${iso}T00:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -349,7 +358,7 @@ export class OfferingWorkspace {
           capacity: o.capacity ?? 0,
           location: o.location ?? '',
           mode: o.mode === 'onsite' ? 'Onsite' : 'Online',
-          status: STATUS_LABEL[o.status],
+          status: STATUS_TO_OPTION[o.status],
         },
         onSave: (values) =>
           from(this.confirmNoBlockingConflicts(values)).pipe(
