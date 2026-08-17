@@ -1,51 +1,48 @@
 <div class="card pad">
-  <div class="session-picker-row">
-    <div class="field-inline">
-      <label class="muted-label">Offering</label>
-      <select
-        class="form-input"
-        [ngModel]="selectedOfferingId()"
-        (ngModelChange)="selectOffering($event)"
-      >
-        @for (o of offerings(); track o.id) {
-          <option [value]="o.id">{{ o.courseTitle }} — {{ o.branchName }} ({{ o.instructorName ?? 'Unassigned' }})</option>
-        }
-      </select>
-    </div>
-    <div class="field-inline">
-      <label class="muted-label">Session</label>
-      <select
-        class="form-input"
-        [ngModel]="selectedSessionId()"
-        (ngModelChange)="selectSession($event)"
-      >
-        @for (s of sessions(); track s.id) {
-          <option [value]="s.id">Session {{ s.sessionNo }} — {{ s.sessionDate }}</option>
-        }
-      </select>
-    </div>
-  </div>
+  <label class="muted-label">Offering</label>
+  <app-typeahead
+    [options]="offeringOptions()"
+    [value]="selectedOfferingId()"
+    placeholder="Search by course, branch, or instructor…"
+    (valueChange)="selectOffering($event)"
+  ></app-typeahead>
 
-  <div class="session-banner">
-    @if (selectedOffering(); as off) {
-      <div>
-        <h2 class="session-title">{{ off.courseTitle }} — {{ off.branchName }}</h2>
-        <div class="muted-label">
-          Instructor: {{ off.instructorName ?? 'Unassigned' }}
-          @if (selectedSession(); as s) {
-            · Session {{ s.sessionNo }} · {{ s.sessionDate }} · {{ s.startTime.slice(0, 5) }}–{{ s.endTime.slice(0, 5) }}
+  @if (selectedOffering(); as off) {
+    <div class="session-row">
+      <label class="muted-label">Session</label>
+      @if (sessions().length) {
+        <div class="session-pills">
+          @for (s of sessions(); track s.id) {
+            <button
+              type="button"
+              class="session-pill"
+              [class.active]="s.id === selectedSessionId()"
+              (click)="selectSession(s.id)"
+            >
+              {{ formatSessionPill(s) }}
+            </button>
           }
         </div>
-      </div>
-    } @else {
-      <div class="muted-label">No offering selected.</div>
-    }
-
-    <div class="action-group">
-      <button type="button" class="btn btn-outline" (click)="addStudent()">+ Add Student</button>
-      <button type="button" class="btn btn-outline" (click)="openQrDialog()" [disabled]="!selectedSessionId()">▤ Show check-in QR</button>
+      } @else {
+        <span class="muted-label">This offering has no sessions yet.</span>
+      }
     </div>
-  </div>
+
+    <div class="session-banner">
+      <div class="muted-label">
+        {{ off.instructorName ?? 'Unassigned' }}
+        @if (selectedSession(); as s) {
+          · {{ s.startTime.slice(0, 5) }}–{{ s.endTime.slice(0, 5) }}{{ s.topic ? ' · ' + s.topic : '' }}
+        }
+      </div>
+      <div class="action-group">
+        <button type="button" class="btn btn-outline" (click)="addStudent()">+ Add Student</button>
+        <button type="button" class="btn btn-outline" (click)="openQrDialog()" [disabled]="!selectedSessionId()">▤ Show check-in QR</button>
+      </div>
+    </div>
+  } @else {
+    <p class="muted-label empty-hint">Search for an offering above to see and manage its roster.</p>
+  }
 </div>
 
 @if (qrOpen()) {
@@ -71,73 +68,75 @@
   </div>
 }
 
-@if (error()) {
-  <div class="state-error card">{{ error() }}</div>
-} @else if (loading()) {
-  <div class="state-loading card">Loading enrollments…</div>
-} @else {
-  <app-table-toolbar [controller]="ctrl" slot="top"></app-table-toolbar>
-
-  @if (ctrl.effectiveView() === 'table') {
-    <div class="card" style="padding:0;overflow:hidden">
-      <table>
-        <thead><tr><th>Student</th><th>Enrolled</th><th>Cumulative attendance</th><th>This session</th><th></th></tr></thead>
-        <tbody>
-          @for (e of ctrl.pageItems(); track e.userId) {
-            <tr class="row">
-              <td>
-                <div class="name-cell">
-                  <div class="avatar-sm" [style.background]="e.avatarColor">{{ e.initials }}</div>{{ e.name }}
-                </div>
-              </td>
-              <td>{{ e.enrolledLabel }}</td>
-              <td style="width:180px">
-                <div class="pct-row">
-                  <div class="pct-track"><div class="pct-fill" [style.width.%]="e.pctValue" [style.background]="e.pctColor"></div></div>
-                  <span class="pct-label">{{ e.pctLabel }}</span>
-                </div>
-              </td>
-              <td><span class="badge" [style.background]="e.presentColor">{{ e.presentLabel }}</span></td>
-              <td>
-                <div class="action-group">
-                  <button type="button" class="icon-btn icon-btn-accent" (click)="toggleAttendance(e)" [title]="e.present ? 'Mark absent' : 'Mark present'">{{ e.present ? '↺' : '☑' }}</button>
-                  <button type="button" class="icon-btn" style="color:var(--w-red)" (click)="removeEnrollment(e)" title="Remove enrollment">✕</button>
-                </div>
-              </td>
-            </tr>
-          }
-          @if (!ctrl.pageItems().length) {
-            <tr><td colspan="5" class="muted-cell" style="text-align:center;padding:20px">No students enrolled yet — click "+ Add Student" to enroll one.</td></tr>
-          }
-        </tbody>
-      </table>
-    </div>
+@if (selectedOfferingId()) {
+  @if (error()) {
+    <div class="state-error card">{{ error() }}</div>
+  } @else if (loading()) {
+    <div class="state-loading card">Loading enrollments…</div>
   } @else {
-    <div class="cardgrid">
-      @for (e of ctrl.pageItems(); track e.userId) {
-        <div class="mcard">
-          <div class="mcard-person">
-            <div class="avatar-md" [style.background]="e.avatarColor">{{ e.initials }}</div>
-            <div>
-              <div class="person-name">{{ e.name }}</div>
-              <div class="muted-label">Enrolled {{ e.enrolledLabel }}</div>
-            </div>
-          </div>
-          <div class="pct-row mcard-meta">
-            <div class="pct-track"><div class="pct-fill" [style.width.%]="e.pctValue" [style.background]="e.pctColor"></div></div>
-            <span class="pct-label">{{ e.pctLabel }}</span>
-          </div>
-          <div class="mcard-row">
-            <span class="badge badge-sm" [style.background]="e.presentColor">{{ e.presentLabel }}</span>
-            <div class="action-group">
-              <button type="button" class="icon-btn icon-btn-accent" (click)="toggleAttendance(e)" [title]="e.present ? 'Mark absent' : 'Mark present'">{{ e.present ? '↺' : '☑' }}</button>
-              <button type="button" class="icon-btn" style="color:var(--w-red)" (click)="removeEnrollment(e)" title="Remove enrollment">✕</button>
-            </div>
-          </div>
-        </div>
-      }
-    </div>
-  }
+    <app-table-toolbar [controller]="ctrl" slot="top"></app-table-toolbar>
 
-  <app-table-toolbar [controller]="ctrl" slot="bottom"></app-table-toolbar>
+    @if (ctrl.effectiveView() === 'table') {
+      <div class="card" style="padding:0;overflow:hidden">
+        <table>
+          <thead><tr><th>Student</th><th>Enrolled</th><th>Cumulative attendance</th><th>This session</th><th></th></tr></thead>
+          <tbody>
+            @for (e of ctrl.pageItems(); track e.userId) {
+              <tr class="row">
+                <td>
+                  <div class="name-cell">
+                    <div class="avatar-sm" [style.background]="e.avatarColor">{{ e.initials }}</div>{{ e.name }}
+                  </div>
+                </td>
+                <td>{{ e.enrolledLabel }}</td>
+                <td style="width:180px">
+                  <div class="pct-row">
+                    <div class="pct-track"><div class="pct-fill" [style.width.%]="e.pctValue" [style.background]="e.pctColor"></div></div>
+                    <span class="pct-label">{{ e.pctLabel }}</span>
+                  </div>
+                </td>
+                <td><span class="badge" [style.background]="e.presentColor">{{ e.presentLabel }}</span></td>
+                <td>
+                  <div class="action-group">
+                    <button type="button" class="icon-btn icon-btn-accent" (click)="toggleAttendance(e)" [title]="e.present ? 'Mark absent' : 'Mark present'">{{ e.present ? '↺' : '☑' }}</button>
+                    <button type="button" class="icon-btn" style="color:var(--w-red)" (click)="removeEnrollment(e)" title="Remove enrollment">✕</button>
+                  </div>
+                </td>
+              </tr>
+            }
+            @if (!ctrl.pageItems().length) {
+              <tr><td colspan="5" class="muted-cell" style="text-align:center;padding:20px">No students enrolled yet — click "+ Add Student" to enroll one.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <div class="cardgrid">
+        @for (e of ctrl.pageItems(); track e.userId) {
+          <div class="mcard">
+            <div class="mcard-person">
+              <div class="avatar-md" [style.background]="e.avatarColor">{{ e.initials }}</div>
+              <div>
+                <div class="person-name">{{ e.name }}</div>
+                <div class="muted-label">Enrolled {{ e.enrolledLabel }}</div>
+              </div>
+            </div>
+            <div class="pct-row mcard-meta">
+              <div class="pct-track"><div class="pct-fill" [style.width.%]="e.pctValue" [style.background]="e.pctColor"></div></div>
+              <span class="pct-label">{{ e.pctLabel }}</span>
+            </div>
+            <div class="mcard-row">
+              <span class="badge badge-sm" [style.background]="e.presentColor">{{ e.presentLabel }}</span>
+              <div class="action-group">
+                <button type="button" class="icon-btn icon-btn-accent" (click)="toggleAttendance(e)" [title]="e.present ? 'Mark absent' : 'Mark present'">{{ e.present ? '↺' : '☑' }}</button>
+                <button type="button" class="icon-btn" style="color:var(--w-red)" (click)="removeEnrollment(e)" title="Remove enrollment">✕</button>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <app-table-toolbar [controller]="ctrl" slot="bottom"></app-table-toolbar>
+  }
 }

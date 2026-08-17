@@ -12,6 +12,11 @@ import { ConfirmService } from '../../core/services/confirm.service';
 import { ToastService } from '../../core/services/toast.service';
 import { ListController } from '../../core/list-controller';
 import { TableToolbar } from '../../shared/table-toolbar/table-toolbar';
+import { Typeahead, TypeaheadOption } from '../../shared/typeahead/typeahead';
+
+function formatSessionDate(iso: string): string {
+  return new Date(`${iso}T00:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
 
 interface EnrollmentRow {
   userId: string;
@@ -47,7 +52,7 @@ function toRow(e: ApiEnrollmentRow): EnrollmentRow {
 
 @Component({
   selector: 'app-enrollment',
-  imports: [TableToolbar, FormsModule],
+  imports: [TableToolbar, FormsModule, Typeahead],
   templateUrl: './enrollment.html',
   styleUrl: './enrollment.scss',
 })
@@ -75,6 +80,15 @@ export class Enrollment {
 
   readonly selectedOffering = computed(() => this.offerings().find((o) => o.id === this.selectedOfferingId()) ?? null);
   readonly selectedSession = computed(() => this.sessions().find((s) => s.id === this.selectedSessionId()) ?? null);
+
+  /** Searchable instead of a flat <select> with every offering in the institute in one unscannable
+   * list — the whole point of this redesign. */
+  readonly offeringOptions = computed<TypeaheadOption[]>(() =>
+    this.offerings().map((o) => ({ id: o.id, label: `${o.courseTitle} — ${o.branchName} (${o.instructorName ?? 'Unassigned'})` })),
+  );
+  formatSessionPill(s: ApiCourseSession): string {
+    return `${s.sessionNo} · ${formatSessionDate(s.sessionDate)}`;
+  }
 
   private readonly rows = computed<EnrollmentRow[]>(() => this.enrollmentApi.enrollments().map(toRow));
 
