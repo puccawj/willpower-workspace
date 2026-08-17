@@ -40,6 +40,7 @@ function formatDate(iso: string): string {
 
 interface OfferingListRow {
   id: string;
+  code: string | null;
   branchName: string;
   instructorName: string;
   dateRangeLabel: string;
@@ -54,6 +55,7 @@ interface OfferingListRow {
 function toRow(o: ApiOffering): OfferingListRow {
   return {
     id: o.id,
+    code: o.code,
     branchName: o.branchName,
     instructorName: o.instructorName ?? 'Unassigned',
     dateRangeLabel: `${formatDate(o.startDate)} – ${formatDate(o.endDate)}`,
@@ -237,6 +239,7 @@ export class CourseOverview {
 
   private offeringFields(): FieldDef[] {
     return [
+      { key: 'code', label: 'Code / Nickname', type: 'text', hint: 'Optional — e.g. "Morning Batch". Shown on the public site.' },
       { key: 'branch', label: 'Branch', type: 'typeahead', relOptions: this.branchOptions() },
       { key: 'instructor', label: 'Instructor', type: 'typeahead', relOptions: this.instructorOptions(), hint: 'Optional' },
       { key: 'startDate', label: 'Start date', type: 'date' },
@@ -259,6 +262,7 @@ export class CourseOverview {
         fields: this.offeringFields(),
         isEdit: false,
         values: {
+          code: '',
           branch: this.branchOptions()[0]?.id ?? '',
           instructor: '',
           startDate: '',
@@ -277,6 +281,8 @@ export class CourseOverview {
             mode: String(values['mode'] ?? 'Onsite').toLowerCase() as OfferingPayload['mode'],
             status: STATUS_TO_API[String(values['status'] ?? '')] ?? 'draft',
           };
+          const code = String(values['code'] ?? '').trim();
+          if (code) payload.code = code;
           const instructorId = String(values['instructor'] ?? '').trim();
           if (instructorId) payload.instructorId = instructorId;
           const location = String(values['location'] ?? '').trim();

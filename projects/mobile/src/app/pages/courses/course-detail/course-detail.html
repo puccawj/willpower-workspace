@@ -64,7 +64,7 @@
                 </div>
                 <div class="offering-card-head">
                   <div class="offering-info">
-                    <div class="offering-branch">{{ o.branchName }} · {{ o.mode }}</div>
+                    <div class="offering-branch">{{ o.branchName }} · {{ o.mode }}{{ o.code ? ' · ' + o.code : '' }}</div>
                     <div class="offering-dates">{{ o.startDate }} – {{ o.endDate }}</div>
                     @if (formatSchedule(o.scheduleSummary); as schedule) {
                       <div class="offering-schedule">{{ schedule }}</div>

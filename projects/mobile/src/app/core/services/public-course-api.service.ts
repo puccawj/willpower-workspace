@@ -48,6 +48,7 @@ export interface PublicOfferingScheduleSlot {
 
 export interface PublicOffering {
   id: string;
+  code: string | null;
   branchId: string;
   branchName: string;
   branchCity: string | null;
@@ -64,6 +65,7 @@ export interface PublicOffering {
 interface ApiPublicCourseOfferingCard {
   courseId: string;
   offeringId: string;
+  code: string | null;
   title: string;
   category: string | null;
   imageUrl: string | null;
@@ -83,6 +85,7 @@ interface ApiPublicCourseOfferingCard {
 export interface PublicCourseOfferingCard {
   courseId: string;
   offeringId: string;
+  code: string | null;
   title: string;
   level: string;
   img: string;
@@ -200,6 +203,7 @@ function toPublicCourseOfferingCard(row: ApiPublicCourseOfferingCard, index: num
   return {
     courseId: row.courseId,
     offeringId: row.offeringId,
+    code: row.code,
     title: row.title,
     level: row.category ?? 'Course',
     img: row.imageUrl ?? FALLBACK_IMAGES[index % FALLBACK_IMAGES.length],

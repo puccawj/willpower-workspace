@@ -277,6 +277,7 @@ export class OfferingWorkspace {
 
   private offeringFields(): FieldDef[] {
     return [
+      { key: 'code', label: 'Code / Nickname', type: 'text', hint: 'Optional — e.g. "Morning Batch". Shown on the public site.' },
       { key: 'branch', label: 'Branch', type: 'typeahead', relOptions: this.branchOptions() },
       { key: 'instructor', label: 'Instructor', type: 'typeahead', relOptions: this.instructorOptions(), hint: 'Optional' },
       { key: 'startDate', label: 'Start date', type: 'date' },
@@ -297,6 +298,8 @@ export class OfferingWorkspace {
       mode: String(values['mode'] ?? 'Onsite').toLowerCase() as OfferingPayload['mode'],
       status: STATUS_TO_API[String(values['status'] ?? '')] ?? 'draft',
     };
+    const code = String(values['code'] ?? '').trim();
+    payload.code = code;
     const instructorId = String(values['instructor'] ?? '').trim();
     if (instructorId) payload.instructorId = instructorId;
     const location = String(values['location'] ?? '').trim();
@@ -351,6 +354,7 @@ export class OfferingWorkspace {
         fields: this.offeringFields(),
         isEdit: true,
         values: {
+          code: o.code ?? '',
           branch: o.branchId,
           instructor: o.instructorId ?? '',
           startDate: o.startDate,

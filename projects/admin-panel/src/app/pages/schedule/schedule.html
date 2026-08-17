@@ -12,7 +12,7 @@
         <tbody>
           @for (o of ctrl.pageItems(); track o.id) {
             <tr class="row">
-              <td style="font-weight:500">{{ o.courseTitle }}</td>
+              <td style="font-weight:500">{{ o.courseTitle }}{{ o.code ? ' — ' + o.code : '' }}</td>
               <td>{{ o.branchName }}</td>
               <td>{{ o.instructorName }}</td>
               <td>{{ o.dateRangeLabel }}</td>
@@ -38,7 +38,7 @@
       @for (o of ctrl.pageItems(); track o.id) {
         <div class="mcard">
           <div class="mcard-head">
-            <h4 class="mcard-title">{{ o.courseTitle }}</h4>
+            <h4 class="mcard-title">{{ o.courseTitle }}{{ o.code ? ' — ' + o.code : '' }}</h4>
             <span class="badge badge-sm" [style.background]="statusColors[o.statusKey]">{{ o.statusLabel }}</span>
           </div>
           <div class="muted-label">{{ o.branchName }} · {{ o.instructorName }}</div>

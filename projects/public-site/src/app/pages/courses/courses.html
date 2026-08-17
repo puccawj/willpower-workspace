@@ -36,7 +36,7 @@
             @if (group.prerequisiteTitles.length) {
               <span class="prereq-pill" [title]="'Requires: ' + group.prerequisiteTitles.join(', ')">Requires {{ group.prerequisiteTitles.join(', ') }}</span>
             }
-            <p class="course-desc-lg">{{ o.branchName }} &middot; {{ o.startDate }} – {{ o.endDate }}</p>
+            <p class="course-desc-lg">{{ o.branchName }}{{ o.code ? ' — ' + o.code : '' }} &middot; {{ o.startDate }} – {{ o.endDate }}</p>
             @if (formatSchedule(o.scheduleSummary); as sched) {
               <p class="course-desc-lg">{{ sched }}</p>
             }
@@ -66,7 +66,7 @@
                       class="offering-row"
                     >
                       <span>
-                        <span class="offering-branch">{{ alt.branchName }}</span>
+                        <span class="offering-branch">{{ alt.branchName }}{{ alt.code ? ' — ' + alt.code : '' }}</span>
                         <div class="offering-dates">{{ alt.startDate }} – {{ alt.endDate }}</div>
                       </span>
                       <span class="offering-dates">{{ alt.spotsLeft ?? '—' }} seats left</span>

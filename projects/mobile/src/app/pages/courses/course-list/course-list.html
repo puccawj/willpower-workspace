@@ -22,7 +22,7 @@
               </div>
             </div>
             <div class="course-card-body">
-              <div class="course-level">{{ o.branchName }} · {{ o.format }}</div>
+              <div class="course-level">{{ o.branchName }}{{ o.code ? ' — ' + o.code : '' }} · {{ o.format }}</div>
               <div class="course-title">{{ group.title }}</div>
               <div class="course-open">
                 {{ o.shortStartDate }} · {{ o.open }}
@@ -49,7 +49,7 @@
                     class="offering-row"
                   >
                     <span>
-                      <span class="offering-branch">{{ alt.branchName }}</span>
+                      <span class="offering-branch">{{ alt.branchName }}{{ alt.code ? ' — ' + alt.code : '' }}</span>
                       <div class="offering-dates">{{ alt.startDate }} – {{ alt.endDate }}</div>
                     </span>
                     <span class="offering-dates">{{ alt.spotsLeft ?? '—' }} seats left</span>

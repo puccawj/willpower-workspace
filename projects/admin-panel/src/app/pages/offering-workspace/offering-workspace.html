@@ -5,7 +5,7 @@
 } @else if (offering(); as o) {
   <div class="card pad workspace-head">
     <div>
-      <h2 class="summary-title">{{ o.courseTitle }} — {{ o.branchName }}</h2>
+      <h2 class="summary-title">{{ o.courseTitle }} — {{ o.branchName }}{{ o.code ? ' — ' + o.code : '' }}</h2>
       <div class="muted-label">
         {{ o.instructorName ?? 'Unassigned' }} · {{ dateRangeLabel() }} · {{ o.mode === 'onsite' ? 'Onsite' : 'Online' }}
         · {{ o.enrolledCount }}/{{ o.capacity ?? 0 }} enrolled
@@ -27,6 +27,7 @@
             }
           </div>
           <div class="detail-grid">
+            <div><div class="muted-label">Code / Nickname</div><div>{{ o.code || '—' }}</div></div>
             <div><div class="muted-label">Branch</div><div>{{ o.branchName }}</div></div>
             <div><div class="muted-label">Instructor</div><div>{{ o.instructorName ?? 'Unassigned' }}</div></div>
             <div><div class="muted-label">Dates</div><div>{{ dateRangeLabel() }}</div></div>

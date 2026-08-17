@@ -7,6 +7,7 @@ import { TableToolbar } from '../../shared/table-toolbar/table-toolbar';
 
 interface OfferingRow {
   id: string;
+  code: string | null;
   courseId: string;
   courseTitle: string;
   branchName: string;
@@ -45,6 +46,7 @@ function formatDate(iso: string): string {
 function toRow(o: ApiOffering): OfferingRow {
   return {
     id: o.id,
+    code: o.code,
     courseId: o.courseId,
     courseTitle: o.courseTitle,
     branchName: o.branchName,

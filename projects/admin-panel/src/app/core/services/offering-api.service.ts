@@ -8,6 +8,7 @@ export type ApiOfferingStatus = 'draft' | 'published' | 'completed' | 'cancelled
 
 export interface ApiOffering {
   id: string;
+  code: string | null;
   courseId: string;
   courseTitle: string;
   totalSessions: number;
@@ -38,6 +39,7 @@ export interface ApiCourseSession {
 export interface OfferingPayload {
   courseId: string;
   branchId: string;
+  code?: string;
   instructorId?: string;
   startDate: string;
   endDate: string;
