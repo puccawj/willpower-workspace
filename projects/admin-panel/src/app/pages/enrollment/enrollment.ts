@@ -16,7 +16,7 @@ import { Typeahead, TypeaheadOption } from '../../shared/typeahead/typeahead';
 import { StatCardData, StatCards } from '../../shared/stat-cards/stat-cards';
 
 function formatSessionDate(iso: string): string {
-  return new Date(`${iso}T00:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  return new Date(`${iso}T00:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
 function formatDate(iso: string): string {
