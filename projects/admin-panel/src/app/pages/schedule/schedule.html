@@ -1,9 +1,3 @@
-@if (!roleService.isInstructor()) {
-  <div class="page-toolbar toolbar-end">
-    <button type="button" class="btn btn-solid" (click)="addOffering()">+ New Offering</button>
-  </div>
-}
-
 @if (error()) {
   <div class="state-error card">{{ error() }}</div>
 } @else if (loading()) {
@@ -34,7 +28,7 @@
             </tr>
           }
           @if (!ctrl.pageItems().length) {
-            <tr><td colspan="8" class="muted-cell" style="text-align:center;padding:20px">No class offerings yet.</td></tr>
+            <tr><td colspan="8" class="muted-cell" style="text-align:center;padding:20px">No class offerings yet — create one from Manage Course.</td></tr>
           }
         </tbody>
       </table>
