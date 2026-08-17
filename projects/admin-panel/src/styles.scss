@@ -464,3 +464,48 @@ td {
     grid-template-columns: 1fr;
   }
 }
+
+// Printing the classroom check-in QR poster (Offering Workspace > Roster tab > Show check-in
+// QR > Print for wall). Kept global rather than component-scoped so `body *` and the ID-scoped
+// overrides below actually reach elements outside the component's own emulated CSS encapsulation.
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  #qr-print-area,
+  #qr-print-area * {
+    visibility: visible;
+  }
+
+  #qr-print-area {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  #qr-print-area .qr-print-title {
+    font-size: 28px;
+  }
+
+  #qr-print-area .qr-print-subtitle {
+    font-size: 16px;
+  }
+
+  #qr-print-area .qr-display-img {
+    max-width: 70vw;
+    width: 420px;
+  }
+
+  #qr-print-area .qr-print-instruction {
+    font-size: 18px;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+}

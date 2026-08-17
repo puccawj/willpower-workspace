@@ -158,6 +158,33 @@
   margin: -6px 0 12px;
 }
 
+.qr-print-area {
+  text-align: center;
+}
+
+.qr-print-title {
+  font: 500 16px var(--w-font-serif);
+  margin-bottom: 2px;
+}
+
+.qr-print-subtitle {
+  font: 400 12.5px var(--w-font-sans);
+  color: var(--w-muted);
+  margin-bottom: 10px;
+}
+
+.qr-print-instruction {
+  font: 500 12.5px var(--w-font-sans);
+  color: var(--w-ink-soft);
+  margin-top: 10px;
+}
+
+.qr-print-btn {
+  display: block;
+  width: 100%;
+  margin-top: 16px;
+}
+
 .need-rows {
   display: flex;
   flex-direction: column;

@@ -1,9 +1,15 @@
-import { Component, computed, effect, input, output, signal } from '@angular/core';
+import { Component, ElementRef, computed, effect, input, output, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 export interface TypeaheadOption {
   id: string;
   label: string;
+}
+
+export interface TypeaheadListPosition {
+  top: number;
+  left: number;
+  width: number;
 }
 
 /** Reusable relational picker: carries an id alongside its display label, backed by a real
@@ -21,8 +27,14 @@ export class Typeahead {
   readonly disabled = input(false);
   readonly valueChange = output<string>();
 
+  private readonly inputRef = viewChild<ElementRef<HTMLInputElement>>('inputEl');
+
   readonly query = signal('');
   readonly open = signal(false);
+  /** Rendered via position:fixed at these viewport coordinates instead of position:absolute, so
+   * the list escapes any ancestor with overflow:auto/hidden (e.g. a scrollable modal dialog)
+   * instead of being clipped at that ancestor's edge. */
+  readonly listPosition = signal<TypeaheadListPosition | null>(null);
 
   readonly filtered = computed(() => {
     const q = this.query().trim().toLowerCase();
@@ -43,12 +55,21 @@ export class Typeahead {
     });
   }
 
+  private updateListPosition(): void {
+    const el = this.inputRef()?.nativeElement;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    this.listPosition.set({ top: rect.bottom + 4, left: rect.left, width: rect.width });
+  }
+
   onFocus(): void {
+    this.updateListPosition();
     this.open.set(true);
   }
 
   onInput(text: string): void {
     this.query.set(text);
+    this.updateListPosition();
     this.open.set(true);
     if (!text) this.valueChange.emit('');
   }

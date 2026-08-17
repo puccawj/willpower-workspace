@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -246,20 +246,33 @@ export class OfferingWorkspace {
   );
 
   constructor() {
-    const courseId = this.courseId();
-    const offeringId = this.offeringId();
     this.offeringApi.load().subscribe();
     this.branchApi.load().subscribe();
     this.userApi.load().subscribe();
-    if (courseId) {
-      this.courseApi.getOne(courseId).subscribe({ next: (c) => this.course.set(c) });
-      this.needApi.load(courseId).subscribe();
-    }
-    if (offeringId) {
-      this.refreshSessions(offeringId);
-      this.certApi.load(offeringId).subscribe();
-      this.loadActiveTemplate();
-    }
+
+    // Angular reuses this component instance when navigating between two offerings (only the
+    // :offeringId route param changes) — an effect keyed on courseId()/offeringId() re-runs this
+    // load on every such navigation, not just on first construction, and resets tab-scoped state
+    // so the new offering doesn't briefly show the previous one's session/roster selection.
+    effect(() => {
+      const courseId = this.courseId();
+      const offeringId = this.offeringId();
+
+      this.activeTab.set('overview');
+      this.selectedSessionId.set('');
+      this.sessions.set([]);
+      this.qrOpen.set(false);
+
+      if (courseId) {
+        this.courseApi.getOne(courseId).subscribe({ next: (c) => this.course.set(c) });
+        this.needApi.load(courseId).subscribe();
+      }
+      if (offeringId) {
+        this.refreshSessions(offeringId);
+        this.certApi.load(offeringId).subscribe();
+        this.loadActiveTemplate();
+      }
+    });
   }
 
   private showError(err: unknown, fallback: string): void {
@@ -616,6 +629,12 @@ export class OfferingWorkspace {
 
   closeQrDialog(): void {
     this.qrOpen.set(false);
+  }
+
+  /** Prints only #qr-print-area (course/session title + the QR itself) via a print stylesheet
+   * that hides everything else — meant to be posted on a classroom wall for students to scan. */
+  printQr(): void {
+    window.print();
   }
 
   // =========================================================================

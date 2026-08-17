@@ -1,5 +1,6 @@
 <div class="typeahead">
   <input
+    #inputEl
     class="form-input"
     type="text"
     autocomplete="off"
@@ -10,16 +11,17 @@
     (blur)="onBlur()"
     [placeholder]="placeholder()"
   />
-  @if (open() && filtered().length) {
-    <div class="typeahead-list">
-      @for (opt of filtered(); track opt.id) {
-        <div class="typeahead-option" [class.selected]="opt.id === value()" (mousedown)="select(opt)">{{ opt.label }}</div>
-      }
-    </div>
-  }
-  @if (open() && !filtered().length) {
-    <div class="typeahead-list">
-      <div class="typeahead-empty">No matches</div>
-    </div>
+  @if (open() && listPosition(); as pos) {
+    @if (filtered().length) {
+      <div class="typeahead-list" [style.top.px]="pos.top" [style.left.px]="pos.left" [style.width.px]="pos.width">
+        @for (opt of filtered(); track opt.id) {
+          <div class="typeahead-option" [class.selected]="opt.id === value()" (mousedown)="select(opt)">{{ opt.label }}</div>
+        }
+      </div>
+    } @else {
+      <div class="typeahead-list" [style.top.px]="pos.top" [style.left.px]="pos.left" [style.width.px]="pos.width">
+        <div class="typeahead-empty">No matches</div>
+      </div>
+    }
   }
 </div>

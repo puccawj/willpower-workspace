@@ -7,11 +7,11 @@
 }
 
 .typeahead-list {
-  position: absolute;
-  top: calc(100% + 4px);
-  left: 0;
-  right: 0;
-  z-index: 50;
+  // Fixed (not absolute) so the list escapes any ancestor with overflow:auto/hidden — e.g. the
+  // crud-modal dialog, which scrolls its own content and would otherwise clip this at its edge.
+  // Coordinates are computed in TS from the input's real screen position.
+  position: fixed;
+  z-index: 500;
   max-height: 220px;
   overflow-y: auto;
   padding: 6px;
