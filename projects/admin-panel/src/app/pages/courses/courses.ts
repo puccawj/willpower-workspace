@@ -1,10 +1,11 @@
 import { Component, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, map, of, switchMap, tap } from 'rxjs';
+import { Observable, from, map, of, switchMap, tap, throwError } from 'rxjs';
 import { ApiCourse, CourseApiService, CoursePayload } from '../../core/services/course-api.service';
 import { CrudModalService } from '../../core/services/crud-modal.service';
 import { MULTISELECT_DELIM } from '../../shared/crud-modal/crud-modal';
 import { ImageViewerService } from '../../core/services/image-viewer.service';
+import { ConfirmService } from '../../core/services/confirm.service';
 import { RoleService } from '../../core/services/role.service';
 import { ToastService } from '../../core/services/toast.service';
 import { UploadApiService } from '../../core/services/upload-api.service';
@@ -57,6 +58,7 @@ function toRow(c: ApiCourse, titleById: Map<string, string>): CourseRow {
 export class Courses {
   private readonly api = inject(CourseApiService);
   private readonly modal = inject(CrudModalService);
+  private readonly confirmSvc = inject(ConfirmService);
   private readonly toast = inject(ToastService);
   private readonly router = inject(Router);
   private readonly uploads = inject(UploadApiService);
@@ -117,6 +119,13 @@ export class Courses {
       { key: 'totalSessions', label: 'Total sessions', type: 'number' },
       { key: 'passingAttendancePercent', label: 'Passing % (attendance)', type: 'number' },
       {
+        key: 'status',
+        label: 'Status',
+        type: 'select',
+        options: ['Active', 'Inactive'],
+        hint: 'Inactive hides every offering of this course from the public site, regardless of their own status.',
+      },
+      {
         key: 'prerequisites',
         label: 'Prerequisite courses',
         type: 'multiselect',
@@ -142,8 +151,20 @@ export class Courses {
       category: String(values['category'] ?? '').trim() || undefined,
       totalSessions: Number(values['totalSessions']) || 1,
       passingAttendancePercent: Number(values['passingAttendancePercent']) || 80,
+      status: String(values['status'] ?? 'Active') === 'Inactive' ? 'inactive' : 'active',
       prerequisiteCourseIds,
     };
+  }
+
+  /** Confirms before actually deactivating — inactivating hides every offering of this course from
+   * the public site regardless of the offering's own status, so it's worth a deliberate check. */
+  private async confirmIfDeactivating(values: Record<string, string | number>, wasActive: boolean, offeringsCount: number): Promise<boolean> {
+    const goingInactive = String(values['status'] ?? 'Active') === 'Inactive';
+    if (!wasActive || !goingInactive) return true;
+    return this.confirmSvc.ask(
+      `This course has ${offeringsCount} offering${offeringsCount === 1 ? '' : 's'}. Setting it to Inactive will hide ${offeringsCount === 1 ? 'it' : 'all of them'} from the public site immediately, even ones marked Published.`,
+      { title: 'Deactivate Course', confirmLabel: 'Set Inactive', danger: true },
+    );
   }
 
   private resolvePayload(values: Record<string, string | number>): Observable<CoursePayload> {
@@ -168,6 +189,7 @@ export class Courses {
         category: '',
         totalSessions: 8,
         passingAttendancePercent: 80,
+        status: 'Active',
         prerequisites: '',
         image: '',
       },
@@ -191,13 +213,19 @@ export class Courses {
         category: row.category === '—' ? '' : row.category,
         totalSessions: row.totalSessions,
         passingAttendancePercent: Number(row.passingLabel.replace('%', '')),
+        status: row.isActive ? 'Active' : 'Inactive',
         prerequisites: row.prerequisiteTitles,
         image: row.imageUrl,
       },
       onSave: (values) =>
-        this.resolvePayload(values).pipe(
+        from(this.confirmIfDeactivating(values, row.isActive, row.offeringsCount)).pipe(
+          switchMap((ok) => (ok ? this.resolvePayload(values) : throwError(() => new Error('deactivate-declined')))),
           switchMap((payload) => this.api.update(row.id, payload)),
-          tap({ error: (err) => this.showError(err, 'Failed to update course.') }),
+          tap({
+            error: (err) => {
+              if ((err as Error)?.message !== 'deactivate-declined') this.showError(err, 'Failed to update course.');
+            },
+          }),
         ),
       onDelete: () =>
         this.api.remove(row.id).pipe(tap({ error: (err) => this.showError(err, 'Failed to delete course.') })),

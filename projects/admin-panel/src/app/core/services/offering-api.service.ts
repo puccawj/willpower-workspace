@@ -11,6 +11,7 @@ export interface ApiOffering {
   code: string | null;
   courseId: string;
   courseTitle: string;
+  courseStatus: 'active' | 'inactive';
   totalSessions: number;
   branchId: string;
   branchName: string;

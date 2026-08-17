@@ -18,7 +18,12 @@
               <td>{{ o.dateRangeLabel }}</td>
               <td>{{ o.enrolledCount }} / {{ o.capacity }}</td>
               <td>{{ o.modeLabel }}</td>
-              <td><span class="badge" [style.background]="statusColors[o.statusKey]">{{ o.statusLabel }}</span></td>
+              <td>
+                <span class="badge" [style.background]="statusColors[o.statusKey]">{{ o.statusLabel }}</span>
+                @if (!o.courseActive) {
+                  <span class="badge" style="background:var(--w-muted)" title="The parent course is Inactive — this offering doesn't show on the public site regardless of its own status.">Course inactive</span>
+                }
+              </td>
               <td>
                 <div class="action-group">
                   <button type="button" class="icon-btn icon-btn-accent" (click)="goEnrollment(o)" title="Enrollment & Attendance">☑</button>
@@ -41,6 +46,9 @@
             <h4 class="mcard-title">{{ o.courseTitle }}{{ o.code ? ' — ' + o.code : '' }}</h4>
             <span class="badge badge-sm" [style.background]="statusColors[o.statusKey]">{{ o.statusLabel }}</span>
           </div>
+          @if (!o.courseActive) {
+            <div class="muted-label" style="color:var(--w-muted)">🔒 Course inactive — hidden from public site</div>
+          }
           <div class="muted-label">{{ o.branchName }} · {{ o.instructorName }}</div>
           <div class="muted-label mcard-meta">{{ o.dateRangeLabel }} · {{ o.modeLabel }}</div>
           <div class="mcard-row">

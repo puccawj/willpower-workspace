@@ -9,8 +9,18 @@
         <img [src]="c.imageUrl" alt="" class="summary-thumb" (click)="viewCover()" />
       }
       <div>
-        <h2 class="summary-title">{{ c.title }}</h2>
+        <h2 class="summary-title">
+          {{ c.title }}
+          <span class="badge badge-sm" [style.background]="c.status === 'active' ? 'var(--w-green)' : 'var(--w-muted)'">
+            {{ c.status === 'active' ? 'Active' : 'Inactive' }}
+          </span>
+        </h2>
         <div class="muted-label">{{ c.category || 'Uncategorized' }} · {{ c.totalSessions }} sessions · {{ passingPercent() }}% to pass</div>
+        @if (c.status === 'inactive') {
+          <p class="offerings-note" style="background:#fdf1d6;border:1px solid #ecc772;border-left:4px solid #d19a1f;border-radius:8px;padding:10px 14px;color:#8a5a00;font-weight:500;margin-top:8px">
+            🔒 This course is Inactive — none of its offerings show on the public site, regardless of their own status.
+          </p>
+        }
         @if (c.description) {
           <p class="summary-desc">{{ c.description }}</p>
         }

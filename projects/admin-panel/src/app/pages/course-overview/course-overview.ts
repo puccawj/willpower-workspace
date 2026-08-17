@@ -1,12 +1,13 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { Observable, map, of, switchMap, tap } from 'rxjs';
+import { Observable, from, map, of, switchMap, tap, throwError } from 'rxjs';
 import { ApiCourse, CourseApiService, CoursePayload } from '../../core/services/course-api.service';
 import { ApiOffering, ApiOfferingStatus, OfferingApiService, OfferingPayload } from '../../core/services/offering-api.service';
 import { BranchApiService } from '../../core/services/branch-api.service';
 import { UserApiService } from '../../core/services/user-api.service';
 import { CrudModalService } from '../../core/services/crud-modal.service';
+import { ConfirmService } from '../../core/services/confirm.service';
 import { RoleService } from '../../core/services/role.service';
 import { ToastService } from '../../core/services/toast.service';
 import { UploadApiService } from '../../core/services/upload-api.service';
@@ -80,6 +81,7 @@ export class CourseOverview {
   private readonly branchApi = inject(BranchApiService);
   private readonly userApi = inject(UserApiService);
   private readonly modal = inject(CrudModalService);
+  private readonly confirmSvc = inject(ConfirmService);
   private readonly uploads = inject(UploadApiService);
   private readonly toast = inject(ToastService);
   private readonly imageViewer = inject(ImageViewerService);
@@ -173,6 +175,13 @@ export class CourseOverview {
       { key: 'totalSessions', label: 'Total sessions', type: 'number' },
       { key: 'passingAttendancePercent', label: 'Passing % (attendance)', type: 'number' },
       {
+        key: 'status',
+        label: 'Status',
+        type: 'select',
+        options: ['Active', 'Inactive'],
+        hint: 'Inactive hides every offering of this course from the public site, regardless of their own status.',
+      },
+      {
         key: 'prerequisites',
         label: 'Prerequisite courses',
         type: 'multiselect',
@@ -196,6 +205,7 @@ export class CourseOverview {
       category: String(values['category'] ?? '').trim() || undefined,
       totalSessions: Number(values['totalSessions']) || 1,
       passingAttendancePercent: Number(values['passingAttendancePercent']) || 80,
+      status: String(values['status'] ?? 'Active') === 'Inactive' ? 'inactive' : 'active',
       prerequisiteCourseIds: prereqTitles.map((t) => idByTitle.get(t.toLowerCase())).filter((id): id is string => !!id),
     };
 
@@ -205,6 +215,17 @@ export class CourseOverview {
     }
     if (image) payload.image = image;
     return of(payload);
+  }
+
+  /** Confirms before actually deactivating — inactivating hides every offering of this course from
+   * the public site regardless of the offering's own status, so it's worth a deliberate check. */
+  private async confirmIfDeactivating(values: Record<string, string | number>, wasActive: boolean, offeringsCount: number): Promise<boolean> {
+    const goingInactive = String(values['status'] ?? 'Active') === 'Inactive';
+    if (!wasActive || !goingInactive) return true;
+    return this.confirmSvc.ask(
+      `This course has ${offeringsCount} offering${offeringsCount === 1 ? '' : 's'}. Setting it to Inactive will hide ${offeringsCount === 1 ? 'it' : 'all of them'} from the public site immediately, even ones marked Published.`,
+      { title: 'Deactivate Course', confirmLabel: 'Set Inactive', danger: true },
+    );
   }
 
   editCourse(): void {
@@ -221,15 +242,19 @@ export class CourseOverview {
         category: c.category ?? '',
         totalSessions: c.totalSessions,
         passingAttendancePercent: Number(c.passingAttendancePercent),
+        status: c.status === 'active' ? 'Active' : 'Inactive',
         prerequisites: this.prerequisiteTitles(),
         image: c.imageUrl ?? '',
       },
       onSave: (values) =>
-        this.resolveCoursePayload(values).pipe(
+        from(this.confirmIfDeactivating(values, c.status === 'active', c.offeringsCount)).pipe(
+          switchMap((ok) => (ok ? this.resolveCoursePayload(values) : throwError(() => new Error('deactivate-declined')))),
           switchMap((payload) => this.courseApi.update(c.id, payload)),
           tap({
             next: () => this.loadCourse(c.id),
-            error: (err) => this.showError(err, 'Failed to update course.'),
+            error: (err) => {
+              if ((err as Error)?.message !== 'deactivate-declined') this.showError(err, 'Failed to update course.');
+            },
           }),
         ),
     });

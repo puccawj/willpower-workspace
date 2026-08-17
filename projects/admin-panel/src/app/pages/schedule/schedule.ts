@@ -10,6 +10,9 @@ interface OfferingRow {
   code: string | null;
   courseId: string;
   courseTitle: string;
+  /** Whether the parent COURSE is active — an inactive course hides every one of its offerings
+   * from the public site regardless of the offering's own status (Published/Draft/etc). */
+  courseActive: boolean;
   branchName: string;
   instructorName: string;
   startDate: string;
@@ -49,6 +52,7 @@ function toRow(o: ApiOffering): OfferingRow {
     code: o.code,
     courseId: o.courseId,
     courseTitle: o.courseTitle,
+    courseActive: o.courseStatus === 'active',
     branchName: o.branchName,
     instructorName: o.instructorName ?? 'Unassigned',
     startDate: o.startDate,
