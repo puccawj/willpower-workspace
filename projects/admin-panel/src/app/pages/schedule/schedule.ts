@@ -95,7 +95,7 @@ export class Schedule {
   }
 
   goEnrollment(row: OfferingRow): void {
-    this.router.navigate(['/enrollment'], { queryParams: { offeringId: row.id } });
+    this.router.navigate(['/courses', row.courseId, 'offerings', row.id], { queryParams: { tab: 'roster' } });
   }
 
   goWorkspace(row: OfferingRow): void {

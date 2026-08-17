@@ -222,6 +222,11 @@ export class OfferingWorkspace {
 
   readonly courseId = toSignal(this.route.paramMap.pipe(map((p) => p.get('id') ?? '')), { initialValue: '' });
   readonly offeringId = toSignal(this.route.paramMap.pipe(map((p) => p.get('offeringId') ?? '')), { initialValue: '' });
+  /** Lets a link jump straight into a specific tab, e.g. ?tab=roster from the All Offerings
+   * page's "Enrollment & Attendance" shortcut — instead of always landing on Overview. */
+  private readonly initialTabParam = toSignal(this.route.queryParamMap.pipe(map((p) => p.get('tab') ?? '')), {
+    initialValue: '',
+  });
 
   readonly activeTab = signal<Tab>('overview');
   readonly tabOptions = [
@@ -273,11 +278,18 @@ export class OfferingWorkspace {
     effect(() => {
       const courseId = this.courseId();
       const offeringId = this.offeringId();
+      const initialTab = this.initialTabParam();
 
-      this.activeTab.set('overview');
       this.selectedSessionId.set('');
       this.sessions.set([]);
       this.qrOpen.set(false);
+      // Set directly (not via selectTab()) — selectTab() synchronously calls onRosterTabOpen(),
+      // which reads sessions(). Reading a signal inside effect() makes it a tracked dependency of
+      // *this* effect, so sessions.set(rows) below (once refreshSessions resolves) would re-run
+      // the whole effect and wipe the just-loaded sessions again. onRosterTabOpen() is instead
+      // triggered from refreshSessions()'s async callback, outside this effect's tracked scope.
+      const tab: Tab = this.tabOptions.some((t) => t.key === initialTab) ? (initialTab as Tab) : 'overview';
+      this.activeTab.set(tab);
 
       if (courseId) {
         this.courseApi.getOne(courseId).subscribe({ next: (c) => this.course.set(c) });
@@ -287,6 +299,7 @@ export class OfferingWorkspace {
         this.refreshSessions(offeringId);
         this.certApi.load(offeringId).subscribe();
         this.loadActiveTemplate();
+        if (tab === 'certificates') this.onCertificatesTabOpen();
       }
     });
   }
@@ -414,7 +427,12 @@ export class OfferingWorkspace {
 
   private refreshSessions(offeringId: string): void {
     this.offeringApi.listSessions(offeringId).subscribe({
-      next: (rows) => this.sessions.set(rows),
+      next: (rows) => {
+        this.sessions.set(rows);
+        // Sessions load asynchronously — if a deep link (?tab=roster) already switched to the
+        // Roster tab before this resolved, pick its default session now that there's data to pick from.
+        if (this.activeTab() === 'roster') this.onRosterTabOpen();
+      },
       error: (err) => this.showError(err, 'Failed to load session calendar.'),
     });
   }
