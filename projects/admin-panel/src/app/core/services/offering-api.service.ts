@@ -4,7 +4,7 @@ import { switchMap, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 export type ApiOfferingMode = 'online' | 'onsite';
-export type ApiOfferingStatus = 'draft' | 'scheduled' | 'ongoing' | 'completed' | 'cancelled';
+export type ApiOfferingStatus = 'draft' | 'published' | 'completed' | 'cancelled';
 
 export interface ApiOffering {
   id: string;

@@ -16,23 +16,20 @@ import { FieldDef } from '../../core/models/admin.models';
 
 const STATUS_COLOR: Record<ApiOfferingStatus, string> = {
   draft: 'var(--w-muted)',
-  scheduled: 'var(--w-green)',
-  ongoing: 'var(--w-gold)',
+  published: 'var(--w-green)',
   completed: 'var(--w-ink-soft)',
   cancelled: 'var(--w-red)',
 };
-const STATUS_OPTIONS = ['Draft', 'Scheduled', 'Ongoing', 'Completed', 'Cancelled'];
+const STATUS_OPTIONS = ['Draft', 'Publish', 'Completed', 'Cancelled'];
 const STATUS_TO_API: Record<string, ApiOfferingStatus> = {
   Draft: 'draft',
-  Scheduled: 'scheduled',
-  Ongoing: 'ongoing',
+  Publish: 'published',
   Completed: 'completed',
   Cancelled: 'cancelled',
 };
 const STATUS_LABEL: Record<ApiOfferingStatus, string> = {
   draft: 'Draft',
-  scheduled: 'Scheduled',
-  ongoing: 'Ongoing',
+  published: 'Published',
   completed: 'Completed',
   cancelled: 'Cancelled',
 };

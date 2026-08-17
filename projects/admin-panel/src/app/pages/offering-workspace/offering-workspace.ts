@@ -46,23 +46,20 @@ const WHOLE_COURSE = 'Not session-specific';
 
 const STATUS_COLOR: Record<ApiOfferingStatus, string> = {
   draft: 'var(--w-muted)',
-  scheduled: 'var(--w-green)',
-  ongoing: 'var(--w-gold)',
+  published: 'var(--w-green)',
   completed: 'var(--w-ink-soft)',
   cancelled: 'var(--w-red)',
 };
-const STATUS_OPTIONS = ['Draft', 'Scheduled', 'Ongoing', 'Completed', 'Cancelled'];
+const STATUS_OPTIONS = ['Draft', 'Publish', 'Completed', 'Cancelled'];
 const STATUS_TO_API: Record<string, ApiOfferingStatus> = {
   Draft: 'draft',
-  Scheduled: 'scheduled',
-  Ongoing: 'ongoing',
+  Publish: 'published',
   Completed: 'completed',
   Cancelled: 'cancelled',
 };
 const STATUS_LABEL: Record<ApiOfferingStatus, string> = {
   draft: 'Draft',
-  scheduled: 'Scheduled',
-  ongoing: 'Ongoing',
+  published: 'Published',
   completed: 'Completed',
   cancelled: 'Cancelled',
 };
@@ -72,13 +69,12 @@ function formatDate(iso: string): string {
 }
 
 /** Client-side "effective" status badge — computed from dates, never written back to the DB.
- * A cancelled offering always stays cancelled; otherwise dates decide draft/scheduled/ongoing/completed. */
+ * A cancelled offering always stays cancelled; otherwise the end date decides published/completed. */
 function effectiveStatus(o: ApiOffering): ApiOfferingStatus {
   if (o.status === 'cancelled' || o.status === 'draft') return o.status;
   const today = new Date().toISOString().slice(0, 10);
-  if (today < o.startDate) return 'scheduled';
   if (today > o.endDate) return 'completed';
-  return 'ongoing';
+  return 'published';
 }
 
 interface EnrollmentRow {
