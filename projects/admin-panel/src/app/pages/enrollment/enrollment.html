@@ -1,13 +1,35 @@
-<div class="card pad">
+<div class="card pad offering-picker">
   <label class="muted-label">Offering</label>
   <app-typeahead
     [options]="offeringOptions()"
     [value]="selectedOfferingId()"
-    placeholder="Search by course, branch, or instructor…"
+    placeholder="Search by course, code, branch, or instructor…"
     (valueChange)="selectOffering($event)"
   ></app-typeahead>
 
-  @if (selectedOffering(); as off) {
+  @if (!selectedOffering()) {
+    <p class="muted-label empty-hint">Search for an offering above to see and manage its roster.</p>
+  }
+</div>
+
+@if (selectedOffering(); as off) {
+  <div class="card pad offering-summary">
+    <div class="offering-summary-head">
+      <div>
+        <h3 class="offering-summary-title">
+          {{ off.courseTitle }}
+          @if (off.code) { <span class="code-chip">{{ off.code }}</span> }
+        </h3>
+        <div class="muted-label">{{ offeringMetaLabel() }}</div>
+      </div>
+      <div class="action-group">
+        <button type="button" class="btn btn-outline" (click)="addStudent()">+ Add Student</button>
+        <button type="button" class="btn btn-outline" (click)="openQrDialog()" [disabled]="!selectedSessionId()">▤ Show check-in QR</button>
+      </div>
+    </div>
+
+    <app-stat-cards [stats]="statCards()"></app-stat-cards>
+
     <div class="session-row">
       <label class="muted-label">Session</label>
       @if (sessions().length) {
@@ -23,27 +45,17 @@
             </button>
           }
         </div>
+        @if (selectedSession(); as s) {
+          <div class="muted-label session-detail">
+            {{ s.startTime.slice(0, 5) }}–{{ s.endTime.slice(0, 5) }}{{ s.topic ? ' · ' + s.topic : '' }}
+          </div>
+        }
       } @else {
         <span class="muted-label">This offering has no sessions yet.</span>
       }
     </div>
-
-    <div class="session-banner">
-      <div class="muted-label">
-        {{ off.instructorName ?? 'Unassigned' }}
-        @if (selectedSession(); as s) {
-          · {{ s.startTime.slice(0, 5) }}–{{ s.endTime.slice(0, 5) }}{{ s.topic ? ' · ' + s.topic : '' }}
-        }
-      </div>
-      <div class="action-group">
-        <button type="button" class="btn btn-outline" (click)="addStudent()">+ Add Student</button>
-        <button type="button" class="btn btn-outline" (click)="openQrDialog()" [disabled]="!selectedSessionId()">▤ Show check-in QR</button>
-      </div>
-    </div>
-  } @else {
-    <p class="muted-label empty-hint">Search for an offering above to see and manage its roster.</p>
-  }
-</div>
+  </div>
+}
 
 @if (qrOpen()) {
   <div class="qr-overlay" (click)="closeQrDialog()">

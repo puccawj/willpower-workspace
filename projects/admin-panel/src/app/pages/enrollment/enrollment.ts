@@ -13,9 +13,14 @@ import { ToastService } from '../../core/services/toast.service';
 import { ListController } from '../../core/list-controller';
 import { TableToolbar } from '../../shared/table-toolbar/table-toolbar';
 import { Typeahead, TypeaheadOption } from '../../shared/typeahead/typeahead';
+import { StatCardData, StatCards } from '../../shared/stat-cards/stat-cards';
 
 function formatSessionDate(iso: string): string {
   return new Date(`${iso}T00:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+function formatDate(iso: string): string {
+  return new Date(`${iso}T00:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
 interface EnrollmentRow {
@@ -52,7 +57,7 @@ function toRow(e: ApiEnrollmentRow): EnrollmentRow {
 
 @Component({
   selector: 'app-enrollment',
-  imports: [TableToolbar, FormsModule, Typeahead],
+  imports: [TableToolbar, FormsModule, Typeahead, StatCards],
   templateUrl: './enrollment.html',
   styleUrl: './enrollment.scss',
 })
@@ -82,17 +87,43 @@ export class Enrollment {
   readonly selectedSession = computed(() => this.sessions().find((s) => s.id === this.selectedSessionId()) ?? null);
 
   /** Searchable instead of a flat <select> with every offering in the institute in one unscannable
-   * list — the whole point of this redesign. */
+   * list — the whole point of this redesign. Code/nickname included so offerings of the same
+   * course (e.g. two "Contemplative Study Circle" runs) are distinguishable in the dropdown. */
   readonly offeringOptions = computed<TypeaheadOption[]>(() =>
-    this.offerings().map((o) => ({ id: o.id, label: `${o.courseTitle} — ${o.branchName} (${o.instructorName ?? 'Unassigned'})` })),
+    this.offerings().map((o) => ({
+      id: o.id,
+      label: `${o.courseTitle}${o.code ? ' — ' + o.code : ''} — ${o.branchName} (${o.instructorName ?? 'Unassigned'})`,
+    })),
   );
   formatSessionPill(s: ApiCourseSession): string {
     return `${s.sessionNo} · ${formatSessionDate(s.sessionDate)}`;
   }
 
+  readonly offeringMetaLabel = computed(() => {
+    const o = this.selectedOffering();
+    if (!o) return '';
+    const mode = o.mode === 'onsite' ? 'Onsite' : 'Online';
+    return `${o.branchName} · ${o.instructorName ?? 'Unassigned'} · ${mode} · ${formatDate(o.startDate)} – ${formatDate(o.endDate)}`;
+  });
+
   private readonly rows = computed<EnrollmentRow[]>(() => this.enrollmentApi.enrollments().map(toRow));
 
   readonly ctrl = new ListController<EnrollmentRow>(this.rows);
+
+  /** Quick-glance roster stats above the table — enrolled headcount, how many checked in for the
+   * currently-selected session, and the offering's average cumulative attendance. */
+  readonly statCards = computed<StatCardData[]>(() => {
+    const rows = this.rows();
+    const enrolled = rows.length;
+    const present = rows.filter((r) => r.present).length;
+    const avgAttendance = enrolled ? Math.round(rows.reduce((sum, r) => sum + r.pctValue, 0) / enrolled) : 0;
+    const off = this.selectedOffering();
+    return [
+      { label: 'Enrolled', value: enrolled, sub: off?.capacity ? `of ${off.capacity} capacity` : undefined },
+      { label: 'Present this session', value: `${present}/${enrolled}` },
+      { label: 'Avg. cumulative attendance', value: `${avgAttendance}%` },
+    ];
+  });
 
   constructor() {
     this.offeringApi.load().subscribe(() => {

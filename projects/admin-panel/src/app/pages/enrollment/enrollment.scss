@@ -2,22 +2,51 @@
   display: block;
 }
 
-.session-banner {
-  margin-top: 14px;
-  padding-top: 14px;
-  border-top: 1px solid var(--w-border);
+.offering-picker {
+  margin-bottom: 16px;
+}
+
+.offering-summary {
+  margin-bottom: 16px;
+}
+
+.offering-summary-head {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   flex-wrap: wrap;
   gap: 16px;
+  margin-bottom: 18px;
+}
+
+.offering-summary-title {
+  font: 500 21px var(--w-font-serif);
+  margin: 0 0 4px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.code-chip {
+  font: 600 12px var(--w-font-sans);
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: var(--w-accent-soft, var(--w-bg-alt));
+  color: var(--w-accent);
+  border: 1px solid var(--w-accent);
 }
 
 .session-row {
   margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--w-border);
   display: flex;
   flex-direction: column;
   gap: 6px;
+}
+
+.session-detail {
+  margin-top: 4px;
 }
 
 .session-pills {
