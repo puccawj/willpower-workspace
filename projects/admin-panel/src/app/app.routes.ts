@@ -149,7 +149,7 @@ export const routes: Routes = [
         path: 'schedule',
         component: Schedule,
         canActivate: [roleAccessGuard],
-        data: { title: 'Class Schedule', subtitle: 'Course offerings and session calendar', allow: ['superadmin', 'admin', 'instructor'] },
+        data: { title: 'All Offerings', subtitle: 'Browse every course offering across all courses', allow: ['superadmin', 'admin', 'instructor'] },
       },
       {
         path: 'enrollment',

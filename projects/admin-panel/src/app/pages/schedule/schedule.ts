@@ -1,17 +1,10 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, from, of, switchMap, tap, throwError } from 'rxjs';
 import { CourseApiService } from '../../core/services/course-api.service';
 import { BranchApiService } from '../../core/services/branch-api.service';
 import { UserApiService } from '../../core/services/user-api.service';
-import {
-  ApiCourseSession,
-  ApiOffering,
-  ApiOfferingStatus,
-  OfferingApiService,
-  OfferingPayload,
-  SessionPayload,
-} from '../../core/services/offering-api.service';
+import { ApiOffering, ApiOfferingStatus, OfferingApiService, OfferingPayload } from '../../core/services/offering-api.service';
 import { CrudModalService } from '../../core/services/crud-modal.service';
 import { ConfirmService } from '../../core/services/confirm.service';
 import { RoleService } from '../../core/services/role.service';
@@ -89,16 +82,6 @@ function toRow(o: ApiOffering): OfferingRow {
   };
 }
 
-export function sessionFields(): FieldDef[] {
-  return [
-    { key: 'sessionDate', label: 'Session date', type: 'date' },
-    { key: 'startTime', label: 'Start time', type: 'text', hint: '24-hour HH:mm, e.g. 18:00' },
-    { key: 'endTime', label: 'End time', type: 'text', hint: '24-hour HH:mm, e.g. 20:00' },
-    { key: 'topic', label: 'Topic', type: 'text', hint: 'Optional' },
-    { key: 'location', label: 'Location', type: 'text', hint: 'Optional — defaults to the offering location' },
-  ];
-}
-
 function buildFields(
   courseOptions: { id: string; label: string }[],
   branchOptions: { id: string; label: string }[],
@@ -117,6 +100,12 @@ function buildFields(
   ];
 }
 
+/**
+ * Cross-course directory of every offering — the one place to browse/search offerings without
+ * already knowing which course they belong to. Actually managing an offering (sessions, roster,
+ * needs, certificates, editing its own fields) all happens in the Offering Workspace now; this
+ * page only browses and creates, so there's exactly one place that edits an offering, not two.
+ */
 @Component({
   selector: 'app-schedule',
   imports: [TableToolbar],
@@ -149,11 +138,6 @@ export class Schedule {
 
   readonly ctrl = new ListController<OfferingRow>(this.rows);
 
-  readonly selectedOfferingId = signal('');
-  readonly sessions = signal<ApiCourseSession[]>([]);
-
-  readonly selectedOffering = computed(() => this.rows().find((r) => r.id === this.selectedOfferingId()) ?? null);
-
   constructor() {
     this.api.load().subscribe();
     this.courseApi.load().subscribe();
@@ -170,108 +154,8 @@ export class Schedule {
     this.router.navigate(['/enrollment'], { queryParams: { offeringId: row.id } });
   }
 
-  viewSessions(row: OfferingRow): void {
-    this.selectedOfferingId.set(row.id);
-    this.refreshSessions(row.id);
-  }
-
-  private refreshSessions(offeringId: string): void {
-    this.api.listSessions(offeringId).subscribe({
-      next: (rows) => this.sessions.set(rows),
-      error: (err) => this.showError(err, 'Failed to load session calendar.'),
-    });
-  }
-
-  private toSessionPayload(values: Record<string, string | number>): SessionPayload {
-    const payload: SessionPayload = {
-      sessionDate: String(values['sessionDate'] ?? ''),
-      startTime: String(values['startTime'] ?? '').trim(),
-      endTime: String(values['endTime'] ?? '').trim(),
-    };
-    const topic = String(values['topic'] ?? '').trim();
-    const location = String(values['location'] ?? '').trim();
-    if (topic) payload.topic = topic;
-    if (location) payload.location = location;
-    return payload;
-  }
-
-  addSession(): void {
-    const offeringId = this.selectedOfferingId();
-    if (!offeringId) return;
-
-    this.modal.open({
-      title: 'Add Session',
-      fields: sessionFields(),
-      isEdit: false,
-      values: { sessionDate: '', startTime: '', endTime: '', topic: '', location: '' },
-      onSave: (values) =>
-        this.api.addSession(offeringId, this.toSessionPayload(values)).pipe(
-          tap({
-            next: () => this.refreshSessions(offeringId),
-            error: (err) => this.showError(err, 'Failed to add session.'),
-          }),
-        ),
-    });
-  }
-
-  editSession(session: ApiCourseSession): void {
-    const offeringId = this.selectedOfferingId();
-    if (!offeringId) return;
-
-    this.modal.open({
-      title: `Edit Session ${session.sessionNo}`,
-      fields: sessionFields(),
-      isEdit: true,
-      values: {
-        sessionDate: session.sessionDate,
-        startTime: session.startTime.slice(0, 5),
-        endTime: session.endTime.slice(0, 5),
-        topic: session.topic ?? '',
-        location: session.location ?? '',
-      },
-      onSave: (values) =>
-        this.api.updateSession(offeringId, session.id, this.toSessionPayload(values)).pipe(
-          tap({
-            next: () => this.refreshSessions(offeringId),
-            error: (err) => this.showError(err, 'Failed to update session.'),
-          }),
-        ),
-      onDelete: () => this.removeSession(offeringId, session),
-    });
-  }
-
-  private async removeSession(offeringId: string, session: ApiCourseSession): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.api.removeSession(offeringId, session.id).subscribe({
-        next: () => {
-          this.refreshSessions(offeringId);
-          resolve();
-        },
-        error: (err) => {
-          this.showError(err, 'Failed to delete session.');
-          reject(err);
-        },
-      });
-    });
-  }
-
-  async deleteSession(session: ApiCourseSession): Promise<void> {
-    const offeringId = this.selectedOfferingId();
-    if (!offeringId) return;
-
-    const confirmed = await this.confirmSvc.ask(
-      `Delete session ${session.sessionNo} (${session.sessionDate})? Any attendance recorded for it will be removed too.`,
-      { title: 'Delete Session', confirmLabel: 'Delete', danger: true },
-    );
-    if (!confirmed) return;
-
-    this.api.removeSession(offeringId, session.id).subscribe({
-      next: () => {
-        this.toast.show(`Session ${session.sessionNo} deleted.`, 'success');
-        this.refreshSessions(offeringId);
-      },
-      error: (err) => this.showError(err, 'Failed to delete session.'),
-    });
+  goWorkspace(row: OfferingRow): void {
+    this.router.navigate(['/courses', row.courseId, 'offerings', row.id]);
   }
 
   private toPayload(values: Record<string, string | number>): OfferingPayload {
@@ -297,7 +181,7 @@ export class Schedule {
     return payload;
   }
 
-  private checkConflicts(values: Record<string, string | number>, excludingId: string | null): OfferingRow[] {
+  private checkConflicts(values: Record<string, string | number>): OfferingRow[] {
     const start = new Date(String(values['startDate']));
     const end = new Date(String(values['endDate']));
     if (isNaN(start.getTime()) || isNaN(end.getTime())) return [];
@@ -306,7 +190,6 @@ export class Schedule {
     const branchId = String(values['branch'] ?? '').trim();
 
     return this.rows().filter((o) => {
-      if (o.id === excludingId) return false;
       const oStart = new Date(o.startDate);
       const oEnd = new Date(o.endDate);
       const overlaps = start <= oEnd && oStart <= end;
@@ -318,8 +201,8 @@ export class Schedule {
   /** Blocking pre-save conflict check — instead of a toast fired after the save already went through,
    * this asks for an explicit "create anyway" before the API call happens at all. Resolves false if the
    * admin declines, in which case the caller should abort the save. */
-  private async confirmNoBlockingConflicts(values: Record<string, string | number>, excludingId: string | null): Promise<boolean> {
-    const conflicts = this.checkConflicts(values, excludingId);
+  private async confirmNoBlockingConflicts(values: Record<string, string | number>): Promise<boolean> {
+    const conflicts = this.checkConflicts(values);
     if (!conflicts.length) return true;
 
     const instructorId = String(values['instructor'] ?? '').trim();
@@ -362,7 +245,7 @@ export class Schedule {
           status: 'Draft',
         },
         onSave: (values) =>
-          from(this.confirmNoBlockingConflicts(values, null)).pipe(
+          from(this.confirmNoBlockingConflicts(values)).pipe(
             switchMap((ok) => (ok ? this.api.create(this.toPayload(values)) : throwError(() => new Error('conflict-declined')))),
             tap({
               error: (err) => {
@@ -370,38 +253,6 @@ export class Schedule {
               },
             }),
           ),
-      });
-    });
-  }
-
-  editOffering(row: OfferingRow): void {
-    this.ensureBranchesLoaded().subscribe(() => {
-      this.modal.open({
-        title: 'Edit Class Offering',
-        fields: buildFields(this.courseOptions(), this.branchOptions(), this.instructorOptions()),
-        isEdit: true,
-        values: {
-          course: row.courseId,
-          branch: row.branchId,
-          instructor: row.instructorId ?? '',
-          startDate: row.startDate,
-          endDate: row.endDate,
-          capacity: row.capacity,
-          location: row.location,
-          mode: row.modeLabel,
-          status: row.statusLabel,
-        },
-        onSave: (values) =>
-          from(this.confirmNoBlockingConflicts(values, row.id)).pipe(
-            switchMap((ok) => (ok ? this.api.update(row.id, this.toPayload(values)) : throwError(() => new Error('conflict-declined')))),
-            tap({
-              error: (err) => {
-                if ((err as Error)?.message !== 'conflict-declined') this.showError(err, 'Failed to update offering.');
-              },
-            }),
-          ),
-        onDelete: () =>
-          this.api.remove(row.id).pipe(tap({ error: (err) => this.showError(err, 'Failed to delete offering.') })),
       });
     });
   }

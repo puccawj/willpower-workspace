@@ -38,11 +38,20 @@ import { RoleService } from '../../core/services/role.service';
 import { ToastService } from '../../core/services/toast.service';
 import { FilterTabs } from '../../shared/filter-tabs/filter-tabs';
 import { FieldDef } from '../../core/models/admin.models';
-import { sessionFields } from '../schedule/schedule';
 
 type Tab = 'overview' | 'sessions' | 'roster' | 'needs' | 'certificates';
 
 const WHOLE_COURSE = 'Not session-specific';
+
+function sessionFields(): FieldDef[] {
+  return [
+    { key: 'sessionDate', label: 'Session date', type: 'date' },
+    { key: 'startTime', label: 'Start time', type: 'text', hint: '24-hour HH:mm, e.g. 18:00' },
+    { key: 'endTime', label: 'End time', type: 'text', hint: '24-hour HH:mm, e.g. 20:00' },
+    { key: 'topic', label: 'Topic', type: 'text', hint: 'Optional' },
+    { key: 'location', label: 'Location', type: 'text', hint: 'Optional — defaults to the offering location' },
+  ];
+}
 
 const STATUS_COLOR: Record<ApiOfferingStatus, string> = {
   draft: 'var(--w-muted)',

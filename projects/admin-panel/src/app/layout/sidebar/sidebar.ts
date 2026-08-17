@@ -53,7 +53,7 @@ export class Sidebar {
       header: 'Learning',
       items: [
         { path: 'courses', label: 'Manage Course', icon: '▣', allow: ['superadmin', 'admin', 'instructor'] },
-        { path: 'schedule', label: 'Class Schedule', icon: '▦', allow: ['superadmin', 'admin', 'instructor'] },
+        { path: 'schedule', label: 'All Offerings', icon: '▦', allow: ['superadmin', 'admin', 'instructor'] },
         { path: 'enrollment', label: 'Enrollment & Attendance', icon: '☑', allow: ['superadmin', 'admin', 'instructor'] },
       ],
     },
