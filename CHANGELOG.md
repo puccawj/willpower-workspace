@@ -2,6 +2,23 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-18 (5) — Course category is now a managed picker
+
+**Admin panel:**
+- New **Course Categories** page (sidebar, under Learning) — simple
+  CRUD (name + active toggle) for the category list, backed by the new
+  `/course-categories` API. Manage Course and Course Overview's
+  "Category" field is now a typeahead over that list instead of a
+  freeform text input.
+
+## 2026-08-18 (4) — Offering status badge now shows the real stored value
+
+**Admin panel:**
+- Offering Workspace no longer shows a separate client-computed "Status
+  (computed)" badge — the backend now auto-transitions
+  published → completed on the end date, so the stored status is
+  already correct and the two badges were redundant.
+
 ## 2026-08-18 (3) — Enrollment & Attendance is now a real multi-session grid
 
 **Admin panel:**
