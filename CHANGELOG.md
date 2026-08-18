@@ -2,6 +2,58 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-18 (1) — QR print-for-wall, mobile prod-build fix
+
+**Admin panel:**
+- Added a "🖶 Print for wall" button to the Enrollment & Attendance and
+  RSVP & Attendance check-in QR dialogs, printing just the course/event
+  title, session/date, and QR code via a dedicated print stylesheet — the
+  Offering Workspace's QR dialog already had this; now all three places a
+  check-in QR appears in the admin panel support it.
+
+**Mobile:**
+- Fixed a broken production build: the script that writes each project's
+  `environment.prod.ts` at build time never generated `googleIosClientId`,
+  which iOS Google sign-in depends on — every production mobile build has
+  been failing to compile since that field was introduced. Also refreshed
+  the debug build on the test device.
+
+## 2026-08-17 (1) — Course Offering redesign, phase 3
+
+**Admin panel:**
+- **All Offerings** is back as its own standalone page (`/schedule`),
+  listing every offering across every course, sorted by course, with a
+  Code/Nickname column and full create/edit/delete — reversing an earlier
+  attempt to merge it into Manage Course as a tab.
+- Offerings now carry an optional **Code/Nickname** (e.g. "Morning
+  Batch"), shown in the All Offerings table, the Enrollment & Attendance
+  offering picker/summary, and the public-site offering listing — needed
+  once a course has more than one offering running at a time.
+- Offering `status` simplified to Draft/Publish/Completed/Cancelled, with
+  real enforcement: enrollment (self- and admin-driven) requires
+  `Published`; a `Completed` offering locks further changes. Fixed a bug
+  where the Edit Offering modal's Status field rendered blank and would
+  silently reset to Draft on save.
+- Courses gained an **Active/Inactive** toggle (with a confirm step),
+  surfaced as a badge everywhere an inactive course's offerings are
+  listed — since an inactive course already hides its offerings from the
+  public site, but that state was previously invisible in the admin UI.
+- **Enrollment & Attendance** page redesign: offering picker + summary
+  card (with code/nickname, branch, instructor, mode, dates) replaces the
+  old single dropdown, stat cards for enrolled/present/avg. attendance
+  moved above the roster, and session pills now show the year
+  (e.g. "8 · May 20, 2026", previously just "May 20").
+- Fixed the relational typeahead picker not showing other options once a
+  field already had a value selected, a stale-data bug when switching
+  offerings quickly, and the typeahead dropdown getting clipped inside
+  scrollable containers.
+- Session Start/End time fields are now dropdown pickers instead of free
+  text, and the pre-save Schedule Conflict warning message was made more
+  concise.
+- Restyled the shared confirm dialog to look like an iOS/SwiftUI alert.
+- `index.html` is no longer cached by browsers on admin-panel/public-site,
+  so a fresh deploy is picked up without a hard refresh.
+
 ## 2026-08-15 (2) — Course Offering redesign, phase 2
 
 **Admin panel:**
