@@ -24,17 +24,18 @@ for (const project of PROJECTS) {
   const facebookAppId = process.env.FACEBOOK_APP_ID || readCurrent(filePath, 'facebookAppId');
   const turnstileSiteKey = process.env.TURNSTILE_SITE_KEY || readCurrent(filePath, 'turnstileSiteKey');
 
-  // mobile-only: required by @capgo/capacitor-social-login's native Facebook SDK init.
+  // mobile-only: required by @capgo/capacitor-social-login's native Google (iOS) and Facebook SDK init.
   const extraLines =
     project === 'mobile'
-      ? `\n  facebookClientToken: '${process.env.FACEBOOK_CLIENT_TOKEN || readCurrent(filePath, 'facebookClientToken')}',`
+      ? `\n  googleIosClientId: '${process.env.GOOGLE_IOS_CLIENT_ID || readCurrent(filePath, 'googleIosClientId')}',` +
+        `\n  facebookClientToken: '${process.env.FACEBOOK_CLIENT_TOKEN || readCurrent(filePath, 'facebookClientToken')}',`
       : '';
 
   const contents = `export const environment = {
   production: true,
   apiUrl: '${apiUrl}',
-  googleClientId: '${googleClientId}',
-  facebookAppId: '${facebookAppId}',${extraLines}
+  googleClientId: '${googleClientId}',${extraLines}
+  facebookAppId: '${facebookAppId}',
   turnstileSiteKey: '${turnstileSiteKey}',
 };
 `;
