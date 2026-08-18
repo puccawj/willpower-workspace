@@ -164,3 +164,61 @@
   width: 100%;
   margin-top: 16px;
 }
+
+.grid-scroll {
+  max-width: 100%;
+}
+
+.attendance-grid {
+  white-space: nowrap;
+
+  th,
+  td {
+    text-align: center;
+  }
+
+  th:first-child,
+  td:first-child {
+    text-align: left;
+  }
+}
+
+.sticky-col {
+  position: sticky;
+  left: 0;
+  background: var(--w-panel);
+  z-index: 1;
+}
+
+.session-col {
+  min-width: 64px;
+}
+
+.attendance-cell {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--w-border-strong);
+  background: transparent;
+  color: var(--w-muted);
+  font: 600 14px var(--w-font-sans);
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+
+  &:hover {
+    background: var(--w-bg-alt);
+  }
+
+  &.present {
+    background: var(--w-green);
+    border-color: var(--w-green);
+    color: #fff;
+  }
+}
+
+.mcard-session-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 10px 0;
+}

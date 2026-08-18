@@ -3,6 +3,11 @@ import { Injectable, inject, signal } from '@angular/core';
 import { switchMap, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
+export interface ApiSessionAttendanceCell {
+  sessionId: string;
+  present: boolean;
+}
+
 export interface ApiEnrollmentRow {
   userId: string;
   name: string;
@@ -15,6 +20,7 @@ export interface ApiEnrollmentRow {
   passingPercent: number;
   isPassing: boolean;
   presentThisSession: boolean;
+  sessionAttendance: ApiSessionAttendanceCell[];
 }
 
 @Injectable({ providedIn: 'root' })

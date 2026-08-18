@@ -33,9 +33,8 @@ interface EnrollmentRow {
   pctLabel: string;
   pctValue: number;
   pctColor: string;
-  present: boolean;
-  presentLabel: string;
-  presentColor: string;
+  /** sessionId -> present, for O(1) cell lookup while rendering the attendance grid. */
+  attendanceMap: Map<string, boolean>;
 }
 
 function toRow(e: ApiEnrollmentRow): EnrollmentRow {
@@ -49,9 +48,7 @@ function toRow(e: ApiEnrollmentRow): EnrollmentRow {
     pctLabel: `${e.attendancePercent}%`,
     pctValue: e.attendancePercent,
     pctColor: e.isPassing ? 'var(--w-green)' : e.attendancePercent >= e.passingPercent * 0.75 ? 'var(--w-gold)' : 'var(--w-red)',
-    present: e.presentThisSession,
-    presentLabel: e.presentThisSession ? 'Present' : 'Absent',
-    presentColor: e.presentThisSession ? 'var(--w-green)' : 'var(--w-red)',
+    attendanceMap: new Map(e.sessionAttendance.map((c) => [c.sessionId, c.present])),
   };
 }
 
@@ -81,10 +78,12 @@ export class Enrollment {
   readonly offerings = this.offeringApi.offerings;
   readonly selectedOfferingId = signal('');
   readonly sessions = signal<ApiCourseSession[]>([]);
-  readonly selectedSessionId = signal('');
+  /** Which session's QR code to show — the roster grid itself always shows every session as a
+   * column, this only picks the QR dialog's target session. Defaults to the next upcoming one. */
+  readonly qrSessionId = signal('');
 
   readonly selectedOffering = computed(() => this.offerings().find((o) => o.id === this.selectedOfferingId()) ?? null);
-  readonly selectedSession = computed(() => this.sessions().find((s) => s.id === this.selectedSessionId()) ?? null);
+  readonly qrSession = computed(() => this.sessions().find((s) => s.id === this.qrSessionId()) ?? null);
 
   /** Searchable instead of a flat <select> with every offering in the institute in one unscannable
    * list — the whole point of this redesign. Code/nickname included so offerings of the same
@@ -95,7 +94,7 @@ export class Enrollment {
       label: `${o.courseTitle}${o.code ? ' — ' + o.code : ''} — ${o.branchName} (${o.instructorName ?? 'Unassigned'})`,
     })),
   );
-  formatSessionPill(s: ApiCourseSession): string {
+  formatSessionColumn(s: ApiCourseSession): string {
     return `${s.sessionNo} · ${formatSessionDate(s.sessionDate)}`;
   }
 
@@ -110,12 +109,17 @@ export class Enrollment {
 
   readonly ctrl = new ListController<EnrollmentRow>(this.rows);
 
-  /** Quick-glance roster stats above the table — enrolled headcount, how many checked in for the
-   * currently-selected session, and the offering's average cumulative attendance. */
+  attendanceFor(row: EnrollmentRow, sessionId: string): boolean {
+    return row.attendanceMap.get(sessionId) ?? false;
+  }
+
+  /** Quick-glance roster stats above the grid — enrolled headcount, how many checked in for the
+   * current (next-upcoming or most-recent) session, and the offering's average cumulative attendance. */
   readonly statCards = computed<StatCardData[]>(() => {
     const rows = this.rows();
     const enrolled = rows.length;
-    const present = rows.filter((r) => r.present).length;
+    const currentSessionId = this.qrSessionId();
+    const present = currentSessionId ? rows.filter((r) => r.attendanceMap.get(currentSessionId)).length : 0;
     const avgAttendance = enrolled ? Math.round(rows.reduce((sum, r) => sum + r.pctValue, 0) / enrolled) : 0;
     const off = this.selectedOffering();
     return [
@@ -135,24 +139,20 @@ export class Enrollment {
 
   selectOffering(offeringId: string): void {
     this.selectedOfferingId.set(offeringId);
-    this.selectedSessionId.set('');
+    this.qrSessionId.set('');
     this.sessions.set([]);
     if (!offeringId) return;
 
+    this.enrollmentApi.load(offeringId).subscribe();
     this.offeringApi.listSessions(offeringId).subscribe({
       next: (rows) => {
         this.sessions.set(rows);
         const today = new Date().toISOString().slice(0, 10);
         const defaultSession = rows.find((s) => s.sessionDate >= today) ?? rows[rows.length - 1] ?? rows[0];
-        if (defaultSession) this.selectSession(defaultSession.id);
+        if (defaultSession) this.qrSessionId.set(defaultSession.id);
       },
       error: (err) => this.showError(err, 'Failed to load sessions.'),
     });
-  }
-
-  selectSession(sessionId: string): void {
-    this.selectedSessionId.set(sessionId);
-    this.enrollmentApi.load(this.selectedOfferingId(), sessionId).subscribe();
   }
 
   private showError(err: unknown, fallback: string): void {
@@ -160,11 +160,8 @@ export class Enrollment {
     this.toast.show(message, 'error');
   }
 
-  toggleAttendance(row: EnrollmentRow): void {
+  toggleAttendance(row: EnrollmentRow, sessionId: string): void {
     const offeringId = this.selectedOfferingId();
-    const sessionId = this.selectedSessionId();
-    if (!sessionId) return;
-
     this.enrollmentApi.toggleAttendance(offeringId, sessionId, row.userId).subscribe({
       next: (res) => this.toast.show(`${row.name} marked ${res.checkedIn ? 'present' : 'absent'}.`, 'success'),
       error: (err) => this.showError(err, 'Failed to update attendance.'),
@@ -179,7 +176,7 @@ export class Enrollment {
     });
     if (!confirmed) return;
 
-    this.enrollmentApi.removeEnrollment(this.selectedOfferingId(), row.userId, this.selectedSessionId()).subscribe({
+    this.enrollmentApi.removeEnrollment(this.selectedOfferingId(), row.userId).subscribe({
       next: () => this.toast.show(`${row.name} was removed from this offering.`, 'success'),
       error: (err) => this.showError(err, 'Failed to remove enrollment.'),
     });
@@ -217,8 +214,7 @@ export class Enrollment {
    * admin override ("enroll anyway") and retries with `force: true` if confirmed. */
   private enrollWithPrerequisiteOverride(userId: string): Observable<unknown> {
     const offeringId = this.selectedOfferingId();
-    const sessionId = this.selectedSessionId();
-    return this.enrollmentApi.enroll(offeringId, userId, sessionId).pipe(
+    return this.enrollmentApi.enroll(offeringId, userId).pipe(
       catchError((err) => {
         const message = (err as { error?: { message?: string } })?.error?.message ?? '';
         if (!/not completed/i.test(message)) return throwError(() => err);
@@ -232,7 +228,7 @@ export class Enrollment {
         ).pipe(
           switchMap((confirmed) => {
             if (!confirmed) return throwError(() => err);
-            return this.enrollmentApi.enroll(offeringId, userId, sessionId, true);
+            return this.enrollmentApi.enroll(offeringId, userId, undefined, true);
           }),
         );
       }),
@@ -248,7 +244,7 @@ export class Enrollment {
 
   openQrDialog(): void {
     const offeringId = this.selectedOfferingId();
-    const sessionId = this.selectedSessionId();
+    const sessionId = this.qrSessionId();
     if (!sessionId) return;
 
     this.qrDataUrl.set(null);

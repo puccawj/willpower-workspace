@@ -24,28 +24,28 @@
       </div>
       <div class="action-group">
         <button type="button" class="btn btn-outline" (click)="addStudent()">+ Add Student</button>
-        <button type="button" class="btn btn-outline" (click)="openQrDialog()" [disabled]="!selectedSessionId()">▤ Show check-in QR</button>
+        <button type="button" class="btn btn-outline" (click)="openQrDialog()" [disabled]="!qrSessionId()">▤ Show check-in QR</button>
       </div>
     </div>
 
     <app-stat-cards [stats]="statCards()"></app-stat-cards>
 
     <div class="session-row">
-      <label class="muted-label">Session</label>
+      <label class="muted-label">QR check-in for session</label>
       @if (sessions().length) {
         <div class="session-pills">
           @for (s of sessions(); track s.id) {
             <button
               type="button"
               class="session-pill"
-              [class.active]="s.id === selectedSessionId()"
-              (click)="selectSession(s.id)"
+              [class.active]="s.id === qrSessionId()"
+              (click)="qrSessionId.set(s.id)"
             >
-              {{ formatSessionPill(s) }}
+              {{ formatSessionColumn(s) }}
             </button>
           }
         </div>
-        @if (selectedSession(); as s) {
+        @if (qrSession(); as s) {
           <div class="muted-label session-detail">
             {{ s.startTime.slice(0, 5) }}–{{ s.endTime.slice(0, 5) }}{{ s.topic ? ' · ' + s.topic : '' }}
           </div>
@@ -66,7 +66,7 @@
       </div>
       <p class="muted-label qr-dialog-hint no-print">
         Display this in the classroom — students scan it with their own phone to check themselves in for
-        Session {{ selectedSession()?.sessionNo }} — {{ selectedSession()?.sessionDate }}.
+        Session {{ qrSession()?.sessionNo }} — {{ qrSession()?.sessionDate }}.
       </p>
 
       @if (qrLoading()) {
@@ -77,7 +77,7 @@
         <div id="qr-print-area" class="qr-print-area">
           <div class="qr-print-title">{{ selectedOffering()?.courseTitle }}</div>
           <div class="qr-print-subtitle">
-            Session {{ selectedSession()?.sessionNo }} — {{ selectedSession()?.sessionDate }}
+            Session {{ qrSession()?.sessionNo }} — {{ qrSession()?.sessionDate }}
           </div>
           <img [src]="url" alt="Session check-in QR code" class="qr-display-img" />
           <div class="qr-print-instruction">Scan with your phone camera to check in</div>
@@ -97,35 +97,52 @@
     <app-table-toolbar [controller]="ctrl" slot="top"></app-table-toolbar>
 
     @if (ctrl.effectiveView() === 'table') {
-      <div class="card" style="padding:0;overflow:hidden">
-        <table>
-          <thead><tr><th>Student</th><th>Enrolled</th><th>Cumulative attendance</th><th>This session</th><th></th></tr></thead>
+      <div class="card grid-scroll" style="padding:0;overflow:auto">
+        <table class="attendance-grid">
+          <thead>
+            <tr>
+              <th class="sticky-col">Student</th>
+              <th>Enrolled</th>
+              <th>Cumulative</th>
+              @for (s of sessions(); track s.id) {
+                <th class="session-col">{{ formatSessionColumn(s) }}</th>
+              }
+              <th></th>
+            </tr>
+          </thead>
           <tbody>
             @for (e of ctrl.pageItems(); track e.userId) {
               <tr class="row">
-                <td>
+                <td class="sticky-col">
                   <div class="name-cell">
                     <div class="avatar-sm" [style.background]="e.avatarColor">{{ e.initials }}</div>{{ e.name }}
                   </div>
                 </td>
                 <td>{{ e.enrolledLabel }}</td>
-                <td style="width:180px">
+                <td style="width:160px">
                   <div class="pct-row">
                     <div class="pct-track"><div class="pct-fill" [style.width.%]="e.pctValue" [style.background]="e.pctColor"></div></div>
                     <span class="pct-label">{{ e.pctLabel }}</span>
                   </div>
                 </td>
-                <td><span class="badge" [style.background]="e.presentColor">{{ e.presentLabel }}</span></td>
+                @for (s of sessions(); track s.id) {
+                  <td class="session-col">
+                    <button
+                      type="button"
+                      class="attendance-cell"
+                      [class.present]="attendanceFor(e, s.id)"
+                      (click)="toggleAttendance(e, s.id)"
+                      [title]="attendanceFor(e, s.id) ? 'Mark absent for ' + formatSessionColumn(s) : 'Mark present for ' + formatSessionColumn(s)"
+                    >{{ attendanceFor(e, s.id) ? '✓' : '·' }}</button>
+                  </td>
+                }
                 <td>
-                  <div class="action-group">
-                    <button type="button" class="icon-btn icon-btn-accent" (click)="toggleAttendance(e)" [title]="e.present ? 'Mark absent' : 'Mark present'">{{ e.present ? '↺' : '☑' }}</button>
-                    <button type="button" class="icon-btn" style="color:var(--w-red)" (click)="removeEnrollment(e)" title="Remove enrollment">✕</button>
-                  </div>
+                  <button type="button" class="icon-btn" style="color:var(--w-red)" (click)="removeEnrollment(e)" title="Remove enrollment">✕</button>
                 </td>
               </tr>
             }
             @if (!ctrl.pageItems().length) {
-              <tr><td colspan="5" class="muted-cell" style="text-align:center;padding:20px">No students enrolled yet — click "+ Add Student" to enroll one.</td></tr>
+              <tr><td [attr.colspan]="4 + sessions().length" class="muted-cell" style="text-align:center;padding:20px">No students enrolled yet — click "+ Add Student" to enroll one.</td></tr>
             }
           </tbody>
         </table>
@@ -145,12 +162,19 @@
               <div class="pct-track"><div class="pct-fill" [style.width.%]="e.pctValue" [style.background]="e.pctColor"></div></div>
               <span class="pct-label">{{ e.pctLabel }}</span>
             </div>
+            <div class="mcard-session-pills">
+              @for (s of sessions(); track s.id) {
+                <button
+                  type="button"
+                  class="attendance-cell"
+                  [class.present]="attendanceFor(e, s.id)"
+                  (click)="toggleAttendance(e, s.id)"
+                  [title]="formatSessionColumn(s)"
+                >{{ s.sessionNo }}</button>
+              }
+            </div>
             <div class="mcard-row">
-              <span class="badge badge-sm" [style.background]="e.presentColor">{{ e.presentLabel }}</span>
-              <div class="action-group">
-                <button type="button" class="icon-btn icon-btn-accent" (click)="toggleAttendance(e)" [title]="e.present ? 'Mark absent' : 'Mark present'">{{ e.present ? '↺' : '☑' }}</button>
-                <button type="button" class="icon-btn" style="color:var(--w-red)" (click)="removeEnrollment(e)" title="Remove enrollment">✕</button>
-              </div>
+              <button type="button" class="icon-btn" style="color:var(--w-red)" (click)="removeEnrollment(e)" title="Remove enrollment">✕</button>
             </div>
           </div>
         }
