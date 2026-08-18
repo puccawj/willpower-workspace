@@ -2,6 +2,21 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-18 (2) — Consolidate Roster/Certificates into their standalone pages
+
+**Admin panel:**
+- Offering Workspace's Roster and Certificates tabs duplicated the
+  standalone Enrollment & Attendance and Certificate Management pages —
+  same per-offering data, two separately-maintained UIs that had already
+  drifted apart (the standalone Enrollment page had gotten a layout
+  redesign and a QR print button the Workspace tab never received).
+  Removed both tabs; Offering Workspace is now Overview/Sessions/Needs,
+  with "Roster & Attendance" / "Certificates" buttons that deep-link to
+  the standalone pages with the offering pre-selected. Certificate
+  Management gained the `?offeringId=` deep-link support Enrollment &
+  Attendance already had. All Offerings' row-level "Enrollment &
+  Attendance" action now deep-links the same way.
+
 ## 2026-08-18 (1) — QR print-for-wall, mobile prod-build fix
 
 **Admin panel:**
