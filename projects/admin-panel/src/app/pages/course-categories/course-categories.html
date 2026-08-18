@@ -1,0 +1,53 @@
+<div class="page-toolbar toolbar-end">
+  <button type="button" class="btn btn-solid" (click)="addCategory()">+ Add Category</button>
+</div>
+
+@if (error()) {
+  <div class="state-error card">{{ error() }}</div>
+} @else if (loading()) {
+  <div class="state-loading card">Loading categories…</div>
+} @else {
+  <app-table-toolbar [controller]="ctrl" slot="top"></app-table-toolbar>
+
+  @if (ctrl.effectiveView() === 'table') {
+    <div class="card" style="padding:0;overflow:hidden">
+      <table>
+        <thead><tr><th>Category</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody>
+          @for (c of ctrl.pageItems(); track c.key) {
+            <tr class="row">
+              <td style="font-weight:500">{{ c.name }}</td>
+              <td><span class="badge" [style.background]="c.statusColor">{{ c.statusLabel }}</span></td>
+              <td>
+                <div class="action-group">
+                  <button type="button" class="icon-btn icon-btn-accent" (click)="editCategory(c)" title="Edit">✎</button>
+                  <button type="button" class="icon-btn" [style.color]="c.toggleColor" (click)="toggleStatus(c)" [title]="c.toggleLabel">⏻</button>
+                </div>
+              </td>
+            </tr>
+          }
+          @if (!ctrl.pageItems().length) {
+            <tr><td colspan="3" class="muted-cell" style="text-align:center;padding:20px">No categories yet — click "+ Add Category" to create the first one.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <div class="cardgrid">
+      @for (c of ctrl.pageItems(); track c.key) {
+        <div class="mcard">
+          <div class="mcard-head">
+            <h4 class="mcard-title">{{ c.name }}</h4>
+            <span class="badge badge-sm" [style.background]="c.statusColor">{{ c.statusLabel }}</span>
+          </div>
+          <div class="mcard-actions action-group">
+            <button type="button" class="icon-btn icon-btn-accent" (click)="editCategory(c)" title="Edit">✎</button>
+            <button type="button" class="icon-btn" [style.color]="c.toggleColor" (click)="toggleStatus(c)" [title]="c.toggleLabel">⏻</button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <app-table-toolbar [controller]="ctrl" slot="bottom"></app-table-toolbar>
+}

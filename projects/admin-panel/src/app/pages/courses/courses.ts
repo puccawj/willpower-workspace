@@ -2,6 +2,7 @@ import { Component, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, from, map, of, switchMap, tap, throwError } from 'rxjs';
 import { ApiCourse, CourseApiService, CoursePayload } from '../../core/services/course-api.service';
+import { CourseCategoryApiService } from '../../core/services/course-category-api.service';
 import { CrudModalService } from '../../core/services/crud-modal.service';
 import { MULTISELECT_DELIM } from '../../shared/crud-modal/crud-modal';
 import { ImageViewerService } from '../../core/services/image-viewer.service';
@@ -18,6 +19,7 @@ interface CourseRow {
   title: string;
   description: string;
   syllabus: string;
+  categoryId: string;
   category: string;
   imageUrl: string;
   totalSessions: number;
@@ -36,7 +38,8 @@ function toRow(c: ApiCourse, titleById: Map<string, string>): CourseRow {
     title: c.title,
     description: c.description ?? '',
     syllabus: c.syllabus ?? '',
-    category: c.category ?? '—',
+    categoryId: c.categoryId ?? '',
+    category: c.categoryName ?? '—',
     imageUrl: c.imageUrl ?? '',
     totalSessions: c.totalSessions,
     passingLabel: `${Number(c.passingAttendancePercent)}%`,
@@ -57,6 +60,7 @@ function toRow(c: ApiCourse, titleById: Map<string, string>): CourseRow {
 })
 export class Courses {
   private readonly api = inject(CourseApiService);
+  private readonly categoryApi = inject(CourseCategoryApiService);
   private readonly modal = inject(CrudModalService);
   private readonly confirmSvc = inject(ConfirmService);
   private readonly toast = inject(ToastService);
@@ -78,6 +82,7 @@ export class Courses {
 
   constructor() {
     this.api.load().subscribe();
+    this.categoryApi.load().subscribe();
   }
 
   private showError(err: unknown, fallback: string): void {
@@ -106,16 +111,26 @@ export class Courses {
   }
 
   /** Options for the "Prerequisite courses" multiselect — every course except the one being edited. */
-  private buildFields(excludeId?: string): FieldDef[] {
+  private buildFields(excludeId?: string, currentCategoryId?: string): FieldDef[] {
     const options = this.api
       .courses()
       .filter((c) => c.id !== excludeId)
       .map((c) => c.title);
+    const categoryOptions = this.categoryApi
+      .categories()
+      .filter((c) => c.active || c.id === currentCategoryId)
+      .map((c) => ({ id: c.id, label: c.name }));
     return [
       { key: 'title', label: 'Course title', type: 'text' },
       { key: 'description', label: 'Description', type: 'textarea' },
       { key: 'syllabus', label: 'Syllabus', type: 'textarea', hint: 'One topic per line — shown on the public course page.' },
-      { key: 'category', label: 'Category', type: 'text' },
+      {
+        key: 'category',
+        label: 'Category',
+        type: 'typeahead',
+        relOptions: categoryOptions,
+        hint: 'Manage the list under Course Categories.',
+      },
       { key: 'totalSessions', label: 'Total sessions', type: 'number' },
       { key: 'passingAttendancePercent', label: 'Passing % (attendance)', type: 'number' },
       {
@@ -148,7 +163,7 @@ export class Courses {
       title: String(values['title'] ?? '').trim(),
       description: String(values['description'] ?? '').trim() || undefined,
       syllabus: String(values['syllabus'] ?? '').trim() || undefined,
-      category: String(values['category'] ?? '').trim() || undefined,
+      categoryId: String(values['category'] ?? '').trim() || undefined,
       totalSessions: Number(values['totalSessions']) || 1,
       passingAttendancePercent: Number(values['passingAttendancePercent']) || 80,
       status: String(values['status'] ?? 'Active') === 'Inactive' ? 'inactive' : 'active',
@@ -204,13 +219,13 @@ export class Courses {
   editCourse(row: CourseRow): void {
     this.modal.open({
       title: 'Edit Course',
-      fields: this.buildFields(row.id),
+      fields: this.buildFields(row.id, row.categoryId),
       isEdit: true,
       values: {
         title: row.title,
         description: row.description,
         syllabus: row.syllabus,
-        category: row.category === '—' ? '' : row.category,
+        category: row.categoryId,
         totalSessions: row.totalSessions,
         passingAttendancePercent: Number(row.passingLabel.replace('%', '')),
         status: row.isActive ? 'Active' : 'Inactive',

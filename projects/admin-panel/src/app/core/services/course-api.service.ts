@@ -10,7 +10,8 @@ export interface ApiCourse {
   title: string;
   description: string | null;
   syllabus: string | null;
-  category: string | null;
+  categoryId: string | null;
+  categoryName: string | null;
   imageUrl: string | null;
   totalSessions: number;
   passingAttendancePercent: string;
@@ -23,7 +24,7 @@ export interface CoursePayload {
   title: string;
   description?: string;
   syllabus?: string;
-  category?: string;
+  categoryId?: string;
   image?: string;
   totalSessions: number;
   passingAttendancePercent?: number;

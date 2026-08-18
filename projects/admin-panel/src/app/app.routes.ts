@@ -145,6 +145,12 @@ export const routes: Routes = [
         data: { title: 'Course Feedback', subtitle: 'Member star ratings and private notes across this course\'s offerings', allow: ['superadmin', 'admin'] },
       },
       {
+        path: 'course-categories',
+        loadComponent: () => import('./pages/course-categories/course-categories').then((m) => m.CourseCategories),
+        canActivate: [roleAccessGuard],
+        data: { title: 'Course Categories', subtitle: 'Managed category list used on course templates', allow: ['superadmin', 'admin'] },
+      },
+      {
         path: 'schedule',
         loadComponent: () => import('./pages/all-offerings/all-offerings').then((m) => m.AllOfferings),
         canActivate: [roleAccessGuard],

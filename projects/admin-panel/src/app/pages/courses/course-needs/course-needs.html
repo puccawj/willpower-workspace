@@ -4,7 +4,7 @@
   @if (course(); as c) {
     <div>
       <h2 class="summary-title">{{ c.title }}</h2>
-      <div class="muted-label">{{ c.category ?? 'Course' }}</div>
+      <div class="muted-label">{{ c.categoryName ?? 'Course' }}</div>
     </div>
   } @else {
     <div class="muted-label">Loading course…</div>

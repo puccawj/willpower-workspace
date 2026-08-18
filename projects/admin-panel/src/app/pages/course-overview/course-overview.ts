@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Observable, from, map, of, switchMap, tap, throwError } from 'rxjs';
 import { ApiCourse, CourseApiService, CoursePayload } from '../../core/services/course-api.service';
+import { CourseCategoryApiService } from '../../core/services/course-category-api.service';
 import { ApiOffering, ApiOfferingStatus, OfferingApiService, OfferingPayload } from '../../core/services/offering-api.service';
 import { BranchApiService } from '../../core/services/branch-api.service';
 import { UserApiService } from '../../core/services/user-api.service';
@@ -77,6 +78,7 @@ function toRow(o: ApiOffering): OfferingListRow {
 })
 export class CourseOverview {
   private readonly courseApi = inject(CourseApiService);
+  private readonly categoryApi = inject(CourseCategoryApiService);
   private readonly offeringApi = inject(OfferingApiService);
   private readonly branchApi = inject(BranchApiService);
   private readonly userApi = inject(UserApiService);
@@ -124,6 +126,7 @@ export class CourseOverview {
       this.branchApi.load().subscribe();
       this.userApi.load().subscribe();
       this.courseApi.load().subscribe();
+      this.categoryApi.load().subscribe();
     }
   }
 
@@ -161,17 +164,27 @@ export class CourseOverview {
 
   // ---- Edit course template (same field set as the Courses list page) ----
 
-  private courseFields(): FieldDef[] {
+  private courseFields(currentCategoryId?: string): FieldDef[] {
     const excludeId = this.courseId();
     const options = this.courseApi
       .courses()
       .filter((c) => c.id !== excludeId)
       .map((c) => c.title);
+    const categoryOptions = this.categoryApi
+      .categories()
+      .filter((c) => c.active || c.id === currentCategoryId)
+      .map((c) => ({ id: c.id, label: c.name }));
     return [
       { key: 'title', label: 'Course title', type: 'text' },
       { key: 'description', label: 'Description', type: 'textarea' },
       { key: 'syllabus', label: 'Syllabus', type: 'textarea', hint: 'One topic per line — shown on the public course page.' },
-      { key: 'category', label: 'Category', type: 'text' },
+      {
+        key: 'category',
+        label: 'Category',
+        type: 'typeahead',
+        relOptions: categoryOptions,
+        hint: 'Manage the list under Course Categories.',
+      },
       { key: 'totalSessions', label: 'Total sessions', type: 'number' },
       { key: 'passingAttendancePercent', label: 'Passing % (attendance)', type: 'number' },
       {
@@ -202,7 +215,7 @@ export class CourseOverview {
       title: String(values['title'] ?? '').trim(),
       description: String(values['description'] ?? '').trim() || undefined,
       syllabus: String(values['syllabus'] ?? '').trim() || undefined,
-      category: String(values['category'] ?? '').trim() || undefined,
+      categoryId: String(values['category'] ?? '').trim() || undefined,
       totalSessions: Number(values['totalSessions']) || 1,
       passingAttendancePercent: Number(values['passingAttendancePercent']) || 80,
       status: String(values['status'] ?? 'Active') === 'Inactive' ? 'inactive' : 'active',
@@ -233,13 +246,13 @@ export class CourseOverview {
     if (!c) return;
     this.modal.open({
       title: 'Edit Course',
-      fields: this.courseFields(),
+      fields: this.courseFields(c.categoryId ?? undefined),
       isEdit: true,
       values: {
         title: c.title,
         description: c.description ?? '',
         syllabus: c.syllabus ?? '',
-        category: c.category ?? '',
+        category: c.categoryId ?? '',
         totalSessions: c.totalSessions,
         passingAttendancePercent: Number(c.passingAttendancePercent),
         status: c.status === 'active' ? 'Active' : 'Inactive',
