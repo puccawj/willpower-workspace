@@ -197,4 +197,8 @@ export class Rsvp {
   closeQrDialog(): void {
     this.qrOpen.set(false);
   }
+
+  printQr(): void {
+    window.print();
+  }
 }

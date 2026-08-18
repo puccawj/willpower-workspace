@@ -30,11 +30,11 @@
 @if (qrOpen()) {
   <div class="qr-overlay" (click)="closeQrDialog()">
     <div class="qr-dialog" (click)="$event.stopPropagation()">
-      <div class="qr-dialog-head">
+      <div class="qr-dialog-head no-print">
         <h3 class="qr-dialog-title">Check-in QR code</h3>
         <span class="qr-dialog-close" (click)="closeQrDialog()">×</span>
       </div>
-      <p class="muted-label qr-dialog-hint">
+      <p class="muted-label qr-dialog-hint no-print">
         Display this at the door — guests scan it with their own phone to check themselves in.
       </p>
 
@@ -43,7 +43,13 @@
       } @else if (qrError()) {
         <p class="qr-camera-error">{{ qrError() }}</p>
       } @else if (qrDataUrl(); as url) {
-        <img [src]="url" alt="Event check-in QR code" class="qr-display-img" />
+        <div id="qr-print-area" class="qr-print-area">
+          <div class="qr-print-title">{{ event()?.title }}</div>
+          <div class="qr-print-subtitle">{{ dateFull() }}</div>
+          <img [src]="url" alt="Event check-in QR code" class="qr-display-img" />
+          <div class="qr-print-instruction">Scan with your phone camera to check in</div>
+        </div>
+        <button type="button" class="btn btn-outline qr-print-btn no-print" (click)="printQr()">🖶 Print for wall</button>
       }
     </div>
   </div>

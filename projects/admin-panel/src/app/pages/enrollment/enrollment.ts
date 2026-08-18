@@ -270,4 +270,8 @@ export class Enrollment {
   closeQrDialog(): void {
     this.qrOpen.set(false);
   }
+
+  printQr(): void {
+    window.print();
+  }
 }
