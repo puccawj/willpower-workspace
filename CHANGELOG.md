@@ -2,6 +2,18 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-18 (3) — Enrollment & Attendance is now a real multi-session grid
+
+**Admin panel:**
+- Enrollment & Attendance's roster is now a proper grid: rows are
+  students, one column per session, each cell toggles present/absent for
+  that specific session — replacing the old "pick a session, see one
+  column, re-pick to check a different day" flow. The session pills at
+  the top are now just the QR check-in target picker (which session's QR
+  to display), since the roster no longer needs a "current session" to
+  filter by. Backed by a new `sessionAttendance` field the API returns
+  per student.
+
 ## 2026-08-18 (2) — Consolidate Roster/Certificates into their standalone pages
 
 **Admin panel:**
