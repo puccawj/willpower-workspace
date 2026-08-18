@@ -12,7 +12,7 @@
       </div>
     </div>
     <div class="workspace-head-actions">
-      <span class="badge" [style.background]="effectiveStatusColor()" title="Computed from today's date vs. start/end — not written back to the record">{{ effectiveStatusLabel() }}</span>
+      <span class="badge" [style.background]="statusColor()">{{ statusLabel() }}</span>
       <button type="button" class="btn btn-outline" (click)="goEnrollment()">☑ Roster & Attendance</button>
       <button type="button" class="btn btn-outline" (click)="goCertificates()">◈ Certificates</button>
     </div>
@@ -38,8 +38,7 @@
             <div><div class="muted-label">Capacity</div><div>{{ o.enrolledCount }} / {{ o.capacity ?? 0 }}</div></div>
             <div><div class="muted-label">Mode</div><div>{{ o.mode === 'onsite' ? 'Onsite' : 'Online' }}</div></div>
             <div><div class="muted-label">Location</div><div>{{ o.location || '—' }}</div></div>
-            <div><div class="muted-label">Status (manual)</div><div>{{ o.status }}</div></div>
-            <div><div class="muted-label">Status (computed)</div><div>{{ effectiveStatusLabel() }}</div></div>
+            <div><div class="muted-label">Status</div><div>{{ statusLabel() }}</div></div>
           </div>
         </div>
       }

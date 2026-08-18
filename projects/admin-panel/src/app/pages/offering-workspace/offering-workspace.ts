@@ -6,7 +6,6 @@ import { Observable, from, map, of, switchMap, tap, throwError } from 'rxjs';
 import { ApiCourse, CourseApiService } from '../../core/services/course-api.service';
 import {
   ApiCourseSession,
-  ApiOffering,
   ApiOfferingStatus,
   OfferingApiService,
   OfferingPayload,
@@ -85,15 +84,6 @@ function formatDate(iso: string): string {
   return new Date(`${iso}T00:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
-/** Client-side "effective" status badge — computed from dates, never written back to the DB.
- * A cancelled offering always stays cancelled; otherwise the end date decides published/completed. */
-function effectiveStatus(o: ApiOffering): ApiOfferingStatus {
-  if (o.status === 'cancelled' || o.status === 'draft') return o.status;
-  const today = new Date().toISOString().slice(0, 10);
-  if (today > o.endDate) return 'completed';
-  return 'published';
-}
-
 interface NeedRow {
   id: string;
   title: string;
@@ -167,13 +157,13 @@ export class OfferingWorkspace {
   readonly offering = computed(() => this.offeringApi.offerings().find((o) => o.id === this.offeringId()) ?? null);
   readonly offeringLoading = this.offeringApi.loading;
 
-  readonly effectiveStatusLabel = computed(() => {
+  readonly statusLabel = computed(() => {
     const o = this.offering();
-    return o ? STATUS_LABEL[effectiveStatus(o)] : '';
+    return o ? STATUS_LABEL[o.status] : '';
   });
-  readonly effectiveStatusColor = computed(() => {
+  readonly statusColor = computed(() => {
     const o = this.offering();
-    return o ? STATUS_COLOR[effectiveStatus(o)] : '';
+    return o ? STATUS_COLOR[o.status] : '';
   });
   readonly dateRangeLabel = computed(() => {
     const o = this.offering();
