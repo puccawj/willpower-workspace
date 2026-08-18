@@ -124,7 +124,7 @@ export const routes: Routes = [
         path: 'courses/:id/offerings/:offeringId',
         loadComponent: () => import('./pages/offering-workspace/offering-workspace').then((m) => m.OfferingWorkspace),
         canActivate: [roleAccessGuard],
-        data: { title: 'Offering Workspace', subtitle: 'Overview, sessions, roster, needs, and certificates — all in one place', allow: ['superadmin', 'admin', 'instructor'] },
+        data: { title: 'Offering Workspace', subtitle: 'Overview, sessions, and donation needs for this offering', allow: ['superadmin', 'admin', 'instructor'] },
       },
       {
         path: 'courses/:id/needs',

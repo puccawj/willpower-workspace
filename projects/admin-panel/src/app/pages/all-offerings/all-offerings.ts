@@ -148,7 +148,7 @@ export class AllOfferings {
   }
 
   goEnrollment(row: OfferingRow): void {
-    this.router.navigate(['/courses', row.courseId, 'offerings', row.id], { queryParams: { tab: 'roster' } });
+    this.router.navigate(['/enrollment'], { queryParams: { offeringId: row.id } });
   }
 
   private offeringFields(excludeCourseSelect = false): FieldDef[] {

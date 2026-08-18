@@ -15,6 +15,13 @@
   margin-bottom: 16px;
 }
 
+.workspace-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 .summary-title {
   font: 500 21px var(--w-font-serif);
   margin: 0 0 4px;
@@ -68,121 +75,6 @@
 
 .session-topic {
   font: 500 13.5px var(--w-font-sans);
-}
-
-.session-banner {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 16px;
-}
-
-.field-inline {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 220px;
-}
-
-.active-template-indicator {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 8px;
-}
-
-.active-template-thumb {
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
-  object-fit: cover;
-  flex-shrink: 0;
-}
-
-.qr-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(36, 28, 21, 0.55);
-  z-index: 90;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-}
-
-.qr-dialog {
-  background: var(--w-panel);
-  border-radius: 14px;
-  max-width: 420px;
-  width: 100%;
-  max-height: 80vh;
-  overflow-y: auto;
-  padding: 26px;
-  box-shadow: 0 30px 70px -30px rgba(36, 28, 21, 0.5);
-}
-
-.qr-dialog-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 6px;
-}
-
-.qr-dialog-title {
-  font: 500 19px var(--w-font-serif);
-  margin: 0;
-}
-
-.qr-dialog-close {
-  cursor: pointer;
-  font: 600 20px var(--w-font-sans);
-  color: var(--w-muted);
-}
-
-.qr-dialog-hint {
-  margin: 0 0 16px;
-}
-
-.qr-display-img {
-  display: block;
-  width: 100%;
-  max-width: 280px;
-  margin: 0 auto;
-  border-radius: 10px;
-}
-
-.qr-camera-error {
-  font: 500 12.5px var(--w-font-sans);
-  color: var(--w-red);
-  margin: -6px 0 12px;
-}
-
-.qr-print-area {
-  text-align: center;
-}
-
-.qr-print-title {
-  font: 500 16px var(--w-font-serif);
-  margin-bottom: 2px;
-}
-
-.qr-print-subtitle {
-  font: 400 12.5px var(--w-font-sans);
-  color: var(--w-muted);
-  margin-bottom: 10px;
-}
-
-.qr-print-instruction {
-  font: 500 12.5px var(--w-font-sans);
-  color: var(--w-ink-soft);
-  margin-top: 10px;
-}
-
-.qr-print-btn {
-  display: block;
-  width: 100%;
-  margin-top: 16px;
 }
 
 .need-rows {

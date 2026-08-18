@@ -1,5 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { catchError, concatMap, from, map, of, switchMap } from 'rxjs';
 import { CourseApiService } from '../../core/services/course-api.service';
 import { ApiOffering, OfferingApiService } from '../../core/services/offering-api.service';
@@ -54,9 +56,15 @@ export class Certificates {
   private readonly certPreview = inject(CertificatePreviewService);
   private readonly confirm = inject(ConfirmService);
   private readonly toast = inject(ToastService);
+  private readonly route = inject(ActivatedRoute);
 
   readonly loading = this.enrollmentApi.loading;
   readonly error = this.enrollmentApi.error;
+
+  private readonly queryOfferingId = toSignal(
+    this.route.queryParamMap.pipe(map((params) => params.get('offeringId') ?? '')),
+    { initialValue: '' },
+  );
 
   readonly offerings = this.offeringApi.offerings;
   readonly selectedOfferingId = signal('');
@@ -113,8 +121,8 @@ export class Certificates {
   constructor() {
     this.courseApi.load().subscribe();
     this.offeringApi.load().subscribe(() => {
-      const first = this.offerings()[0]?.id ?? '';
-      if (first) this.selectOffering(first);
+      const initial = this.queryOfferingId() || this.offerings()[0]?.id || '';
+      if (initial) this.selectOffering(initial);
     });
   }
 
