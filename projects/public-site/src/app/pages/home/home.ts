@@ -6,8 +6,10 @@ import { HomeBannerApiService } from '../../core/services/home-banner-api.servic
 import { RatingApiService, RatingSummary } from '../../core/services/rating-api.service';
 import { AuthService } from '../../core/services/auth.service';
 import { SiteContentApiService } from '../../core/services/site-content-api.service';
+import { ImageViewerService } from '../../core/services/image-viewer.service';
 
 const AUTO_ADVANCE_MS = 6000;
+const SWIPE_THRESHOLD_PX = 40;
 
 export interface HomeHeroContent {
   eyebrow: string;
@@ -50,6 +52,7 @@ export class Home implements OnDestroy {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
   private readonly siteContentApi = inject(SiteContentApiService);
+  private readonly imageViewer = inject(ImageViewerService);
 
   readonly isLoggedIn = this.auth.isLoggedIn;
   readonly hero = signal<HomeHeroContent>({ ...DEFAULT_HERO });
@@ -122,6 +125,36 @@ export class Home implements OnDestroy {
     } else {
       this.router.navigateByUrl(link);
     }
+  }
+
+  openZoom(event: Event, imageUrl: string): void {
+    event.stopPropagation();
+    this.imageViewer.open(imageUrl);
+  }
+
+  // ---- Swipe left/right between banners ----
+
+  private swipeStartX = 0;
+  private swipeStartY = 0;
+  private swiping = false;
+
+  onCarouselPointerDown(event: PointerEvent): void {
+    this.swipeStartX = event.clientX;
+    this.swipeStartY = event.clientY;
+    this.swiping = true;
+  }
+
+  onCarouselPointerUp(event: PointerEvent): void {
+    if (!this.swiping) return;
+    this.swiping = false;
+    if (this.banners().length < 2) return;
+
+    const dx = event.clientX - this.swipeStartX;
+    const dy = event.clientY - this.swipeStartY;
+    if (Math.abs(dx) < SWIPE_THRESHOLD_PX || Math.abs(dx) < Math.abs(dy)) return;
+
+    if (dx < 0) this.next();
+    else this.prev();
   }
 
   ngOnDestroy(): void {

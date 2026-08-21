@@ -11,8 +11,10 @@ import { PublicEventApiService } from '../../core/services/public-event-api.serv
 import { PublicCourseApiService, PublicCourseOfferingCard } from '../../core/services/public-course-api.service';
 import { PullToRefreshService } from '../../core/services/pull-to-refresh.service';
 import { RatingApiService, RatingSummary } from '../../core/services/rating-api.service';
+import { ImageViewerService } from '../../core/services/image-viewer.service';
 
 const AUTO_ADVANCE_MS = 6000;
+const SWIPE_THRESHOLD_PX = 40;
 
 @Component({
   selector: 'app-home',
@@ -31,6 +33,7 @@ export class Home {
   private readonly pushRegistration = inject(PushRegistrationService);
   private readonly ratingApi = inject(RatingApiService);
   private readonly router = inject(Router);
+  private readonly imageViewer = inject(ImageViewerService);
 
   readonly view = signal<'list' | 'card'>('card');
   readonly banners = this.bannerApi.banners;
@@ -107,6 +110,36 @@ export class Home {
     } else {
       this.router.navigateByUrl(link);
     }
+  }
+
+  openZoom(event: Event, imageUrl: string): void {
+    event.stopPropagation();
+    this.imageViewer.open(imageUrl);
+  }
+
+  // ---- Swipe left/right between banners ----
+
+  private swipeStartX = 0;
+  private swipeStartY = 0;
+  private swiping = false;
+
+  onCarouselPointerDown(event: PointerEvent): void {
+    this.swipeStartX = event.clientX;
+    this.swipeStartY = event.clientY;
+    this.swiping = true;
+  }
+
+  onCarouselPointerUp(event: PointerEvent): void {
+    if (!this.swiping) return;
+    this.swiping = false;
+    if (this.banners().length < 2) return;
+
+    const dx = event.clientX - this.swipeStartX;
+    const dy = event.clientY - this.swipeStartY;
+    if (Math.abs(dx) < SWIPE_THRESHOLD_PX || Math.abs(dx) < Math.abs(dy)) return;
+
+    if (dx < 0) this.nextSlide();
+    else this.prevSlide();
   }
 
   constructor() {

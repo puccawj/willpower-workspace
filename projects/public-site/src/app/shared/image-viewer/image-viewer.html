@@ -14,8 +14,9 @@
       (wheel)="onWheel($event)"
       (pointerdown)="onPointerDown($event)"
       (pointermove)="onPointerMove($event)"
-      (pointerup)="onPointerUp()"
-      (pointerleave)="onPointerUp()"
+      (pointerup)="onPointerUp($event)"
+      (pointercancel)="onPointerUp($event)"
+      (pointerleave)="onPointerUp($event)"
     >
       <img
         [src]="url"

@@ -15,6 +15,30 @@
   border-radius: 18px;
   overflow: hidden;
   background: var(--w-bg-alt);
+  touch-action: pan-y;
+}
+
+.carousel-zoom {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.4);
+  color: #fff;
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.6);
+  }
 }
 
 .carousel-slide {

@@ -8,6 +8,43 @@
   justify-content: center;
 }
 
+.viewer-toolbar {
+  position: absolute;
+  top: max(54px, calc(env(safe-area-inset-top) + 8px));
+  left: 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  padding: 6px 8px;
+  z-index: 1;
+}
+
+.viewer-btn {
+  min-width: 30px;
+  height: 30px;
+  padding: 0 8px;
+  border-radius: 6px;
+  border: none;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font: 600 calc(15px * var(--text-scale, 1)) var(--w-font-sans, sans-serif);
+  line-height: 1;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.4;
+  }
+}
+
+.viewer-scale {
+  min-width: 40px;
+  text-align: center;
+  font: 500 calc(11px * var(--text-scale, 1)) var(--w-font-sans, sans-serif);
+  color: rgba(255, 255, 255, 0.85);
+}
+
 .viewer-close {
   position: absolute;
   top: max(54px, calc(env(safe-area-inset-top) + 8px));
@@ -21,10 +58,27 @@
   font-size: calc(23px * var(--text-scale, 1));
   line-height: 1;
   cursor: pointer;
+  z-index: 1;
+}
+
+.viewer-stage {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  touch-action: none;
 }
 
 .viewer-image {
   max-width: 92vw;
   max-height: 85vh;
   object-fit: contain;
+  transition: transform 0.08s ease-out;
+  user-select: none;
+
+  &.zoomed {
+    cursor: grab;
+  }
 }

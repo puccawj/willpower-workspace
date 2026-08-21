@@ -10,6 +10,25 @@
   overflow: hidden;
   background: var(--w-bg-alt);
   margin-bottom: 18px;
+  touch-action: pan-y;
+}
+
+.banner-zoom {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.4);
+  color: #fff;
+  font-size: 13px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
 }
 
 .banner-slide {

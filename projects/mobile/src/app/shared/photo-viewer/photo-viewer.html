@@ -1,6 +1,29 @@
 @if (viewer.imageUrl(); as url) {
   <div class="viewer-overlay" (click)="close()">
+    <div class="viewer-toolbar" (click)="$event.stopPropagation()">
+      <button type="button" class="viewer-btn" (click)="zoomOut()" [disabled]="!canZoomOut" aria-label="Zoom out">−</button>
+      <span class="viewer-scale">{{ (scale() * 100).toFixed(0) }}%</span>
+      <button type="button" class="viewer-btn" (click)="zoomIn()" [disabled]="!canZoomIn" aria-label="Zoom in">+</button>
+    </div>
     <button type="button" class="viewer-close" (click)="close()" aria-label="Close">×</button>
-    <img [src]="url" alt="Photo" class="viewer-image" (click)="$event.stopPropagation()" />
+
+    <div
+      class="viewer-stage"
+      (click)="$event.stopPropagation()"
+      (pointerdown)="onPointerDown($event)"
+      (pointermove)="onPointerMove($event)"
+      (pointerup)="onPointerUp($event)"
+      (pointercancel)="onPointerUp($event)"
+      (pointerleave)="onPointerUp($event)"
+    >
+      <img
+        [src]="url"
+        alt="Photo"
+        class="viewer-image"
+        [class.zoomed]="scale() > 1"
+        [style.transform]="'translate(' + offsetX() + 'px, ' + offsetY() + 'px) scale(' + scale() + ')'"
+        draggable="false"
+      />
+    </div>
   </div>
 }

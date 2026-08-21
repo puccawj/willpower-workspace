@@ -1,6 +1,10 @@
 <div class="home">
   @if (banners().length) {
-    <div class="home-banner">
+    <div
+      class="home-banner"
+      (pointerdown)="onCarouselPointerDown($event)"
+      (pointerup)="onCarouselPointerUp($event)"
+    >
       @for (b of banners(); track b.id; let i = $index) {
         <img
           [src]="b.imageUrl"
@@ -11,6 +15,7 @@
           (click)="onBannerClick(b.linkUrl)"
         />
       }
+      <button type="button" class="banner-zoom" (click)="openZoom($event, banners()[activeSlide()].imageUrl)" aria-label="Zoom banner image">🔍</button>
       @if (banners().length > 1) {
         <div class="banner-dots">
           @for (b of banners(); track b.id; let i = $index) {

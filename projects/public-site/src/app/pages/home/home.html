@@ -1,6 +1,10 @@
 @if (banners().length) {
   <section class="home-banner">
-    <div class="carousel">
+    <div
+      class="carousel"
+      (pointerdown)="onCarouselPointerDown($event)"
+      (pointerup)="onCarouselPointerUp($event)"
+    >
       @for (b of banners(); track b.id; let i = $index) {
         <img
           [src]="b.imageUrl"
@@ -11,6 +15,7 @@
           (click)="onBannerClick(b.linkUrl)"
         />
       }
+      <button type="button" class="carousel-zoom" (click)="openZoom($event, banners()[activeSlide()].imageUrl)" aria-label="Zoom banner image">🔍</button>
       @if (banners().length > 1) {
         <button type="button" class="carousel-nav carousel-prev" (click)="prev()" aria-label="Previous banner">‹</button>
         <button type="button" class="carousel-nav carousel-next" (click)="next()" aria-label="Next banner">›</button>
