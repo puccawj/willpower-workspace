@@ -2,6 +2,18 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-18 (7) — Fix banner clicks landing on the wrong slide's link
+
+**Public-site + mobile:**
+- Faded-out carousel slides only had `opacity: 0`, not
+  `pointer-events: none`, so whichever slide happened to sit last in the
+  DOM — not necessarily the one actually shown — silently intercepted
+  every click and navigated to *its* link instead of the visible
+  banner's. Found while verifying the new swipe gesture didn't affect
+  click-through. Also guards against a drag-swipe's trailing native
+  click (mouse still fires `click` on release after a drag) so
+  swiping to the next slide can no longer also navigate away.
+
 ## 2026-08-18 (6) — Home banner pinch-zoom and swipe navigation
 
 **Public-site + mobile:**
