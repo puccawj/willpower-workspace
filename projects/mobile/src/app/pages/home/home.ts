@@ -104,6 +104,10 @@ export class Home {
   }
 
   onBannerClick(link: string | null): void {
+    // A drag-swipe can still fire a native click on release even though the pointer moved —
+    // without this guard, dragging to the next slide could also navigate away via the slide
+    // you dragged *from*.
+    if (this.suppressNextBannerClick) return;
     if (!link) return;
     if (/^https?:\/\//.test(link)) {
       void Browser.open({ url: link });
@@ -122,6 +126,7 @@ export class Home {
   private swipeStartX = 0;
   private swipeStartY = 0;
   private swiping = false;
+  private suppressNextBannerClick = false;
 
   onCarouselPointerDown(event: PointerEvent): void {
     this.swipeStartX = event.clientX;
@@ -137,6 +142,9 @@ export class Home {
     const dx = event.clientX - this.swipeStartX;
     const dy = event.clientY - this.swipeStartY;
     if (Math.abs(dx) < SWIPE_THRESHOLD_PX || Math.abs(dx) < Math.abs(dy)) return;
+
+    this.suppressNextBannerClick = true;
+    setTimeout(() => (this.suppressNextBannerClick = false), 0);
 
     if (dx < 0) this.nextSlide();
     else this.prevSlide();

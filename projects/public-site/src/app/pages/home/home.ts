@@ -119,6 +119,10 @@ export class Home implements OnDestroy {
   }
 
   onBannerClick(link: string | null): void {
+    // A mouse-drag swipe still fires a native click on mouseup even though the pointer moved —
+    // touch mostly suppresses this on its own, but desktop mouse doesn't, so without this guard
+    // dragging to the next slide could also navigate away via the slide you dragged *from*.
+    if (this.suppressNextBannerClick) return;
     if (!link) return;
     if (/^https?:\/\//.test(link)) {
       window.open(link, '_blank', 'noopener');
@@ -137,6 +141,7 @@ export class Home implements OnDestroy {
   private swipeStartX = 0;
   private swipeStartY = 0;
   private swiping = false;
+  private suppressNextBannerClick = false;
 
   onCarouselPointerDown(event: PointerEvent): void {
     this.swipeStartX = event.clientX;
@@ -152,6 +157,9 @@ export class Home implements OnDestroy {
     const dx = event.clientX - this.swipeStartX;
     const dy = event.clientY - this.swipeStartY;
     if (Math.abs(dx) < SWIPE_THRESHOLD_PX || Math.abs(dx) < Math.abs(dy)) return;
+
+    this.suppressNextBannerClick = true;
+    setTimeout(() => (this.suppressNextBannerClick = false), 0);
 
     if (dx < 0) this.next();
     else this.prev();
