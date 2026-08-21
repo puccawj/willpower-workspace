@@ -2,6 +2,16 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-21 (2) — Mobile: Events section matches Courses layout
+
+**Mobile:**
+- Home's "Upcoming events" header shortened to "Events", with a
+  "View all →" link added next to the view toggle (matching Courses).
+- Card view now scrolls horizontally like Courses, instead of a static
+  2-column grid.
+- Both the Events and Courses home-page previews are capped at 10
+  items each.
+
 ## 2026-08-21 (1) — Mobile: Branches subtitle, ribbon overflow, full events list
 
 **Mobile:**
