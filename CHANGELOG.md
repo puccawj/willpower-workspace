@@ -2,6 +2,16 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-21 (5) — Public-site: home Events section matches mobile
+
+**Public-site:**
+- Home's "Upcoming events" header shortened to "Events". The preview
+  now shows every event (upcoming, live, and past — previously past
+  was dropped entirely and the list capped at 3), sorted
+  live-then-upcoming-then-past, capped at 10. Past events render at
+  reduced opacity instead of disappearing; upcoming events get a new
+  "Upcoming" pill alongside the existing "Live" one.
+
 ## 2026-08-21 (4) — Mobile: center the ribbon banner text
 
 **Mobile:**
