@@ -174,11 +174,11 @@ export function shortDate(dateStr: string): string {
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
-/** Day/month/year, no branch — used on the diagonal ribbon corner, which only has room for one
- * short line before it wraps. */
+/** Day/month/2-digit-year, no branch — used on the diagonal ribbon corner, which only has room
+ * for one short line before it wraps (a 4-digit year was still too wide). */
 export function ribbonDate(dateStr: string): string {
   const d = new Date(dateStr + 'T00:00:00');
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' });
 }
 
 function formatLabel(modes: ('online' | 'onsite')[]): string {
