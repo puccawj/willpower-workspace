@@ -11,6 +11,7 @@ import {
   PublicDonationRow,
   PublicOffering,
   formatSchedule,
+  ribbonDate,
   shortDate,
 } from '../../../core/services/public-course-api.service';
 import { MeApiService } from '../../../core/services/me-api.service';
@@ -53,6 +54,7 @@ export class CourseDetail {
 
   readonly formatSchedule = formatSchedule;
   readonly shortDate = shortDate;
+  readonly ribbonDate = ribbonDate;
 
   readonly isLoggedIn = this.auth.isLoggedIn;
   readonly isStudent = computed(() => this.auth.currentUser()?.role === 'student');

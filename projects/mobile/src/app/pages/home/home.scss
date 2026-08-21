@@ -234,6 +234,10 @@
   border: 1px solid var(--w-border);
   border-radius: 10px;
   padding: 12px;
+
+  &.past {
+    opacity: 0.55;
+  }
 }
 
 .event-date {
@@ -259,6 +263,13 @@
   min-width: 0;
 }
 
+.event-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .event-title {
   font: 500 calc(15px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-ink);
@@ -267,6 +278,32 @@
 .event-meta {
   font: 400 calc(12.5px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-muted-2);
+}
+
+.when-pill {
+  flex-shrink: 0;
+  font: 600 calc(9.5px * var(--text-scale, 1)) var(--w-font-sans);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #fff;
+  padding: 2px 7px;
+  border-radius: 20px;
+  line-height: 1.5;
+}
+
+.when-pill-live {
+  background: var(--w-red);
+}
+
+.when-pill-upcoming {
+  background: var(--w-accent);
+}
+
+.when-pill-onimg {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 1;
 }
 
 .event-grid {
@@ -281,6 +318,10 @@
   border: 1px solid var(--w-border);
   border-radius: 10px;
   overflow: hidden;
+
+  &.past {
+    opacity: 0.55;
+  }
 }
 
 .event-card-img {

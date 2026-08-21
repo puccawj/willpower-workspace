@@ -8,6 +8,7 @@ import { MeApiService, MyEvent } from '../../core/services/me-api.service';
 import { NotificationApiService } from '../../core/services/notification-api.service';
 import { PushRegistrationService } from '../../core/services/push-registration.service';
 import { PublicEventApiService } from '../../core/services/public-event-api.service';
+import { PublicEvent } from '../../core/models/public-event.models';
 import { PublicCourseApiService, PublicCourseOfferingCard } from '../../core/services/public-course-api.service';
 import { PullToRefreshService } from '../../core/services/pull-to-refresh.service';
 import { RatingApiService, RatingSummary } from '../../core/services/rating-api.service';
@@ -55,7 +56,12 @@ export class Home {
     return confirmed[0] ?? null;
   });
 
-  readonly upcoming = computed(() => this.publicEvents.events().filter((e) => e.when === 'upcoming').slice(0, 6));
+  /** Every event — upcoming and live shown first (most actionable), past events trail behind
+   * and are rendered dimmed rather than hidden, so this doubles as a lightweight history view. */
+  readonly homeEvents = computed(() => {
+    const priority: Record<PublicEvent['when'], number> = { live: 0, upcoming: 1, past: 2 };
+    return [...this.publicEvents.events()].sort((a, b) => priority[a.when] - priority[b.when]);
+  });
 
   readonly offerings = computed(() => this.offeringCards().slice(0, 6));
   private readonly offeringCards = signal<PublicCourseOfferingCard[]>([]);
@@ -77,7 +83,7 @@ export class Home {
   }
 
   private refreshRatings(): void {
-    const eventIds = this.upcoming().map((e) => e.id);
+    const eventIds = this.homeEvents().map((e) => e.id);
     this.ratingApi.bulkSummary('event', eventIds).subscribe((s) => this.eventRatings.set(s));
     const offeringIds = this.offerings().map((o) => o.offeringId);
     this.ratingApi.bulkSummary('offering', offeringIds).subscribe((s) => this.offeringRatings.set(s));

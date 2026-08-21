@@ -65,15 +65,22 @@
     </div>
   </div>
 
-  @if (upcoming().length === 0) {
-    <p class="empty-note">No upcoming events right now — check back soon.</p>
+  @if (homeEvents().length === 0) {
+    <p class="empty-note">No events right now — check back soon.</p>
   } @else if (view() === 'list') {
     <div class="event-list">
-      @for (e of upcoming(); track e.id) {
-        <a [routerLink]="['/events', e.id]" class="event-row">
+      @for (e of homeEvents(); track e.id) {
+        <a [routerLink]="['/events', e.id]" class="event-row" [class.past]="e.when === 'past'">
           <div class="event-date"><div class="event-day">{{ e.day }}</div><div class="event-mon">{{ e.mon }}</div></div>
           <div class="event-info">
-            <div class="event-title">{{ e.title }}</div>
+            <div class="event-title-row">
+              <div class="event-title">{{ e.title }}</div>
+              @if (e.when === 'live') {
+                <span class="when-pill when-pill-live">Live</span>
+              } @else if (e.when === 'upcoming') {
+                <span class="when-pill when-pill-upcoming">Upcoming</span>
+              }
+            </div>
             <div class="event-meta">
               {{ e.branch }} · {{ e.time }}
               @if (eventRatingFor(e.id).count) {
@@ -86,9 +93,16 @@
     </div>
   } @else {
     <div class="event-grid">
-      @for (e of upcoming(); track e.id) {
-        <a [routerLink]="['/events', e.id]" class="event-card">
-          <div class="event-card-img"><img [src]="e.img" alt="" /></div>
+      @for (e of homeEvents(); track e.id) {
+        <a [routerLink]="['/events', e.id]" class="event-card" [class.past]="e.when === 'past'">
+          <div class="event-card-img">
+            <img [src]="e.img" alt="" />
+            @if (e.when === 'live') {
+              <span class="when-pill when-pill-live when-pill-onimg">Live</span>
+            } @else if (e.when === 'upcoming') {
+              <span class="when-pill when-pill-upcoming when-pill-onimg">Upcoming</span>
+            }
+          </div>
           <div class="event-card-body">
             <div class="event-card-date">{{ e.mon }} {{ e.day }}</div>
             <div class="event-card-title">{{ e.title }}</div>
@@ -144,7 +158,7 @@
                 @if (o.prerequisiteTitles.length) {
                   <span class="ribbon-lock" [title]="'Requires: ' + o.prerequisiteTitles.join(', ')">🔒</span>
                 }
-                {{ o.branchCity || o.branchName }}<br />{{ o.shortStartDate }}
+                {{ o.ribbonDate }}
               </div>
             </div>
           </div>

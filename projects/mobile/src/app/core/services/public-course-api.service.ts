@@ -96,6 +96,7 @@ export interface PublicCourseOfferingCard {
   startDate: string;
   endDate: string;
   shortStartDate: string;
+  ribbonDate: string;
   spotsLeft: number | null;
   open: string;
   scheduleSummary: PublicOfferingScheduleSlot[];
@@ -173,6 +174,13 @@ export function shortDate(dateStr: string): string {
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
+/** Day/month/year, no branch — used on the diagonal ribbon corner, which only has room for one
+ * short line before it wraps. */
+export function ribbonDate(dateStr: string): string {
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
 function formatLabel(modes: ('online' | 'onsite')[]): string {
   const has = new Set(modes);
   if (has.has('onsite') && has.has('online')) return 'Onsite & Online';
@@ -214,6 +222,7 @@ function toPublicCourseOfferingCard(row: ApiPublicCourseOfferingCard, index: num
     startDate: row.startDate,
     endDate: row.endDate,
     shortStartDate: shortDate(row.startDate),
+    ribbonDate: ribbonDate(row.startDate),
     spotsLeft: row.spotsLeft,
     open: row.status === 'completed' ? 'Completed' : row.spotsLeft === null || row.spotsLeft > 0 ? 'Open for enrollment' : 'Full',
     scheduleSummary: row.scheduleSummary,
