@@ -2,6 +2,14 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-21 (3) — Mobile: ribbon date to a 2-digit year
+
+**Mobile:**
+- The course/offering card ribbon's date ("Aug 21, 2026") could still
+  wrap onto a second line at the "Extra large" text-size setting —
+  shortened to a 2-digit year ("Aug 21, 26"), confirmed not to wrap at
+  any text-size setting on home, course list, or course detail.
+
 ## 2026-08-21 (2) — Mobile: Events section matches Courses layout
 
 **Mobile:**
