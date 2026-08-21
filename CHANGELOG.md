@@ -2,6 +2,18 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-18 (6) — Home banner pinch-zoom and swipe navigation
+
+**Public-site + mobile:**
+- The home banner carousel can now be dragged left/right to change
+  slides, in addition to the existing arrow/dot clicks.
+- A new zoom button on each banner opens it full-screen with
+  pinch-to-zoom (touch), scroll-wheel zoom (desktop), zoom in/out
+  buttons, and drag-to-pan once zoomed in.
+- Mobile's photo viewer (used by every photo gallery in the app, not
+  just banners) previously had no zoom at all — it now has the same
+  zoom/pan/pinch capability as public-site's.
+
 ## 2026-08-18 (5) — Course category is now a managed picker
 
 **Admin panel:**
