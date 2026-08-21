@@ -184,6 +184,17 @@ img {
   50% { opacity: 0.35; }
 }
 
+.upcoming-pill {
+  font: 600 11px var(--w-font-sans);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--w-accent);
+  padding: 3px 8px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
 .btn {
   font: 600 14px var(--w-font-sans);
   border-radius: 7px;
@@ -223,6 +234,15 @@ img {
   &:hover {
     transform: translateY(-3px);
     box-shadow: 0 16px 34px -20px rgba(36, 28, 21, 0.45);
+  }
+
+  &.past {
+    opacity: 0.55;
+
+    &:hover {
+      transform: none;
+      box-shadow: none;
+    }
   }
 }
 

@@ -1,6 +1,7 @@
 import { Component, OnDestroy, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { PublicEventApiService } from '../../core/services/public-event-api.service';
+import { PublicEvent } from '../../core/models/public-event.models';
 import { PublicCourseApiService, PublicCourseOfferingCard } from '../../core/services/public-course-api.service';
 import { HomeBannerApiService } from '../../core/services/home-banner-api.service';
 import { RatingApiService, RatingSummary } from '../../core/services/rating-api.service';
@@ -60,12 +61,13 @@ export class Home implements OnDestroy {
   readonly activeSlide = signal(0);
   private timer: ReturnType<typeof setInterval> | null = null;
 
-  readonly homeEvents = computed(() =>
-    this.eventsApi
-      .events()
-      .filter((ev) => ev.when === 'upcoming' || ev.when === 'live')
-      .slice(0, 3),
-  );
+  /** Every event — upcoming and live shown first (most actionable), past events trail behind
+   * and are rendered dimmed rather than hidden, so this doubles as a lightweight history view.
+   * Capped at 10 — this is a home-page preview, "View all" leads to the full list. */
+  readonly homeEvents = computed(() => {
+    const priority: Record<PublicEvent['when'], number> = { live: 0, upcoming: 1, past: 2 };
+    return [...this.eventsApi.events()].sort((a, b) => priority[a.when] - priority[b.when]).slice(0, 10);
+  });
   readonly homeOfferings = computed(() => this.offerings().slice(0, 3));
   private readonly offerings = signal<PublicCourseOfferingCard[]>([]);
 
