@@ -2,6 +2,15 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-21 (4) — Mobile: center the ribbon banner text
+
+**Mobile:**
+- The diagonal ribbon banner's rotated center never actually lined up
+  with its corner box's center (off by 10-15px), just not noticeable
+  with the old two-line content. Re-measured each of the 3 ribbon
+  locations (home, course list, course detail) and corrected the
+  offset so the text now sits visually centered on the corner.
+
 ## 2026-08-21 (3) — Mobile: ribbon date to a 2-digit year
 
 **Mobile:**
