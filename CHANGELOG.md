@@ -2,6 +2,21 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-21 (1) — Mobile: Branches subtitle, ribbon overflow, full events list
+
+**Mobile:**
+- Profile > About Willpower Institute > Branches no longer shows the
+  hardcoded "United States · Canada · Australia" subtitle.
+- Course/offering card ribbons (home, course list, course detail) show
+  just the date now instead of branch name + date on two lines — the
+  branch name was pushing text past the ribbon's fixed width and
+  wrapping/overflowing.
+- Home's "Upcoming events" now shows every event (upcoming, live, and
+  past — previously only "upcoming" was fetched, live events were
+  dropped entirely), sorted live-then-upcoming-then-past. Live/Upcoming
+  get a colored pill badge; past events render at reduced opacity
+  instead of being hidden, in both list and card view.
+
 ## 2026-08-18 (7) — Fix banner clicks landing on the wrong slide's link
 
 **Public-site + mobile:**
