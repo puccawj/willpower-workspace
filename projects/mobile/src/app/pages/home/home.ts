@@ -57,13 +57,14 @@ export class Home {
   });
 
   /** Every event — upcoming and live shown first (most actionable), past events trail behind
-   * and are rendered dimmed rather than hidden, so this doubles as a lightweight history view. */
+   * and are rendered dimmed rather than hidden, so this doubles as a lightweight history view.
+   * Capped at 10 — this is a home-page preview, "View all" leads to the full list. */
   readonly homeEvents = computed(() => {
     const priority: Record<PublicEvent['when'], number> = { live: 0, upcoming: 1, past: 2 };
-    return [...this.publicEvents.events()].sort((a, b) => priority[a.when] - priority[b.when]);
+    return [...this.publicEvents.events()].sort((a, b) => priority[a.when] - priority[b.when]).slice(0, 10);
   });
 
-  readonly offerings = computed(() => this.offeringCards().slice(0, 6));
+  readonly offerings = computed(() => this.offeringCards().slice(0, 10));
   private readonly offeringCards = signal<PublicCourseOfferingCard[]>([]);
 
   readonly eventRatings = signal<Record<string, RatingSummary>>({});

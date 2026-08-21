@@ -58,10 +58,13 @@
   }
 
   <div class="section-head">
-    <div class="section-title">Upcoming events</div>
-    <div class="view-toggle">
-      <span class="toggle-btn" [class.active]="view() === 'list'" (click)="view.set('list')">☰</span>
-      <span class="toggle-btn" [class.active]="view() === 'card'" (click)="view.set('card')">▦</span>
+    <div class="section-title">Events</div>
+    <div class="section-head-actions">
+      <a routerLink="/events" class="view-all-link">View all →</a>
+      <div class="view-toggle">
+        <span class="toggle-btn" [class.active]="view() === 'list'" (click)="view.set('list')">☰</span>
+        <span class="toggle-btn" [class.active]="view() === 'card'" (click)="view.set('card')">▦</span>
+      </div>
     </div>
   </div>
 
@@ -92,7 +95,7 @@
       }
     </div>
   } @else {
-    <div class="event-grid">
+    <div class="event-scroll">
       @for (e of homeEvents(); track e.id) {
         <a [routerLink]="['/events', e.id]" class="event-card" [class.past]="e.when === 'past'">
           <div class="event-card-img">
