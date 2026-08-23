@@ -2,6 +2,14 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-21 (10) — Public-site: align "View all courses" with Events
+
+**Public-site:**
+- The Courses section header now uses the same layout as Events (title
+  block on the left, link top-right) instead of the link sitting below
+  a separately centered paragraph — "View all courses →" now lines up
+  in the exact same position as "View all events →".
+
 ## 2026-08-21 (9) — Public-site: "View all courses" link on home
 
 **Public-site:**
