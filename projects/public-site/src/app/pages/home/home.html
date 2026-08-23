@@ -98,11 +98,15 @@
 </section>
 
 <section class="courses-section pad">
-  <div class="section-inner center">
-    <div class="eyebrow">Study with us</div>
-    <h2 class="section-title">Courses &amp; programs</h2>
-    <p class="section-lead">Structured paths of study, from introductory practice to certified completion.</p>
-    <a routerLink="/courses" class="link-cta courses-view-all">View all courses →</a>
+  <div class="section-inner">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">Study with us</div>
+        <h2 class="section-title">Courses &amp; programs</h2>
+        <p class="section-lead">Structured paths of study, from introductory practice to certified completion.</p>
+      </div>
+      <a routerLink="/courses" class="link-cta">View all courses →</a>
+    </div>
     <div class="home-row-wrap">
       <button type="button" class="row-nav row-nav-prev" (click)="scrollRow(coursesRow, -1)" aria-label="Scroll courses left">‹</button>
       <div class="home-row-scroll text-left" #coursesRow>
