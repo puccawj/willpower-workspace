@@ -68,7 +68,7 @@ export class Home implements OnDestroy {
     const priority: Record<PublicEvent['when'], number> = { live: 0, upcoming: 1, past: 2 };
     return [...this.eventsApi.events()].sort((a, b) => priority[a.when] - priority[b.when]).slice(0, 10);
   });
-  readonly homeOfferings = computed(() => this.offerings().slice(0, 3));
+  readonly homeOfferings = computed(() => this.offerings().slice(0, 10));
   private readonly offerings = signal<PublicCourseOfferingCard[]>([]);
 
   readonly eventRatings = signal<Record<string, RatingSummary>>({});

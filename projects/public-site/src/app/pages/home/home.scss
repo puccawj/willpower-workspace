@@ -214,6 +214,21 @@
   padding-bottom: 64px;
 }
 
+/** Single scrollable row instead of a wrapping grid — for a preview of up to 10 items,
+ * scrolling sideways keeps the section a fixed height instead of growing the page. */
+.home-row-scroll {
+  display: flex;
+  gap: 22px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+  scrollbar-width: thin;
+
+  > .event-card,
+  > .course-card {
+    flex: 0 0 320px;
+  }
+}
+
 .img-ribbon-corner {
   position: absolute;
   top: 0;
@@ -325,5 +340,12 @@
 @media (max-width: 880px) {
   .heroh1 {
     font-size: 42px;
+  }
+
+  .home-row-scroll {
+    > .event-card,
+    > .course-card {
+      flex: 0 0 260px;
+    }
   }
 }
