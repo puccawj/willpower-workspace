@@ -214,6 +214,10 @@
   padding-bottom: 64px;
 }
 
+.home-row-wrap {
+  position: relative;
+}
+
 /** Single scrollable row instead of a wrapping grid — for a preview of up to 10 items,
  * scrolling sideways keeps the section a fixed height instead of growing the page. */
 .home-row-scroll {
@@ -231,6 +235,45 @@
   > .event-card,
   > .course-card {
     flex: 0 0 320px;
+  }
+}
+
+.row-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--w-border-strong);
+  background: var(--w-bg);
+  color: var(--w-ink);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  box-shadow: 0 10px 26px -14px rgba(36, 28, 21, 0.4);
+  transition: background 0.15s;
+
+  &:hover {
+    background: var(--w-bg-alt);
+  }
+}
+
+.row-nav-prev {
+  left: -22px;
+}
+
+.row-nav-next {
+  right: -22px;
+}
+
+@media (max-width: 880px) {
+  .row-nav {
+    display: none;
   }
 }
 

@@ -61,7 +61,9 @@
       </div>
       <a routerLink="/events" class="link-cta">View all events →</a>
     </div>
-    <div class="home-row-scroll">
+    <div class="home-row-wrap">
+      <button type="button" class="row-nav row-nav-prev" (click)="scrollRow(eventsRow, -1)" aria-label="Scroll events left">‹</button>
+      <div class="home-row-scroll" #eventsRow>
       @for (ev of homeEvents(); track ev.id) {
         <a [routerLink]="['/events', ev.id]" class="event-card" [class.past]="ev.when === 'past'">
           <div class="event-card-img"><img [src]="ev.img" alt="" /></div>
@@ -89,6 +91,8 @@
           </div>
         </a>
       }
+      </div>
+      <button type="button" class="row-nav row-nav-next" (click)="scrollRow(eventsRow, 1)" aria-label="Scroll events right">›</button>
     </div>
   </div>
 </section>
@@ -98,7 +102,9 @@
     <div class="eyebrow">Study with us</div>
     <h2 class="section-title">Courses &amp; programs</h2>
     <p class="section-lead">Structured paths of study, from introductory practice to certified completion.</p>
-    <div class="home-row-scroll text-left">
+    <div class="home-row-wrap">
+      <button type="button" class="row-nav row-nav-prev" (click)="scrollRow(coursesRow, -1)" aria-label="Scroll courses left">‹</button>
+      <div class="home-row-scroll text-left" #coursesRow>
       @for (o of homeOfferings(); track o.offeringId) {
         <a [routerLink]="['/courses', o.courseId]" [queryParams]="{ offering: o.offeringId }" class="course-card">
           <div class="course-card-img">
@@ -131,6 +137,8 @@
       } @empty {
         <p class="muted-label">New courses are being scheduled — check back soon.</p>
       }
+      </div>
+      <button type="button" class="row-nav row-nav-next" (click)="scrollRow(coursesRow, 1)" aria-label="Scroll courses right">›</button>
     </div>
   </div>
 </section>

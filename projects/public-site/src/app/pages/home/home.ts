@@ -133,6 +133,13 @@ export class Home implements OnDestroy {
     }
   }
 
+  /** Scrolls a home-row-scroll container by roughly one card's width (its own visible width is
+   * a good proxy since cards are a fixed size) — used by the prev/next arrow buttons now that
+   * the scrollbar itself is hidden. */
+  scrollRow(row: HTMLElement, direction: 1 | -1): void {
+    row.scrollBy({ left: direction * row.clientWidth * 0.9, behavior: 'smooth' });
+  }
+
   openZoom(event: Event, imageUrl: string): void {
     event.stopPropagation();
     this.imageViewer.open(imageUrl);
