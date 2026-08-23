@@ -2,6 +2,13 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-21 (7) — Public-site: hide the home scroll row's scrollbar
+
+**Public-site:**
+- The Events/Courses horizontal scroll row no longer shows a visible
+  scrollbar track — still scrollable via drag/wheel/touch, matching
+  the hidden-scrollbar treatment mobile's equivalent rows already use.
+
 ## 2026-08-21 (6) — Public-site: home Events/Courses as a single scrollable row
 
 **Public-site:**
