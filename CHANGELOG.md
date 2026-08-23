@@ -2,6 +2,14 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-21 (8) — Public-site: left/right arrows on the home scroll rows
+
+**Public-site:**
+- Added prev/next arrow buttons to the Events and Courses scroll rows
+  — needed now that the scrollbar is hidden, so mouse-driven desktop
+  browsers have a click affordance (touch/trackpad already worked).
+  Hidden on narrow viewports where touch scrolling is primary.
+
 ## 2026-08-21 (7) — Public-site: hide the home scroll row's scrollbar
 
 **Public-site:**
