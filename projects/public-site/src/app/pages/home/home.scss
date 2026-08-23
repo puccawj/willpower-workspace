@@ -220,8 +220,13 @@
   display: flex;
   gap: 22px;
   overflow-x: auto;
-  padding-bottom: 10px;
-  scrollbar-width: thin;
+  padding-bottom: 4px;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 
   > .event-card,
   > .course-card {
