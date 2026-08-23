@@ -2,6 +2,14 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-21 (6) — Public-site: home Events/Courses as a single scrollable row
+
+**Public-site:**
+- Home's Events and Courses sections no longer wrap into a multi-row
+  grid — both now render as one horizontally-scrolling row of
+  fixed-width cards, capped at 10 items each (Courses was previously
+  capped at 3).
+
 ## 2026-08-21 (5) — Public-site: home Events section matches mobile
 
 **Public-site:**
