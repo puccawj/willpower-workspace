@@ -2,6 +2,12 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-21 (9) — Public-site: "View all courses" link on home
+
+**Public-site:**
+- Home's Courses & programs section gets a "View all courses →" link
+  to the full course list, matching the one Events already has.
+
 ## 2026-08-21 (8) — Public-site: left/right arrows on the home scroll rows
 
 **Public-site:**
