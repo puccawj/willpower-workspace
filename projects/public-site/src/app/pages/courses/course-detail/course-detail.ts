@@ -12,6 +12,7 @@ import {
   PublicDonationRow,
   PublicOffering,
   formatSchedule,
+  ribbonDate,
   shortDate,
 } from '../../../core/services/public-course-api.service';
 import { DonateType } from '../../../core/models/willpower.models';
@@ -74,6 +75,7 @@ export class CourseDetail {
 
   readonly formatSchedule = formatSchedule;
   readonly shortDate = shortDate;
+  readonly ribbonDate = ribbonDate;
 
   /** Only the offering the visitor arrived to view, if any — otherwise every open offering. */
   readonly visibleOfferings = computed(() => {

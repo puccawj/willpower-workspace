@@ -53,7 +53,7 @@
               @for (o of visibleOfferings(); track o.id) {
                 <div class="offering-card" [id]="'offering-' + o.id">
                   <div class="offering-ribbon-corner">
-                    <div class="offering-ribbon">{{ o.branchName }}<br />{{ shortDate(o.startDate) }}</div>
+                    <div class="offering-ribbon">{{ ribbonDate(o.startDate) }}</div>
                   </div>
                   <div class="offering-card-head">
                     <div class="offering-info">
