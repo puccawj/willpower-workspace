@@ -1,4 +1,5 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
+import { Browser } from '@capacitor/browser';
 import { MeApiService } from '../../../core/services/me-api.service';
 import { BackButton } from '../../../shared/back-button/back-button';
 
@@ -10,6 +11,7 @@ import { BackButton } from '../../../shared/back-button/back-button';
 })
 export class MyDonations {
   protected readonly meApi = inject(MeApiService);
+  protected readonly opening = signal<string | null>(null);
 
   constructor() {
     this.meApi.loadDonations().subscribe();
@@ -21,5 +23,14 @@ export class MyDonations {
 
   formatDate(createdAt: string): string {
     return new Date(createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  async downloadCertificate(id: string, url: string): Promise<void> {
+    this.opening.set(id);
+    try {
+      await Browser.open({ url });
+    } finally {
+      this.opening.set(null);
+    }
   }
 }

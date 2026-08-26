@@ -8,6 +8,18 @@
       <div class="row">
         <div class="row-title">{{ summarize(d) }}</div>
         <div class="row-meta">{{ formatDate(d.createdAt) }}{{ d.eventTitle ? ' · ' + d.eventTitle : '' }}</div>
+        @if (d.certificateUrl) {
+          <button
+            type="button"
+            class="certificate-inline-row cert-download-btn"
+            [disabled]="opening() === d.id"
+            (click)="downloadCertificate(d.id, d.certificateUrl!)"
+          >
+            {{ opening() === d.id ? 'Opening…' : '🎓 Download Certificate' }}
+          </button>
+        } @else if (d.certificateNo) {
+          <div class="row-meta">Certificate {{ d.certificateNo }}</div>
+        }
       </div>
     }
   </div>

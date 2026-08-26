@@ -9,7 +9,9 @@
             <div class="donation-row-title">{{ d.typeLabel }} · {{ d.amountLabel }}</div>
             <div class="muted-label">{{ d.date }} · {{ d.event }}</div>
           </div>
-          @if (d.certNo) {
+          @if (d.certUrl) {
+            <a class="btn btn-outline" [href]="d.certUrl" target="_blank" rel="noopener">Download Certificate</a>
+          } @else if (d.certNo) {
             <span class="muted-label">Certificate {{ d.certNo }}</span>
           } @else {
             <span class="muted-label">Pending certificate</span>

@@ -51,6 +51,7 @@ export interface MyDonation {
   currency: string;
   eventTitle: string | null;
   certificateNo: string | null;
+  certificateUrl: string | null;
 }
 
 export interface MyCourseSession {

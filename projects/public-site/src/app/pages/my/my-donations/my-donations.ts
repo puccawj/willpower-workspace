@@ -8,6 +8,7 @@ interface DonationRow {
   date: string;
   event: string;
   certNo: string | null;
+  certUrl: string | null;
 }
 
 @Component({
@@ -27,6 +28,7 @@ export class MyDonations {
       date: new Date(d.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }),
       event: d.eventTitle ?? '—',
       certNo: d.certificateNo,
+      certUrl: d.certificateUrl,
     })),
   );
 

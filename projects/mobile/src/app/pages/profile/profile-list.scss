@@ -66,6 +66,19 @@
   font: 600 calc(13.5px * var(--text-scale, 1)) var(--w-font-sans);
 }
 
+.cert-download-btn {
+  border: none;
+  background: none;
+  padding: 8px 0 0;
+  margin: 0;
+  text-align: left;
+  width: 100%;
+
+  &:disabled {
+    opacity: 0.6;
+  }
+}
+
 .pill {
   font: 600 calc(12px * var(--text-scale, 1)) var(--w-font-sans);
   text-transform: uppercase;
