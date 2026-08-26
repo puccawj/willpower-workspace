@@ -2,6 +2,16 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-21 (12) — Public-site: fix Live/Upcoming badge getting clipped
+
+**Public-site:**
+- The branch pill on home event cards had no max-width, so a long
+  branch name could push the Live/Upcoming pill past the card's fixed
+  width — where it got clipped out of view by `overflow: hidden`
+  instead of just wrapping or shrinking. Branch pill now truncates
+  with an ellipsis; the status pills can no longer be squeezed to 0
+  width.
+
 ## 2026-08-21 (11) — Public-site: fix ribbon wrap/centering (same as mobile)
 
 **Public-site:**
