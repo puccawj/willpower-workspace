@@ -2,6 +2,15 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-21 (11) — Public-site: fix ribbon wrap/centering (same as mobile)
+
+**Public-site:**
+- Applied the same ribbon fix already shipped to mobile: the diagonal
+  ribbon on course/offering cards (home, course list, course detail)
+  now shows just the date with a 2-digit year instead of branch name +
+  full year on two lines, and its rotated center is now aligned with
+  its corner box's center (was off by 10-22px depending on location).
+
 ## 2026-08-21 (10) — Public-site: align "View all courses" with Events
 
 **Public-site:**
