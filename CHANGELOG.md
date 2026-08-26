@@ -2,6 +2,17 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-26 (13) — Public-site + mobile: fix multi-day event date/time display
+
+**Public-site, mobile:**
+- Events whose `startAt`/`endAt` fall on different calendar days (e.g. an
+  overnight retreat) previously showed only the start date and a
+  same-day-looking time range, since both were derived from `startAt`
+  alone. The full date now renders as a range ("Thursday, August 27,
+  2026 – Friday, August 28, 2026") and each time is tagged with its own
+  date ("8:00 AM (Aug 27) – 12:00 PM (Aug 28)") whenever the event spans
+  more than one calendar day; single-day events are unaffected.
+
 ## 2026-08-21 (12) — Public-site: fix Live/Upcoming badge getting clipped
 
 **Public-site:**
