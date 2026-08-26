@@ -2,6 +2,19 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-26 (17) — Admin panel: Add Branch's City/Timezone look like dropdowns, Timezone auto-fills
+
+**Admin panel:**
+- City and Timezone (search-as-you-type fields, kept that way since
+  City needs free-text for countries without a preset city list) now
+  show a dropdown-style chevron like every other field, instead of
+  looking like plain text boxes.
+- Timezone now auto-fills once Country + City are picked, using a new
+  per-country/per-city IANA timezone lookup (with real overrides for
+  countries spanning more than one zone — US, Canada, Australia,
+  Russia, Indonesia, Mexico). Still manually editable if the guess is
+  wrong.
+
 ## 2026-08-26 (16) — Admin panel: Add Branch's Country field is now a standard dropdown
 
 **Admin panel:**
