@@ -79,7 +79,7 @@
               }
               @case ('select') {
                 <select
-                  class="form-input"
+                  class="form-input form-input-dropdown"
                   [ngModel]="cfg.values[f.key]"
                   (ngModelChange)="onFieldChange(f.key, $event)"
                 >
@@ -90,7 +90,7 @@
               }
               @case ('combobox') {
                 <input
-                  class="form-input form-input-searchable"
+                  class="form-input form-input-dropdown"
                   [attr.list]="f.key + '-list'"
                   autocomplete="off"
                   placeholder="Type to search…"
@@ -113,7 +113,7 @@
               }
               @case ('timezone') {
                 <input
-                  class="form-input form-input-searchable"
+                  class="form-input form-input-dropdown"
                   [attr.list]="f.key + '-tz-list'"
                   autocomplete="off"
                   placeholder="Type to search timezone…"
