@@ -132,6 +132,15 @@ img {
   padding: 3px 8px;
   border-radius: 20px;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  max-width: 140px;
+}
+
+.live-pill,
+.upcoming-pill {
+  flex-shrink: 0;
 }
 
 .live-pill {
@@ -267,12 +276,14 @@ img {
 .event-card-meta {
   display: flex;
   align-items: center;
-  gap: 10px;
+  flex-wrap: wrap;
+  gap: 8px 10px;
   margin-bottom: 12px;
 }
 
 .event-date {
   text-align: center;
+  flex-shrink: 0;
   background: var(--w-accent);
   color: #fff;
   border-radius: 7px;
