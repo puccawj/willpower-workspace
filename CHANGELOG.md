@@ -2,6 +2,16 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-26 (18) — Admin panel: dropdown fields now look pixel-identical across the app
+
+**Admin panel:**
+- The previous chevron-only fix for City/Timezone still looked
+  different from Country's native `<select>` arrow. Now every
+  dropdown-style field (select, combobox, timezone) shares one style:
+  native select chrome is stripped and the same custom chevron is
+  applied everywhere, so all three (and every other `<select>` field
+  in the app) render identically.
+
 ## 2026-08-26 (17) — Admin panel: Add Branch's City/Timezone look like dropdowns, Timezone auto-fills
 
 **Admin panel:**
