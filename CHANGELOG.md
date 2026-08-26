@@ -2,6 +2,16 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-26 (19) — Admin panel: City/Timezone now use the real dropdown, not a native popup
+
+**Admin panel:**
+- Matching the closed-state look wasn't enough — City/Timezone still
+  opened the browser's own unstylable native autocomplete popup, which
+  looks nothing like the app's dropdown. They now use the same custom
+  app-typeahead component already used for Branch/Instructor pickers
+  (new "free text" mode so City still works for countries without a
+  preset list), so the open list finally looks the same everywhere too.
+
 ## 2026-08-26 (18) — Admin panel: dropdown fields now look pixel-identical across the app
 
 **Admin panel:**
