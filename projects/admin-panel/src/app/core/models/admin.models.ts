@@ -181,4 +181,6 @@ export interface FieldDef {
   hiddenWhen?: (values: Record<string, string | number>) => boolean;
   /** Overrides `hint` with a value computed from the modal's current values; return undefined to fall back to `hint`. */
   hintWhen?: (values: Record<string, string | number>) => string | undefined;
+  /** Called after this field's value changes, with the modal's values post-change. Return a partial values object to auto-fill other fields (e.g. Timezone from Country + City); return undefined to leave everything else as-is. */
+  deriveOnChange?: (values: Record<string, string | number>) => Record<string, string | number> | undefined;
 }

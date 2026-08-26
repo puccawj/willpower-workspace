@@ -1,6 +1,7 @@
 import { Component, computed, inject } from '@angular/core';
 import { map, Observable, of, switchMap, tap } from 'rxjs';
 import { COUNTRIES } from '../../core/data/countries';
+import { CITY_TIMEZONES, COUNTRY_TIMEZONES } from '../../core/data/timezones-by-location';
 import { ApiBranch, BranchApiService, BranchPayload } from '../../core/services/branch-api.service';
 import { CrudModalService } from '../../core/services/crud-modal.service';
 import { ListController } from '../../core/list-controller';
@@ -36,10 +37,24 @@ interface BranchRow {
 
 const COUNTRY_NAMES = COUNTRIES.map((c) => c.name).sort((a, b) => a.localeCompare(b));
 
+/** Looks up the timezone for a country + city combo — a city-specific override where the
+ * country spans more than one zone, otherwise the country's single default. Undefined if
+ * the country isn't recognized or has no timezone data (Timezone is left for the admin to pick). */
+function timezoneFor(countryName: string, city: string): string | undefined {
+  const iso = COUNTRIES.find((c) => c.name.toLowerCase() === countryName.trim().toLowerCase())?.iso;
+  if (!iso) return undefined;
+  return CITY_TIMEZONES[`${iso}|${city.trim()}`] ?? COUNTRY_TIMEZONES[iso];
+}
+
+function autoTimezone(values: Record<string, string | number>): Record<string, string | number> | undefined {
+  const tz = timezoneFor(String(values['country'] ?? ''), String(values['city'] ?? ''));
+  return tz ? { timezone: tz } : undefined;
+}
+
 const FIELDS: FieldDef[] = [
   { key: 'name', label: 'Branch name', type: 'text' },
-  { key: 'country', label: 'Country', type: 'select', options: COUNTRY_NAMES },
-  { key: 'city', label: 'City', type: 'combobox', dependsOn: 'country' },
+  { key: 'country', label: 'Country', type: 'select', options: COUNTRY_NAMES, deriveOnChange: autoTimezone },
+  { key: 'city', label: 'City', type: 'combobox', dependsOn: 'country', deriveOnChange: autoTimezone },
   { key: 'timezone', label: 'Timezone', type: 'timezone' },
   { key: 'address', label: 'Address', type: 'text' },
   { key: 'zipCode', label: 'Zip / Postal code', type: 'text' },
@@ -159,7 +174,7 @@ export class Branches {
         description: '',
         city: '',
         country: COUNTRY_NAMES[0] ?? '',
-        timezone: '',
+        timezone: timezoneFor(COUNTRY_NAMES[0] ?? '', '') ?? '',
         address: '',
         zipCode: '',
         phoneCountryCode: '',

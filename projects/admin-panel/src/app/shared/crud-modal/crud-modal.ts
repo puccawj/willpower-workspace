@@ -53,6 +53,14 @@ export class CrudModal {
 
   onFieldChange(key: string, value: string): void {
     this.modal.setFieldValue(key, value);
+
+    const field = this.modal.config()?.fields.find((f) => f.key === key);
+    const derived = field?.deriveOnChange?.(this.modal.config()?.values ?? {});
+    if (derived) {
+      for (const [derivedKey, derivedValue] of Object.entries(derived)) {
+        this.modal.setFieldValue(derivedKey, derivedValue);
+      }
+    }
   }
 
   fieldValueString(field: FieldDef): string {
