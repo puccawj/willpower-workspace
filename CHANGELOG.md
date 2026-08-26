@@ -2,6 +2,16 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-26 (14) — Public-site + mobile: add Download Certificate to My Donations
+
+**Public-site, mobile:**
+- My Donations showed a certificate number once one was issued but had
+  no way to download it — the page just displayed text, no link. Now
+  shows a real "Download Certificate" action (direct link on
+  public-site, in-app browser open on mobile) once the backend returns
+  a certificate URL for that donation. Requires the paired API change
+  (backend CHANGELOG (4)) which now exposes that URL.
+
 ## 2026-08-26 (13) — Public-site + mobile: fix multi-day event date/time display
 
 **Public-site, mobile:**
