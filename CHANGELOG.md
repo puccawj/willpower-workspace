@@ -2,6 +2,13 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-26 (15) — Public-site + mobile: unify certificate download button text
+
+**Public-site, mobile:**
+- "Download PDF" (My Certificates, mobile's certificate-received page)
+  now reads "Download Certificate" to match the new My Donations
+  download action, so the same button says the same thing everywhere.
+
 ## 2026-08-26 (14) — Public-site + mobile: add Download Certificate to My Donations
 
 **Public-site, mobile:**
