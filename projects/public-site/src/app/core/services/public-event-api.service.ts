@@ -49,9 +49,38 @@ export interface PublicDonationRow {
 const FALLBACK_IMG =
   'https://images.unsplash.com/photo-1600618528240-fb9fc964b853?q=80&w=1200&auto=format&fit=crop';
 
+function isSameCalendarDay(a: Date, b: Date): boolean {
+  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+}
+
+/** For a same-day event, just the time range. For one spanning multiple calendar days (e.g. an
+ * overnight retreat), each time is tagged with its own date so "8:00 AM – 12:00 PM" doesn't read
+ * as a single morning when it's actually a full day-plus event. */
 function formatTimeRange(startAt: string, endAt: string): string {
-  const opts: Intl.DateTimeFormatOptions = { hour: 'numeric', minute: '2-digit' };
-  return `${new Date(startAt).toLocaleTimeString('en-US', opts)} – ${new Date(endAt).toLocaleTimeString('en-US', opts)}`;
+  const start = new Date(startAt);
+  const end = new Date(endAt);
+  const timeOpts: Intl.DateTimeFormatOptions = { hour: 'numeric', minute: '2-digit' };
+
+  if (isSameCalendarDay(start, end)) {
+    return `${start.toLocaleTimeString('en-US', timeOpts)} – ${end.toLocaleTimeString('en-US', timeOpts)}`;
+  }
+
+  const dateOpts: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric' };
+  const startLabel = `${start.toLocaleTimeString('en-US', timeOpts)} (${start.toLocaleDateString('en-US', dateOpts)})`;
+  const endLabel = `${end.toLocaleTimeString('en-US', timeOpts)} (${end.toLocaleDateString('en-US', dateOpts)})`;
+  return `${startLabel} – ${endLabel}`;
+}
+
+/** Full readable date — a range ("Thu, Aug 27 – Fri, Aug 28, 2026") when the event doesn't start
+ * and end on the same calendar day, otherwise just the one date. */
+function formatDateFull(startAt: string, endAt: string): string {
+  const start = new Date(startAt);
+  const end = new Date(endAt);
+  const fullOpts: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+  const startLabel = start.toLocaleDateString('en-US', fullOpts);
+
+  if (isSameCalendarDay(start, end)) return startLabel;
+  return `${startLabel} – ${end.toLocaleDateString('en-US', fullOpts)}`;
 }
 
 function classifyWhen(startAt: string, endAt: string): PublicEvent['when'] {
@@ -71,7 +100,7 @@ function toPublicEvent(row: ApiPublicEventRow): PublicEvent {
     img: row.coverImageUrl ?? FALLBACK_IMG,
     day: start.toLocaleDateString('en-US', { day: '2-digit' }),
     mon: start.toLocaleDateString('en-US', { month: 'short' }).toUpperCase(),
-    dateFull: start.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
+    dateFull: formatDateFull(row.startAt, row.endAt),
     when: classifyWhen(row.startAt, row.endAt),
     branchId: row.branchId,
     branch: row.branchName,
