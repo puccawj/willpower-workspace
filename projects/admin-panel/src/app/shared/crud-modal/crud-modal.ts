@@ -5,7 +5,7 @@ import { COUNTRIES, CountryDialCode } from '../../core/data/countries';
 import { TIMEZONES } from '../../core/data/timezones';
 import { CrudModalService } from '../../core/services/crud-modal.service';
 import { FieldDef } from '../../core/models/admin.models';
-import { Typeahead } from '../typeahead/typeahead';
+import { Typeahead, TypeaheadOption } from '../typeahead/typeahead';
 
 const DEFAULT_COUNTRY_ISO = 'TH';
 export const MULTISELECT_DELIM = '||';
@@ -154,6 +154,16 @@ export class CrudModal {
     const countryName = String(this.modal.config()?.values[field.dependsOn] ?? '').trim();
     const country = this.countries.find((c) => c.name.toLowerCase() === countryName.toLowerCase());
     return (country && CITIES_BY_COUNTRY[country.iso]) ?? [];
+  }
+
+  /** Same options as `comboboxOptions`, shaped for app-typeahead (id === label — the field's
+   * value is the raw string itself, not a foreign-key id). */
+  comboboxTypeaheadOptions(field: FieldDef): TypeaheadOption[] {
+    return this.comboboxOptions(field).map((label) => ({ id: label, label }));
+  }
+
+  timezoneTypeaheadOptions(): TypeaheadOption[] {
+    return this.timezones.map((t) => ({ id: t.tz, label: `${t.tz} (${t.offset})` }));
   }
 
   multiSelectValues(field: FieldDef): string[] {

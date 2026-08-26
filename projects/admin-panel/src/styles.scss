@@ -304,6 +304,20 @@ td {
   cursor: not-allowed;
 }
 
+/** Shared dropdown chevron for native <select>, searchable <input list> fields, and the custom
+ * app-typeahead component, so every dropdown-style field renders identically. Native select
+ * chrome is stripped via appearance:none and replaced with the same chevron everywhere. */
+.form-input-dropdown {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%236b7280' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 8l5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 14px;
+  padding-right: 34px;
+}
+
 .pad {
   padding: 24px;
 }

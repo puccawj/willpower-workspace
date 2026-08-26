@@ -1,7 +1,7 @@
 <div class="typeahead">
   <input
     #inputEl
-    class="form-input"
+    class="form-input form-input-dropdown"
     type="text"
     autocomplete="off"
     [disabled]="disabled()"
@@ -18,7 +18,7 @@
           <div class="typeahead-option" [class.selected]="opt.id === value()" (mousedown)="select(opt)">{{ opt.label }}</div>
         }
       </div>
-    } @else {
+    } @else if (!freeText()) {
       <div class="typeahead-list" [style.top.px]="pos.top" [style.left.px]="pos.left" [style.width.px]="pos.width">
         <div class="typeahead-empty">No matches</div>
       </div>

@@ -89,19 +89,13 @@
                 </select>
               }
               @case ('combobox') {
-                <input
-                  class="form-input form-input-dropdown"
-                  [attr.list]="f.key + '-list'"
-                  autocomplete="off"
+                <app-typeahead
+                  [options]="comboboxTypeaheadOptions(f)"
+                  [value]="fieldValueString(f)"
+                  [freeText]="true"
                   placeholder="Type to search…"
-                  [ngModel]="cfg.values[f.key]"
-                  (ngModelChange)="onFieldChange(f.key, $event)"
-                />
-                <datalist [id]="f.key + '-list'">
-                  @for (opt of comboboxOptions(f); track opt) {
-                    <option [value]="opt"></option>
-                  }
-                </datalist>
+                  (valueChange)="onFieldChange(f.key, $event)"
+                ></app-typeahead>
               }
               @case ('typeahead') {
                 <app-typeahead
@@ -112,19 +106,13 @@
                 ></app-typeahead>
               }
               @case ('timezone') {
-                <input
-                  class="form-input form-input-dropdown"
-                  [attr.list]="f.key + '-tz-list'"
-                  autocomplete="off"
+                <app-typeahead
+                  [options]="timezoneTypeaheadOptions()"
+                  [value]="fieldValueString(f)"
+                  [freeText]="true"
                   placeholder="Type to search timezone…"
-                  [ngModel]="cfg.values[f.key]"
-                  (ngModelChange)="onFieldChange(f.key, $event)"
-                />
-                <datalist [id]="f.key + '-tz-list'">
-                  @for (t of timezones; track t.tz) {
-                    <option [value]="t.tz">{{ t.tz }} ({{ t.offset }})</option>
-                  }
-                </datalist>
+                  (valueChange)="onFieldChange(f.key, $event)"
+                ></app-typeahead>
               }
               @case ('phone') {
                 <div class="PhoneInput">

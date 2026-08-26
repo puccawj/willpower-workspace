@@ -25,6 +25,10 @@ export class Typeahead {
   readonly value = input<string>('');
   readonly placeholder = input('Search…');
   readonly disabled = input(false);
+  /** When true, `value` is the raw typed text itself (not looked up against `options` by id) —
+   * every keystroke commits immediately, and typing something that matches no option is fine
+   * (used for fields like City/Timezone that need a preset list plus a free-text fallback). */
+  readonly freeText = input(false);
   readonly valueChange = output<string>();
 
   private readonly inputRef = viewChild<ElementRef<HTMLInputElement>>('inputEl');
@@ -50,6 +54,10 @@ export class Typeahead {
       const val = this.value();
       const opts = this.options();
       if (this.open()) return;
+      if (this.freeText()) {
+        this.query.set(val);
+        return;
+      }
       const match = opts.find((o) => o.id === val);
       this.query.set(match ? match.label : '');
     });
@@ -76,7 +84,11 @@ export class Typeahead {
     this.query.set(text);
     this.updateListPosition();
     this.open.set(true);
-    if (!text) this.valueChange.emit('');
+    if (this.freeText()) {
+      this.valueChange.emit(text);
+    } else if (!text) {
+      this.valueChange.emit('');
+    }
   }
 
   onBlur(): void {
