@@ -38,7 +38,7 @@ const COUNTRY_NAMES = COUNTRIES.map((c) => c.name).sort((a, b) => a.localeCompar
 
 const FIELDS: FieldDef[] = [
   { key: 'name', label: 'Branch name', type: 'text' },
-  { key: 'country', label: 'Country', type: 'combobox', options: COUNTRY_NAMES },
+  { key: 'country', label: 'Country', type: 'select', options: COUNTRY_NAMES },
   { key: 'city', label: 'City', type: 'combobox', dependsOn: 'country' },
   { key: 'timezone', label: 'Timezone', type: 'timezone' },
   { key: 'address', label: 'Address', type: 'text' },
@@ -158,7 +158,7 @@ export class Branches {
         name: '',
         description: '',
         city: '',
-        country: '',
+        country: COUNTRY_NAMES[0] ?? '',
         timezone: '',
         address: '',
         zipCode: '',
