@@ -2,6 +2,14 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-26 (16) — Admin panel: Add Branch's Country field is now a standard dropdown
+
+**Admin panel:**
+- The Country field on Add/Edit Branch was a free-text input with a
+  search datalist, looking different from every other single-choice
+  field in the app (Branch, Type, Status, Role, Mode all use a plain
+  dropdown). Country is now a standard `<select>` to match.
+
 ## 2026-08-26 (15) — Public-site + mobile: unify certificate download button text
 
 **Public-site, mobile:**
