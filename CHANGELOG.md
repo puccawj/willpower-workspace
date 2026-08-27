@@ -2,6 +2,17 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-27 (20) — Admin panel: fix instructor topbar showing a hardcoded fake name
+
+**Admin panel:**
+- The topbar's scope pill and avatar initials showed a hardcoded
+  "Ajahn Suriya" / "AS" for every instructor account (leftover mock
+  data never wired to real auth), instead of the actual logged-in
+  instructor's name. Now derived from the real session. Paired with a
+  backend fix (API CHANGELOG (6)) that also scopes what offerings an
+  instructor can see to only the ones they teach — a newly created
+  instructor was seeing every other instructor's classes in the branch.
+
 ## 2026-08-26 (19) — Admin panel: City/Timezone now use the real dropdown, not a native popup
 
 **Admin panel:**
