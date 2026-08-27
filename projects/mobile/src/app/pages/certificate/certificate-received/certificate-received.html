@@ -6,12 +6,27 @@
       <div class="cert-sub">You've earned your certificate</div>
     </div>
 
-    <div class="cert-preview">
-      <div class="cert-border"></div>
-      <div class="cert-label">CERTIFICATE OF COMPLETION</div>
-      <div class="cert-name">{{ auth.currentUser()?.name }}</div>
-      <div class="cert-course">{{ cert.courseTitle }}</div>
-      <div class="cert-number">{{ cert.certificateNo }}</div>
+    <div class="cert-canvas">
+      @if (cert.backgroundImageUrl) {
+        <img [src]="cert.backgroundImageUrl" alt="" class="cert-canvas-bg" />
+      }
+      <div class="cert-canvas-frame"></div>
+
+      @if (positions()['kicker']; as pos) {
+        <div class="cert-field cert-field-kicker" [style.left.%]="pos.xPct" [style.top.%]="pos.yPct">{{ kickerText() }}</div>
+      }
+      @if (positions()['name']; as pos) {
+        <div class="cert-field cert-field-name" [style.left.%]="pos.xPct" [style.top.%]="pos.yPct">{{ auth.currentUser()?.name }}</div>
+      }
+      @if (positions()['course']; as pos) {
+        <div class="cert-field cert-field-course" [style.left.%]="pos.xPct" [style.top.%]="pos.yPct">{{ cert.courseTitle }}</div>
+      }
+      @if (positions()['certNo']; as pos) {
+        <div class="cert-field cert-field-certno" [style.left.%]="pos.xPct" [style.top.%]="pos.yPct">No. {{ cert.certificateNo }}</div>
+      }
+      @if (positions()['issueDate']; as pos) {
+        <div class="cert-field cert-field-issuedate" [style.left.%]="pos.xPct" [style.top.%]="pos.yPct">Issued {{ issueDate() }}</div>
+      }
     </div>
 
     <button type="button" class="download-btn" [disabled]="downloading()" (click)="downloadPdf()">

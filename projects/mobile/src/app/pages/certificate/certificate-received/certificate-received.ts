@@ -22,6 +22,17 @@ export class CertificateReceived {
 
   readonly certificate = computed(() => this.meApi.certificates().find((c) => c.id === this.certId) ?? null);
 
+  /** Mirrors admin-panel's certificate-preview component so the "here's your certificate" screen
+   * actually reflects the template it was issued from (background image + field positions),
+   * instead of a generic mock-up card that never matched what admins configured. */
+  readonly positions = computed(() => this.certificate()?.layoutConfig?.positions ?? {});
+  readonly kickerText = computed(() => this.certificate()?.layoutConfig?.kickerText || 'CERTIFICATE OF COMPLETION');
+  readonly issueDate = computed(() => {
+    const cert = this.certificate();
+    if (!cert) return '';
+    return new Date(cert.issuedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  });
+
   constructor() {
     this.meApi.loadCertificates().subscribe();
   }

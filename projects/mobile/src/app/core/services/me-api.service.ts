@@ -40,6 +40,20 @@ export interface MyCertificate {
   certificateNo: string;
   issuedAt: string;
   fileUrl: string;
+  backgroundImageUrl: string;
+  layoutConfig: CertLayoutConfig | null;
+}
+
+export type CertLayoutFieldKey = 'kicker' | 'name' | 'course' | 'certNo' | 'issueDate';
+
+export interface CertLayoutPosition {
+  xPct: number;
+  yPct: number;
+}
+
+export interface CertLayoutConfig {
+  kickerText?: string;
+  positions?: Partial<Record<CertLayoutFieldKey, CertLayoutPosition>>;
 }
 
 export interface MyDonation {
