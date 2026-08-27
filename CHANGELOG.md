@@ -2,6 +2,16 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-27 (22) — Admin panel: Offering Workspace enforces session count vs Total Sessions
+
+**Admin panel:**
+- Nothing previously stopped an offering having more or fewer sessions
+  built than its course's Total Sessions, and it could still be
+  Published with an incomplete schedule. "+ Add Session" now disables
+  once the count is reached, and Publish is rejected server-side
+  unless the built session count exactly matches. Paired with an API
+  change (backend CHANGELOG (8)).
+
 ## 2026-08-27 (21) — Mobile: certificate screen now renders the actual template
 
 **Mobile:**
