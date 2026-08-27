@@ -51,7 +51,15 @@
               <span class="muted-label">{{ sessions().length }} of {{ course()?.totalSessions ?? 0 }} sessions added</span>
             </div>
             @if (!roleService.isInstructor()) {
-              <button type="button" class="btn btn-solid" (click)="addSession()">+ Add Session</button>
+              <button
+                type="button"
+                class="btn btn-solid"
+                [disabled]="sessions().length >= (course()?.totalSessions ?? 0)"
+                [title]="sessions().length >= (course()?.totalSessions ?? 0) ? 'All sessions the course calls for are already built' : ''"
+                (click)="addSession()"
+              >
+                + Add Session
+              </button>
             }
           </div>
           <div class="session-list">
