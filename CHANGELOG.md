@@ -2,6 +2,17 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-27 (21) — Mobile: certificate screen now renders the actual template
+
+**Mobile:**
+- The "certificate received" screen showed a generic hardcoded gold
+  gradient card, unrelated to the real Certificate Template an admin
+  configured — background image, kicker text, field positions. Now
+  renders the same way admin-panel's own preview does: the template's
+  real background image with each field positioned per its
+  layoutConfig, matching the actual issued PDF. Paired with an API
+  change (backend CHANGELOG (7)).
+
 ## 2026-08-27 (20) — Admin panel: fix instructor topbar showing a hardcoded fake name
 
 **Admin panel:**
