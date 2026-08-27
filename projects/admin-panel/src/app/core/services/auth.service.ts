@@ -32,7 +32,7 @@ export class AuthService {
 
   constructor(private readonly roleService: RoleService) {
     const session = this.session();
-    if (session) this.roleService.setRole(session.role);
+    if (session) this.roleService.setRole(session.role, session.name);
   }
 
   login(email: string, password: string, rememberMe: boolean, turnstileToken?: string): Observable<AuthOutcome> {
@@ -86,7 +86,7 @@ export class AuthService {
         };
         this.session.set(session);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
-        this.roleService.setRole(session.role);
+        this.roleService.setRole(session.role, session.name);
       }),
       map(() => ({ ok: true as const })),
       catchError((err) => of({ ok: false as const, message: err?.error?.message ?? fallbackMessage })),
