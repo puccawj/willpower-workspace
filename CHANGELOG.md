@@ -2,6 +2,16 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-27 (23) — Admin panel: topbar shows an admin's real assigned branches
+
+**Admin panel:**
+- The topbar's scope pill said "USA · Canada" for every admin account
+  regardless of which branches they were actually assigned to — same
+  hardcoded-mock-data pattern as the instructor-name bug fixed
+  earlier. Now shows the real branches (backend CHANGELOG (11)).
+  Admin/superadmin avatar initials also now derive from the real name
+  instead of static "AD"/"SA".
+
 ## 2026-08-27 (22) — Admin panel: Offering Workspace enforces session count vs Total Sessions
 
 **Admin panel:**
