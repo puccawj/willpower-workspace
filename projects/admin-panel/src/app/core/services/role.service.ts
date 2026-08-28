@@ -10,10 +10,13 @@ function initialsFrom(name: string): string {
 @Injectable({ providedIn: 'root' })
 export class RoleService {
   readonly role = signal<Role>('superadmin');
-  /** The logged-in user's real name — set by AuthService alongside the role, since RoleService
-   * can't inject AuthService itself without a circular dependency (AuthService already injects
-   * RoleService to keep it in sync on login/restore). */
+  /** The logged-in user's real name/branches — set by AuthService alongside the role, since
+   * RoleService can't inject AuthService itself without a circular dependency (AuthService
+   * already injects RoleService to keep it in sync on login/restore). */
   readonly name = signal('');
+  /** The admin's actual assigned branches (from user_branches via the login response) — not
+   * meaningful for superadmin, who isn't scoped to particular branches at all. */
+  readonly branchNames = signal<string[]>([]);
   readonly isSuper = computed(() => this.role() === 'superadmin');
   readonly isInstructor = computed(() => this.role() === 'instructor');
 
@@ -22,7 +25,7 @@ export class RoleService {
       case 'superadmin':
         return 'All branches';
       case 'admin':
-        return 'USA · Canada';
+        return this.branchNames().length ? this.branchNames().join(' · ') : 'No branch assigned';
       case 'instructor':
         return this.name() || 'Instructor';
     }
@@ -31,16 +34,17 @@ export class RoleService {
   readonly userInitials = computed(() => {
     switch (this.role()) {
       case 'superadmin':
-        return 'SA';
+        return this.name() ? initialsFrom(this.name()) : 'SA';
       case 'admin':
-        return 'AD';
+        return this.name() ? initialsFrom(this.name()) : 'AD';
       case 'instructor':
         return this.name() ? initialsFrom(this.name()) : 'IN';
     }
   });
 
-  setRole(role: Role, name = ''): void {
+  setRole(role: Role, name = '', branchNames: string[] = []): void {
     this.role.set(role);
     this.name.set(name);
+    this.branchNames.set(branchNames);
   }
 }

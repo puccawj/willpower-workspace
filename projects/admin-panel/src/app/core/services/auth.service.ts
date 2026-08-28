@@ -13,11 +13,12 @@ interface Session {
   email: string;
   role: Role;
   name: string;
+  branchNames: string[];
 }
 
 interface LoginResponse {
   accessToken: string;
-  user: { id: string; email: string; role: string; name: string };
+  user: { id: string; email: string; role: string; name: string; branchNames?: string[] };
 }
 
 type AuthOutcome = { ok: true } | { ok: false; message: string };
@@ -32,7 +33,7 @@ export class AuthService {
 
   constructor(private readonly roleService: RoleService) {
     const session = this.session();
-    if (session) this.roleService.setRole(session.role, session.name);
+    if (session) this.roleService.setRole(session.role, session.name, session.branchNames);
   }
 
   login(email: string, password: string, rememberMe: boolean, turnstileToken?: string): Observable<AuthOutcome> {
@@ -83,10 +84,11 @@ export class AuthService {
           email: res.user.email,
           role: res.user.role as Role,
           name: res.user.name,
+          branchNames: res.user.branchNames ?? [],
         };
         this.session.set(session);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
-        this.roleService.setRole(session.role, session.name);
+        this.roleService.setRole(session.role, session.name, session.branchNames);
       }),
       map(() => ({ ok: true as const })),
       catchError((err) => of({ ok: false as const, message: err?.error?.message ?? fallbackMessage })),
@@ -109,7 +111,9 @@ export class AuthService {
         localStorage.removeItem(STORAGE_KEY);
         return null;
       }
-      return parsed;
+      // Sessions persisted before branchNames existed on this shape don't have it — default so
+      // the topbar doesn't show "undefined" until the next login refreshes the stored session.
+      return { ...parsed, branchNames: parsed.branchNames ?? [] };
     } catch {
       localStorage.removeItem(STORAGE_KEY);
       return null;
