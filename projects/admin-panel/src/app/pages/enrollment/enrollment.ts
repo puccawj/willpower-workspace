@@ -186,7 +186,7 @@ export class Enrollment {
     const enrolledIds = new Set(this.rows().map((r) => r.userId));
     const candidates = this.userApi
       .users()
-      .filter((u) => !enrolledIds.has(u.id))
+      .filter((u) => u.role === 'student' && !enrolledIds.has(u.id))
       .map((u) => ({ id: u.id, label: `${u.firstName} ${u.lastName} (${u.email})` }));
 
     if (candidates.length === 0) {

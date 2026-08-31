@@ -2,6 +2,19 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-31 (27) — Enrollment "Add Student" now offers students only
+
+**Admin panel:**
+- The Enrollment & Attendance page's "Add Student" picker previously
+  listed every user regardless of role (admin, instructor, general
+  accounts included) — now filtered to `role === 'student'` only.
+  Branch scoping was already correct (the shared `/users` endpoint
+  already restricts an admin to users in their own branch(es), all
+  branches for superadmin), so this only needed the role filter.
+  Events RSVP page's "Add Attendee" picker was checked too and needed
+  no change — it intentionally includes any role (staff can RSVP
+  guests too) and already inherits the same branch scoping.
+
 ## 2026-08-31 (26) — Dashboard stat labels no longer claim "all branches" for admin
 
 **Admin panel:**
