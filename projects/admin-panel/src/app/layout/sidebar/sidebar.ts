@@ -71,13 +71,13 @@ export class Sidebar {
       items: [
         { path: 'team', label: 'Team Management', icon: '◍', allow: ALL_STAFF },
         { path: 'broadcast', label: 'Broadcast', icon: '◉', allow: ALL_STAFF },
-        { path: 'home-hero', label: 'Home Hero', icon: '⛩', allow: ALL_STAFF },
-        { path: 'home-banners', label: 'Home Banners', icon: '▨', allow: ALL_STAFF },
-        { path: 'about-content', label: 'About Page', icon: '❋', allow: ALL_STAFF },
-        { path: 'privacy-policy-content', label: 'Privacy Policy', icon: '¶', allow: ALL_STAFF },
+        { path: 'home-hero', label: 'Home Hero', icon: '⛩', allow: ['superadmin'] },
+        { path: 'home-banners', label: 'Home Banners', icon: '▨', allow: ['superadmin'] },
+        { path: 'about-content', label: 'About Page', icon: '❋', allow: ['superadmin'] },
+        { path: 'privacy-policy-content', label: 'Privacy Policy', icon: '¶', allow: ['superadmin'] },
       ],
     },
-    { header: 'Insights', items: [{ path: 'reports', label: 'Reports', icon: '▥', allow: ALL_STAFF }] },
+    { header: 'Insights', items: [{ path: 'reports', label: 'Reports', icon: '▥', allow: ['superadmin'] }] },
   ];
 
   readonly visibleGroups = computed(() => {
