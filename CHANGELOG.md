@@ -2,6 +2,19 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-31 (28) — Drop the "All Branches" select-all from Add/Edit User for admin
+
+**Admin panel:**
+- Manage Users' Add/Edit User modal showed an "All Branches" select-all
+  checkbox above the Branches multiselect for every role. The branch
+  *options* themselves were already correctly scoped server-side (an
+  admin's `/branches` call only returns their own branch(es);
+  superadmin gets every branch) — verified locally: admin sees only
+  "United States, Canada", superadmin sees all 5. But the "All
+  Branches" shortcut label made sense only for superadmin (who
+  genuinely operates system-wide); for an admin already limited to 1-2
+  branches it was just confusing chrome. Now shown only for superadmin.
+
 ## 2026-08-31 (27) — Enrollment "Add Student" now offers students only
 
 **Admin panel:**
