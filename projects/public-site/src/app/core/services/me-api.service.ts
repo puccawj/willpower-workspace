@@ -87,6 +87,12 @@ export interface MyRating {
 
 export type StudentApplicationStatus = 'pending' | 'approved' | 'rejected';
 
+export interface MyStudentApplicationBranch {
+  branchId: string;
+  branchName: string;
+  status: StudentApplicationStatus;
+}
+
 export interface MyStudentApplication {
   id: string;
   email: string;
@@ -96,8 +102,8 @@ export interface MyStudentApplication {
   phone: string | null;
   lineId: string | null;
   photoUrl: string | null;
-  status: StudentApplicationStatus;
   createdAt: string;
+  branches: MyStudentApplicationBranch[];
 }
 
 export interface StudentApplicationRequest {
@@ -105,6 +111,7 @@ export interface StudentApplicationRequest {
   firstName: string;
   lastName: string;
   nickname: string;
+  branchIds: string[];
   phone?: string;
   lineId?: string;
   photoUrl?: string;

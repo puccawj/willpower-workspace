@@ -5,8 +5,12 @@ import { environment } from '../../../environments/environment';
 
 export type StudentApplicationStatus = 'pending' | 'approved' | 'rejected';
 
+/** One row per branch the applicant requested — `id` is the per-branch decision row's id
+ * (what approve/reject act on), not the parent application's id. The same applicant can appear
+ * as multiple rows if they applied to more than one branch. */
 export interface ApiStudentApplication {
   id: string;
+  applicationId: string;
   userId: string;
   email: string;
   firstName: string;
@@ -15,9 +19,9 @@ export interface ApiStudentApplication {
   phone: string | null;
   lineId: string | null;
   photoUrl: string | null;
+  branchId: string;
+  branchName: string;
   status: StudentApplicationStatus;
-  reviewedBy: string | null;
-  reviewedAt: string | null;
   createdAt: string;
 }
 

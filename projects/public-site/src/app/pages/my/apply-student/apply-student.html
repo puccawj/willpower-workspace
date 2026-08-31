@@ -13,19 +13,29 @@
       <p>This form is only available to general member accounts.</p>
     </div>
   } @else if (application(); as app) {
-    @if (app.status === 'pending') {
-      <div class="status-card status-pending">
-        <p><strong>Application submitted.</strong> An admin will review it shortly — you'll be able to enroll in courses once approved.</p>
-        <a routerLink="/my/edit-profile" class="apply-edit-link">Edit your application →</a>
-      </div>
-    } @else if (app.status === 'rejected') {
-      <div class="status-card status-rejected">
-        <p>Your previous application was not approved. Please contact your branch for more information, or submit a new application below.</p>
+    @if (app.branches.length) {
+      <div class="status-card" [class.status-pending]="canApply() === false">
+        <p><strong>Application status by branch:</strong></p>
+        <ul class="branch-status-list">
+          @for (b of app.branches; track b.branchId) {
+            <li>
+              {{ b.branchName }} —
+              @switch (b.status) {
+                @case ('pending') { <span class="branch-status-pending">Pending review</span> }
+                @case ('approved') { <span class="branch-status-approved">Approved</span> }
+                @case ('rejected') { <span class="branch-status-rejected">Not approved</span> }
+              }
+            </li>
+          }
+        </ul>
+        @if (!canApply()) {
+          <a routerLink="/my/edit-profile" class="apply-edit-link">Edit your application →</a>
+        }
       </div>
     }
   }
 
-  @if (isGeneral() && (!application() || application()!.status === 'rejected')) {
+  @if (isGeneral() && canApply()) {
     <form class="apply-form" (submit)="$event.preventDefault(); submit()">
       <p class="apply-note">
         Uses your name, nickname, phone, LINE ID, and photo from your account profile —
@@ -61,6 +71,22 @@
           <img [src]="profile()?.photoUrl" alt="" class="apply-photo-preview" />
         </div>
       }
+
+      <div class="field-inline">
+        <label class="muted-label">Which branch(es) do you want to attend?</label>
+        <div class="branch-picker">
+          @for (b of branches(); track b.id) {
+            <label class="branch-checkbox">
+              <input
+                type="checkbox"
+                [checked]="isBranchSelected(b.id)"
+                (change)="toggleBranch(b.id, $any($event.target).checked)"
+              />
+              {{ b.name }}
+            </label>
+          }
+        </div>
+      </div>
 
       @if (error()) {
         <p class="form-error">{{ error() }}</p>

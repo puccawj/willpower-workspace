@@ -108,12 +108,15 @@
 
     @if (application(); as app) {
       <div class="section-title">Student application</div>
-      @if (app.status === 'approved') {
-        <p class="muted-note">Your application was approved — you're a student now.</p>
-      } @else if (app.status === 'rejected') {
-        <p class="muted-note">Your previous application was not approved.</p>
-      } @else {
-        <p class="muted-note">Application submitted — an admin will review it shortly.</p>
+      @for (b of app.branches; track b.branchId) {
+        <p class="muted-note">
+          {{ b.branchName }} —
+          @switch (b.status) {
+            @case ('approved') { approved, you're a student there now. }
+            @case ('rejected') { not approved. }
+            @default { pending review. }
+          }
+        </p>
       }
     }
   }

@@ -13,7 +13,7 @@
     <div class="card" style="padding:0;overflow:hidden">
       <table>
         <thead>
-          <tr><th>Photo</th><th>Name</th><th>Email</th><th>Contact</th><th>Applied</th><th>Status</th><th></th></tr>
+          <tr><th>Photo</th><th>Name</th><th>Email</th><th>Contact</th><th>Branch</th><th>Applied</th><th>Status</th><th></th></tr>
         </thead>
         <tbody>
           @for (a of ctrl.pageItems(); track a.id) {
@@ -28,6 +28,7 @@
               <td style="font-weight:500">{{ a.fullName }} <span class="muted-label">"{{ a.nickname }}"</span></td>
               <td>{{ a.email }}</td>
               <td>{{ a.contactLabel }}</td>
+              <td>{{ a.branchName }}</td>
               <td>{{ a.appliedLabel }}</td>
               <td><span class="badge" [style.background]="a.statusColor">{{ a.statusLabel }}</span></td>
               <td>
@@ -41,7 +42,7 @@
             </tr>
           }
           @if (!ctrl.pageItems().length) {
-            <tr><td colspan="7" class="state-empty">No {{ filter() === 'all' ? '' : filter() }} applications.</td></tr>
+            <tr><td colspan="8" class="state-empty">No {{ filter() === 'all' ? '' : filter() }} applications.</td></tr>
           }
         </tbody>
       </table>
@@ -59,7 +60,7 @@
           </div>
           <div class="muted-label">{{ a.email }}</div>
           <div class="muted-label mcard-meta">{{ a.contactLabel }}</div>
-          <div class="muted-label mcard-meta">Applied {{ a.appliedLabel }}</div>
+          <div class="muted-label mcard-meta">{{ a.branchName }} · Applied {{ a.appliedLabel }}</div>
           @if (a.status === 'pending') {
             <div class="mcard-row">
               <div class="mcard-actions action-group">

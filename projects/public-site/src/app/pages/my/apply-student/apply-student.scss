@@ -81,6 +81,48 @@
   }
 }
 
+.branch-status-list {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.branch-status-pending {
+  color: var(--w-gold-deep);
+  font-weight: 600;
+}
+
+.branch-status-approved {
+  color: var(--w-green);
+  font-weight: 600;
+}
+
+.branch-status-rejected {
+  color: var(--w-accent);
+  font-weight: 600;
+}
+
+.branch-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  border: 1px solid var(--w-border-strong);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.branch-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font: 400 14px var(--w-font-sans);
+  cursor: pointer;
+}
+
 .apply-edit-link {
   display: inline-block;
   margin-top: 10px;

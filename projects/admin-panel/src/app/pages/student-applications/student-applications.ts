@@ -22,6 +22,7 @@ interface StudentApplicationRow {
   photoUrl: string | null;
   contactLabel: string;
   appliedLabel: string;
+  branchName: string;
   status: 'pending' | 'approved' | 'rejected';
   statusLabel: string;
   statusColor: string;
@@ -50,6 +51,7 @@ function toRow(a: ApiStudentApplication): StudentApplicationRow {
     photoUrl: a.photoUrl,
     contactLabel: [a.phone, a.lineId ? `LINE: ${a.lineId}` : ''].filter(Boolean).join(' · ') || '—',
     appliedLabel: formatDateFull(new Date(a.createdAt)),
+    branchName: a.branchName,
     status: a.status,
     statusLabel: STATUS_LABEL[a.status],
     statusColor: STATUS_COLOR[a.status],
@@ -103,14 +105,14 @@ export class StudentApplications {
 
   async approve(row: StudentApplicationRow): Promise<void> {
     const confirmed = await this.confirm.ask(
-      `Approve ${row.fullName} ("${row.nickname}")? Their account role will change to student.`,
+      `Approve ${row.fullName} ("${row.nickname}") for ${row.branchName}? Their account role will change to student and they'll gain access to this branch.`,
       { title: 'Approve application', confirmLabel: 'Approve' },
     );
     if (!confirmed) return;
 
     this.api.approve(row.id).subscribe({
       next: () => {
-        this.toast.show(`${row.nickname} is now a student.`, 'success');
+        this.toast.show(`${row.nickname} is now a student at ${row.branchName}.`, 'success');
         this.reload();
       },
       error: (err) => this.showError(err, 'Failed to approve application.'),
@@ -118,7 +120,7 @@ export class StudentApplications {
   }
 
   async reject(row: StudentApplicationRow): Promise<void> {
-    const confirmed = await this.confirm.ask(`Reject the application from ${row.fullName}?`, {
+    const confirmed = await this.confirm.ask(`Reject ${row.fullName}'s application for ${row.branchName}?`, {
       title: 'Reject application',
       confirmLabel: 'Reject',
       danger: true,
