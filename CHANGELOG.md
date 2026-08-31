@@ -2,6 +2,14 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-31 (25) — Restrict Reports/Home Hero/Home Banners/About/Privacy to superadmin
+
+**Admin panel:**
+- Regular admin accounts can no longer see or open Reports, Home Hero,
+  Home Banners, About Page, or Privacy Policy — sidebar links and
+  route guards now require `superadmin`, matching a paired backend
+  change (API CHANGELOG (13)).
+
 ## 2026-08-28 (24) — Student applications support multiple branches, decided independently
 
 **Admin panel, public-site, mobile:**
