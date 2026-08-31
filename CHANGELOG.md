@@ -2,6 +2,19 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-28 (24) — Student applications support multiple branches, decided independently
+
+**Admin panel, public-site, mobile:**
+- Applying to become a student never asked which branch, and approval
+  never granted one — a newly approved student ended up with zero
+  branches, invisible to branch-scoped views everywhere else in the
+  app. Applicants now pick one or more branches (a real checkbox list
+  from `/public/branches`); each branch's admin approves/rejects
+  independently, so one branch can approve while others are still
+  deciding. Admin panel's Student Applications table shows one row per
+  branch requested, scoped to the admin's own branches (superadmin
+  sees/acts on all). Paired with an API change (backend CHANGELOG (12)).
+
 ## 2026-08-27 (23) — Admin panel: topbar shows an admin's real assigned branches
 
 **Admin panel:**
