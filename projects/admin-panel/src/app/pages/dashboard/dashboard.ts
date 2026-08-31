@@ -6,6 +6,7 @@ import { DonationApiService } from '../../core/services/donation-api.service';
 import { UserApiService } from '../../core/services/user-api.service';
 import { formatDateShort } from '../../core/date-time.util';
 import { StatCards, StatCardData } from '../../shared/stat-cards/stat-cards';
+import { RoleService } from '../../core/services/role.service';
 
 interface BranchBar {
   name: string;
@@ -50,6 +51,9 @@ export class Dashboard {
   private readonly donationApi = inject(DonationApiService);
   private readonly userApi = inject(UserApiService);
   private readonly router = inject(Router);
+  private readonly roleService = inject(RoleService);
+
+  private readonly scopeSub = computed(() => (this.roleService.isSuper() ? 'across all branches' : 'in your branch'));
 
   constructor() {
     this.eventApi.load().subscribe();
@@ -88,13 +92,13 @@ export class Dashboard {
 
     return [
       { label: 'Upcoming events', value: this.upcomingEvents().length, sub: 'Published, not yet started' },
-      { label: 'RSVP this month', value: rsvpThisMonth, sub: 'Going + maybe, across all branches' },
+      { label: 'RSVP this month', value: rsvpThisMonth, sub: `Going + maybe, ${this.scopeSub()}` },
       {
         label: 'Donations this month',
         value: `$${moneyThisMonth.toFixed(2)}`,
         sub: goodsThisMonth ? `+ ${goodsThisMonth} goods donation${goodsThisMonth === 1 ? '' : 's'}` : 'Money donations',
       },
-      { label: 'New members (30d)', value: newMembers, sub: 'Across all branches' },
+      { label: 'New members (30d)', value: newMembers, sub: this.roleService.isSuper() ? 'Across all branches' : 'In your branch' },
     ];
   });
 

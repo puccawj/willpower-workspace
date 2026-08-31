@@ -2,6 +2,19 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-31 (26) — Dashboard stat labels no longer claim "all branches" for admin
+
+**Admin panel:**
+- The Dashboard's "RSVP this month" and "New members (30d)" stat cards
+  always said "across all branches" / "Across all branches", even for a
+  regular admin — misleading, since every number on the page was already
+  correctly scoped to the admin's own branch(es) by the backend
+  (`BranchAccessService`/`branchIdsOf` filtering already in place on
+  `/events`, `/branches`, `/donations`, `/users`). The label now reads
+  "in your branch" / "In your branch" for admin, and still says "across
+  all branches" / "Across all branches" for superadmin, who genuinely
+  sees system-wide data.
+
 ## 2026-08-31 (25) — Restrict Reports/Home Hero/Home Banners/About/Privacy to superadmin
 
 **Admin panel:**
