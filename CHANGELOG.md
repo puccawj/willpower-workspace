@@ -2,6 +2,19 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-08-31 (29) — Remove "All Branches" select-all entirely from Add/Edit User
+
+**Admin panel:**
+- (28) hid the "All Branches" select-all checkbox for admin only, but
+  it snapshotted whatever branches existed at click time into fixed
+  `user_branches` rows — a branch created afterward was silently left
+  out of any user assigned this way, with no indication anything was
+  missing. Confusing for superadmin too. Removed the select-all
+  shortcut entirely for every role; Branches is now a plain multiselect
+  checklist. Re-verified: admin still gets only their own branch(es),
+  superadmin still gets every branch — neither shows a select-all row
+  anymore.
+
 ## 2026-08-31 (28) — Drop the "All Branches" select-all from Add/Edit User for admin
 
 **Admin panel:**

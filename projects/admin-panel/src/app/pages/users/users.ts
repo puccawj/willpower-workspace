@@ -76,7 +76,6 @@ const MANAGEABLE_ROLES: ApiUserRole[] = ['student', 'instructor', 'admin', 'gene
 function buildFields(isEdit: boolean, branchNames: string[], canManageSuperadmin: boolean, isSso: boolean): FieldDef[] {
   const roleOptions = canManageSuperadmin ? [...ROLE_OPTIONS, 'Superadmin'] : ROLE_OPTIONS;
   const branchesField: FieldDef = { key: 'branches', label: 'Branches', type: 'multiselect', options: branchNames };
-  if (canManageSuperadmin) branchesField.selectAllLabel = 'All Branches';
   const passwordField: FieldDef[] = isSso
     ? []
     : [
