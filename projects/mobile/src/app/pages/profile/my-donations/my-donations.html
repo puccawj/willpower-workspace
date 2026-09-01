@@ -3,8 +3,13 @@
 @if (meApi.donations().length === 0) {
   <p class="empty-note">No donations yet.</p>
 } @else {
+  <app-pill-tabs [options]="filterOptions" [active]="filter()" (activeChange)="setFilter($event)" />
+
+  @if (filteredDonations().length === 0) {
+    <p class="empty-note">No donations in this filter.</p>
+  }
   <div class="row-list">
-    @for (d of meApi.donations(); track d.id) {
+    @for (d of filteredDonations(); track d.id) {
       <div class="row">
         <div class="row-title">{{ summarize(d) }}</div>
         <div class="row-meta">{{ formatDate(d.createdAt) }}{{ d.eventTitle ? ' · ' + d.eventTitle : '' }}</div>

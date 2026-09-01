@@ -2,6 +2,28 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-09-01 (30) — Mobile: show registered branches, add-a-branch flow, and filters on My … pages
+
+**Mobile:**
+- Profile now shows the branches the account is actually registered at (from
+  the new `/me` `branches` field), and offers a "Register at another branch"
+  link for existing students (previously "Become a student" only showed for
+  `general` accounts and blocked students entirely with "you're already a
+  student"). Reuses the existing apply-student form; the branch picker now
+  excludes branches the account already belongs to, and the page copy/title
+  adapts to "add a branch" vs. "first application" depending on role.
+- My Courses: filter tabs — In progress / Closed / Passed / All — default
+  In progress. Uses the existing enrollment status + pass/fail fields, no
+  backend change needed.
+- My Certificates: filter tabs by type — All / Course / Money donation /
+  Goods donation (needs the new `/me/certificates` `templateType` field).
+  Also fixed donation certificate rows showing a blank title (fell back to
+  the template name since donation certs have no course).
+- My RSVPs: filter tabs — All / Confirmed / Maybe / Cancelled.
+- My Donations: filter tabs — All / Money / Goods.
+- Added a small reusable `PillTabs` component (`shared/pill-tabs`) backing
+  all four filter bars above.
+
 ## 2026-08-31 (29) — Remove "All Branches" select-all entirely from Add/Edit User
 
 **Admin panel:**

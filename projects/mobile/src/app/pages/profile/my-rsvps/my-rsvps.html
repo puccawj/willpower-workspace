@@ -3,8 +3,13 @@
 @if (meApi.events().length === 0) {
   <p class="empty-note">You haven't RSVP'd to any events yet.</p>
 } @else {
+  <app-pill-tabs [options]="filterOptions" [active]="filter()" (activeChange)="setFilter($event)" />
+
+  @if (filteredEvents().length === 0) {
+    <p class="empty-note">No RSVPs in this filter.</p>
+  }
   <div class="row-list">
-    @for (e of meApi.events(); track e.eventId) {
+    @for (e of filteredEvents(); track e.eventId) {
       <div class="row">
         <div class="row-top">
           <div class="row-title">{{ e.title }}</div>

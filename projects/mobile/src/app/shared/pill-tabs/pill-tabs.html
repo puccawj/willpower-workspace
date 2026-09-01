@@ -1,0 +1,7 @@
+<div class="pill-tabs">
+  @for (opt of options; track opt.key) {
+    <button type="button" class="pill-tab" [class.active]="opt.key === active" (click)="select(opt.key)">
+      {{ opt.label }}
+    </button>
+  }
+</div>

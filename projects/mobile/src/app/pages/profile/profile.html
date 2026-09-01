@@ -3,6 +3,15 @@
     <div class="avatar-lg">{{ auth.currentUser()?.initials }}</div>
     <div class="name">{{ auth.currentUser()?.name }}</div>
     <div class="email">{{ auth.currentUser()?.email }}</div>
+    @if (meApi.profile()?.branches?.length) {
+      <div class="branch-tags">
+        @for (b of meApi.profile()!.branches; track b.branchId) {
+          <span class="branch-tag">{{ b.branchName }}</span>
+        }
+      </div>
+    } @else if (meApi.profile()) {
+      <div class="branch-tags-empty">Not registered at any branch yet</div>
+    }
   </div>
 
   <div class="stat-row">
@@ -28,6 +37,8 @@
     <a routerLink="/profile/donations" class="menu-row"><span>Donation history</span><span class="chev">›</span></a>
     @if (auth.currentUser()?.role === 'general') {
       <a routerLink="/profile/apply-student" class="menu-row"><span>Become a student</span><span class="chev">›</span></a>
+    } @else if (auth.currentUser()?.role === 'student') {
+      <a routerLink="/profile/apply-student" class="menu-row"><span>Register at another branch</span><span class="chev">›</span></a>
     }
   </div>
 

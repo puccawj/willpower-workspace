@@ -33,6 +33,29 @@
   margin-top: 2px;
 }
 
+.branch-tags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.branch-tag {
+  font: 500 calc(11.5px * var(--text-scale, 1)) var(--w-font-sans);
+  color: var(--w-accent);
+  background: var(--w-bg-alt);
+  border: 1px solid var(--w-border);
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.branch-tags-empty {
+  font: 400 calc(12px * var(--text-scale, 1)) var(--w-font-sans);
+  color: var(--w-muted-2);
+  margin-top: 8px;
+}
+
 .stat-row {
   display: flex;
   gap: 10px;

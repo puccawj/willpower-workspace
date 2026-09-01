@@ -32,11 +32,14 @@ export interface MyEnrollment {
   isPassing: boolean;
 }
 
+export type CertificateType = 'certificate' | 'donation_money' | 'donation_goods';
+
 export interface MyCertificate {
   id: string;
   offeringId: string | null;
   courseTitle: string | null;
   templateName: string;
+  templateType: CertificateType;
   certificateNo: string;
   issuedAt: string;
   fileUrl: string;
@@ -140,6 +143,11 @@ export interface UpdateStudentApplicationRequest {
   photoUrl?: string;
 }
 
+export interface MyProfileBranch {
+  branchId: string;
+  branchName: string;
+}
+
 export interface MyProfile {
   id: string;
   firstName: string;
@@ -153,6 +161,7 @@ export interface MyProfile {
   role: string;
   initials: string;
   registrationSource: string;
+  branches: MyProfileBranch[];
 }
 
 export interface UpdateMyProfileRequest {
@@ -175,6 +184,7 @@ export class MeApiService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/me`;
 
+  readonly profile = signal<MyProfile | null>(null);
   readonly events = signal<MyEvent[]>([]);
   readonly enrollments = signal<MyEnrollment[]>([]);
   readonly certificates = signal<MyCertificate[]>([]);
@@ -257,11 +267,11 @@ export class MeApiService {
   }
 
   getProfile(): Observable<MyProfile> {
-    return this.http.get<MyProfile>(this.baseUrl);
+    return this.http.get<MyProfile>(this.baseUrl).pipe(tap((p) => this.profile.set(p)));
   }
 
   updateProfile(dto: UpdateMyProfileRequest): Observable<MyProfile> {
-    return this.http.patch<MyProfile>(this.baseUrl, dto);
+    return this.http.patch<MyProfile>(this.baseUrl, dto).pipe(tap((p) => this.profile.set(p)));
   }
 
   changePassword(dto: ChangeMyPasswordRequest): Observable<void> {
@@ -272,6 +282,7 @@ export class MeApiService {
     this.loading.set(true);
     this.error.set('');
     return Promise.all([
+      firstValueFrom(this.getProfile()),
       firstValueFrom(this.loadEvents()),
       firstValueFrom(this.loadEnrollments()),
       firstValueFrom(this.loadCertificates()),

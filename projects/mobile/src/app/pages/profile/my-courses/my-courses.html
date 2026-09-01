@@ -3,8 +3,13 @@
 @if (meApi.enrollments().length === 0) {
   <p class="empty-note">You haven't enrolled in any courses yet.</p>
 } @else {
+  <app-pill-tabs [options]="filterOptions" [active]="filter()" (activeChange)="setFilter($event)" />
+
+  @if (filteredEnrollments().length === 0) {
+    <p class="empty-note">No courses in this filter.</p>
+  }
   <div class="row-list">
-    @for (e of meApi.enrollments(); track e.offeringId) {
+    @for (e of filteredEnrollments(); track e.offeringId) {
       <a [routerLink]="['/attendance', e.offeringId]" class="row">
         <div class="row-title">{{ e.courseTitle }}</div>
         <div class="row-meta">{{ e.branchName }} · {{ e.attendancePercent }}% attendance</div>
