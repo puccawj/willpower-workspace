@@ -2,6 +2,21 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-09-03 (32) — Fix prereq-pill spacing and a lock-icon CSS bug from (31)
+
+- The "✓ Ready to enroll" pill had no bottom margin, so on Home it sat
+  flush against `.course-foot`'s `border-top` divider line with zero
+  gap. Added `margin-bottom: 8px` to `.prereq-pill` (public-site and
+  mobile).
+- While in there, found and fixed a bug from (31): public-site's
+  `.prereq-pill-met` accidentally inherited the base pill's `::before`
+  lock emoji instead of the base rule keeping it — the green "ready"
+  pill was rendering with a 🔒 in front of it. `.prereq-pill` keeps its
+  emoji, `.prereq-pill-met` now explicitly clears it (mobile already had
+  this right).
+- Verified visually (screenshots) on public-site Home and Courses: clear
+  gap below the pill, no lock emoji on the green variant.
+
 ## 2026-09-03 (31) — Fix: Home/Courses list prerequisite badge never checked if the student passed
 
 - The course-detail page already showed a green "✓ You've completed the
