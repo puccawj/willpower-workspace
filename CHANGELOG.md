@@ -2,6 +2,26 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-09-03 (31) — Fix: Home/Courses list prerequisite badge never checked if the student passed
+
+- The course-detail page already showed a green "✓ You've completed the
+  prerequisite" message once a student passed, but the Home and Courses
+  **list** pages (both platforms) used a separate, older "Requires X" pill
+  that had no such check at all — it always showed the plain warning pill
+  regardless of whether the student had already completed every
+  prerequisite, since neither page even fetched the student's enrollments.
+- Public-site: `Home` and `Courses` now load `/me/enrollments` when logged
+  in and show a green "✓ Ready to enroll" pill (reusing the new
+  `.prereq-pill-met` style) once every prerequisite is met, same as
+  course-detail.
+- Mobile: same fix on `Home` (both the list-row pill and the card-view
+  ribbon, which switches from the 🔒 lock icon/gold gradient to a ✓
+  checkmark/green gradient) and `Courses` (course-list).
+- Verified locally on all four surfaces (public-site Home + Courses,
+  mobile Home + Courses) with a test student who'd completed the
+  prerequisite: all four now show the green "ready" state instead of the
+  warning pill.
+
 ## 2026-09-01 (30) — Mobile: show registered branches, add-a-branch flow, and filters on My … pages
 
 **Mobile:**

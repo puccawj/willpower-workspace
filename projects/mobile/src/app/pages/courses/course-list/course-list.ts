@@ -1,6 +1,8 @@
 import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
+import { AuthService } from '../../../core/services/auth.service';
+import { MeApiService } from '../../../core/services/me-api.service';
 import { PublicCourseApiService, PublicCourseOfferingCard } from '../../../core/services/public-course-api.service';
 import { PullToRefreshService } from '../../../core/services/pull-to-refresh.service';
 import { RatingApiService, RatingSummary } from '../../../core/services/rating-api.service';
@@ -24,10 +26,23 @@ export class CourseList {
   private readonly api = inject(PublicCourseApiService);
   private readonly pullToRefresh = inject(PullToRefreshService);
   private readonly ratingApi = inject(RatingApiService);
+  protected readonly auth = inject(AuthService);
+  private readonly meApi = inject(MeApiService);
 
   readonly loading = signal(false);
   readonly offerings = signal<PublicCourseOfferingCard[]>([]);
   readonly ratings = signal<Record<string, RatingSummary>>({});
+
+  /** Titles of courses the current student has a completed enrollment in, for the prerequisite
+   * badge on course cards — mirrors course-detail.ts's prerequisitesMet(). */
+  private readonly completedCourseTitles = computed(
+    () => new Set(this.meApi.enrollments().filter((e) => e.status === 'completed').map((e) => e.courseTitle)),
+  );
+  prerequisitesMet(required: string[]): boolean {
+    if (!required.length) return true;
+    const completed = this.completedCourseTitles();
+    return required.every((t) => completed.has(t));
+  }
 
   readonly expandedCourseId = signal<string | null>(null);
 
@@ -59,6 +74,7 @@ export class CourseList {
 
   constructor() {
     this.load();
+    if (this.auth.isLoggedIn()) this.meApi.loadEnrollments().subscribe();
 
     this.pullToRefresh.register(() => this.load());
     inject(DestroyRef).onDestroy(() => this.pullToRefresh.clear());

@@ -92,6 +92,16 @@ img {
   }
 }
 
+.prereq-pill-met {
+  color: #3a6b2e;
+  background: #eef6ea;
+  border-color: #a9d197;
+
+  &::before {
+    content: none;
+  }
+}
+
 // Native QR scan (@capacitor-mlkit/barcode-scanning): the camera preview renders behind
 // the WebView, so the page must go transparent for it to show through. The scan page's own
 // root re-asserts visibility so its corner-bracket overlay still renders on top.

@@ -6,6 +6,8 @@ import {
   formatSchedule,
 } from '../../core/services/public-course-api.service';
 import { RatingApiService, RatingSummary } from '../../core/services/rating-api.service';
+import { AuthService } from '../../core/services/auth.service';
+import { MeApiService } from '../../core/services/me-api.service';
 
 export interface CourseGroup {
   courseId: string;
@@ -26,9 +28,23 @@ export interface CourseGroup {
 export class Courses {
   private readonly api = inject(PublicCourseApiService);
   private readonly ratingApi = inject(RatingApiService);
+  private readonly auth = inject(AuthService);
+  private readonly meApi = inject(MeApiService);
 
   readonly offerings = signal<PublicCourseOfferingCard[]>([]);
   readonly formatSchedule = formatSchedule;
+  readonly isLoggedIn = this.auth.isLoggedIn;
+
+  /** Titles of courses the current student has a completed enrollment in, for the prerequisite
+   * pill on course cards — mirrors course-detail.ts's prerequisitesMet(). */
+  private readonly completedCourseTitles = computed(
+    () => new Set(this.meApi.enrollments().filter((e) => e.status === 'completed').map((e) => e.courseTitle)),
+  );
+  prerequisitesMet(required: string[]): boolean {
+    if (!required.length) return true;
+    const completed = this.completedCourseTitles();
+    return required.every((t) => completed.has(t));
+  }
 
   readonly ratings = signal<Record<string, RatingSummary>>({});
 
@@ -65,6 +81,7 @@ export class Courses {
   }
 
   constructor() {
+    if (this.auth.isLoggedIn()) this.meApi.loadEnrollments().subscribe();
     this.api.loadAllOfferings().subscribe((rows) => {
       this.offerings.set(rows);
       this.ratingApi.bulkSummary('offering', rows.map((o) => o.offeringId)).subscribe((s) => this.ratings.set(s));

@@ -6,6 +6,7 @@ import { PublicCourseApiService, PublicCourseOfferingCard } from '../../core/ser
 import { HomeBannerApiService } from '../../core/services/home-banner-api.service';
 import { RatingApiService, RatingSummary } from '../../core/services/rating-api.service';
 import { AuthService } from '../../core/services/auth.service';
+import { MeApiService } from '../../core/services/me-api.service';
 import { SiteContentApiService } from '../../core/services/site-content-api.service';
 import { ImageViewerService } from '../../core/services/image-viewer.service';
 
@@ -51,11 +52,22 @@ export class Home implements OnDestroy {
   private readonly bannerApi = inject(HomeBannerApiService);
   private readonly ratingApi = inject(RatingApiService);
   private readonly auth = inject(AuthService);
+  private readonly meApi = inject(MeApiService);
   private readonly router = inject(Router);
   private readonly siteContentApi = inject(SiteContentApiService);
   private readonly imageViewer = inject(ImageViewerService);
 
   readonly isLoggedIn = this.auth.isLoggedIn;
+  /** Titles of courses the current student has a completed enrollment in, for the prerequisite
+   * pill on course cards — mirrors course-detail.ts's prerequisitesMet(). */
+  private readonly completedCourseTitles = computed(
+    () => new Set(this.meApi.enrollments().filter((e) => e.status === 'completed').map((e) => e.courseTitle)),
+  );
+  prerequisitesMet(required: string[]): boolean {
+    if (!required.length) return true;
+    const completed = this.completedCourseTitles();
+    return required.every((t) => completed.has(t));
+  }
   readonly hero = signal<HomeHeroContent>({ ...DEFAULT_HERO });
   readonly banners = this.bannerApi.banners;
   readonly activeSlide = signal(0);
@@ -88,6 +100,7 @@ export class Home implements OnDestroy {
   }
 
   constructor() {
+    if (this.auth.isLoggedIn()) this.meApi.loadEnrollments().subscribe();
     this.eventsApi.load().subscribe(() => {
       const ids = this.homeEvents().map((ev) => ev.id);
       this.ratingApi.bulkSummary('event', ids).subscribe((summaries) => this.eventRatings.set(summaries));

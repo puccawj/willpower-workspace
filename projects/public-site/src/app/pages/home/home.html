@@ -131,7 +131,11 @@
             }
             <p class="course-desc">{{ o.format }} · {{ o.shortStartDate }}</p>
             @if (o.prerequisiteTitles.length) {
-              <span class="prereq-pill" [title]="'Requires: ' + o.prerequisiteTitles.join(', ')">Requires {{ o.prerequisiteTitles[0] }}</span>
+              @if (isLoggedIn() && prerequisitesMet(o.prerequisiteTitles)) {
+                <span class="prereq-pill prereq-pill-met" [title]="'Completed: ' + o.prerequisiteTitles.join(', ')">✓ Ready to enroll</span>
+              } @else {
+                <span class="prereq-pill" [title]="'Requires: ' + o.prerequisiteTitles.join(', ')">Requires {{ o.prerequisiteTitles[0] }}</span>
+              }
             }
             <div class="course-foot">
               <span class="muted-label">{{ o.open }}</span>

@@ -34,7 +34,11 @@
               </div>
             }
             @if (group.prerequisiteTitles.length) {
-              <span class="prereq-pill" [title]="'Requires: ' + group.prerequisiteTitles.join(', ')">Requires {{ group.prerequisiteTitles.join(', ') }}</span>
+              @if (isLoggedIn() && prerequisitesMet(group.prerequisiteTitles)) {
+                <span class="prereq-pill prereq-pill-met" [title]="'Completed: ' + group.prerequisiteTitles.join(', ')">✓ Ready to enroll</span>
+              } @else {
+                <span class="prereq-pill" [title]="'Requires: ' + group.prerequisiteTitles.join(', ')">Requires {{ group.prerequisiteTitles.join(', ') }}</span>
+              }
             }
             <p class="course-desc-lg">{{ o.branchName }}{{ o.code ? ' — ' + o.code : '' }} &middot; {{ o.startDate }} – {{ o.endDate }}</p>
             @if (formatSchedule(o.scheduleSummary); as sched) {

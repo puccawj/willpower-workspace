@@ -56,6 +56,17 @@ export class Home {
     return confirmed[0] ?? null;
   });
 
+  /** Titles of courses the current student has a completed enrollment in, for the prerequisite
+   * badge on course cards — mirrors course-detail.ts's prerequisitesMet(). */
+  private readonly completedCourseTitles = computed(
+    () => new Set(this.meApi.enrollments().filter((e) => e.status === 'completed').map((e) => e.courseTitle)),
+  );
+  prerequisitesMet(required: string[]): boolean {
+    if (!required.length) return true;
+    const completed = this.completedCourseTitles();
+    return required.every((t) => completed.has(t));
+  }
+
   /** Every event — upcoming and live shown first (most actionable), past events trail behind
    * and are rendered dimmed rather than hidden, so this doubles as a lightweight history view.
    * Capped at 10 — this is a home-page preview, "View all" leads to the full list. */
@@ -159,6 +170,7 @@ export class Home {
 
   constructor() {
     this.meApi.loadEvents().subscribe();
+    this.meApi.loadEnrollments().subscribe();
     this.publicEvents.load().subscribe(() => this.refreshRatings());
     this.publicCourses.loadAllOfferings().subscribe((rows) => {
       this.offeringCards.set(rows);
@@ -173,6 +185,7 @@ export class Home {
     this.pullToRefresh.register(() =>
       Promise.all([
         firstValueFrom(this.meApi.loadEvents()),
+        firstValueFrom(this.meApi.loadEnrollments()),
         firstValueFrom(this.publicEvents.load()),
         firstValueFrom(this.publicCourses.loadAllOfferings()).then((rows) => this.offeringCards.set(rows)),
         firstValueFrom(this.bannerApi.load()),

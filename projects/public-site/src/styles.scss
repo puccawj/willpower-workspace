@@ -181,6 +181,12 @@ img {
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.prereq-pill-met {
+  color: #3a6b2e;
+  background: #eef6ea;
+  border-color: #a9d197;
 
   &::before {
     content: '🔒';

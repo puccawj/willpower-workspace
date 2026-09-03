@@ -143,7 +143,11 @@
               }
             </div>
             @if (o.prerequisiteTitles.length) {
-              <span class="prereq-pill" [title]="'Requires: ' + o.prerequisiteTitles.join(', ')">Requires {{ o.prerequisiteTitles[0] }}</span>
+              @if (auth.isLoggedIn() && prerequisitesMet(o.prerequisiteTitles)) {
+                <span class="prereq-pill prereq-pill-met" [title]="'Completed: ' + o.prerequisiteTitles.join(', ')">✓ Ready to enroll</span>
+              } @else {
+                <span class="prereq-pill" [title]="'Requires: ' + o.prerequisiteTitles.join(', ')">Requires {{ o.prerequisiteTitles[0] }}</span>
+              }
             }
           </div>
           <div class="course-row-open">{{ o.open }}</div>
@@ -157,9 +161,17 @@
           <div class="course-card-img">
             <img [src]="o.img" alt="" />
             <div class="img-ribbon-corner">
-              <div class="img-ribbon" [class.locked]="o.prerequisiteTitles.length">
+              <div
+                class="img-ribbon"
+                [class.locked]="o.prerequisiteTitles.length && !(auth.isLoggedIn() && prerequisitesMet(o.prerequisiteTitles))"
+                [class.ready]="o.prerequisiteTitles.length && auth.isLoggedIn() && prerequisitesMet(o.prerequisiteTitles)"
+              >
                 @if (o.prerequisiteTitles.length) {
-                  <span class="ribbon-lock" [title]="'Requires: ' + o.prerequisiteTitles.join(', ')">🔒</span>
+                  @if (auth.isLoggedIn() && prerequisitesMet(o.prerequisiteTitles)) {
+                    <span class="ribbon-lock ribbon-lock-met" [title]="'Completed: ' + o.prerequisiteTitles.join(', ')">✓</span>
+                  } @else {
+                    <span class="ribbon-lock" [title]="'Requires: ' + o.prerequisiteTitles.join(', ')">🔒</span>
+                  }
                 }
                 {{ o.ribbonDate }}
               </div>
