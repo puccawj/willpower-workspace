@@ -48,6 +48,30 @@ jobs:
       - name: Sync Capacitor iOS (copies the web build into the Xcode project)
         run: npx cap sync ios
 
+      - name: Cache Swift Package Manager dependencies
+        # ios/App/CapApp-SPM/Package.swift is regenerated fresh by `cap sync ios` every run,
+        # declaring several remote packages (Capacitor core, Firebase, MLKit barcode
+        # scanning, native biometric, social login) — with no cache, cold resolution can run
+        # past gym's internal `xcodebuild -showBuildSettings` preflight timeout later in this
+        # workflow. Keyed on the resolved manifest so a dependency bump invalidates it.
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/Library/Caches/org.swift.swiftpm
+            ~/Library/Developer/Xcode/DerivedData/**/SourcePackages
+          key: spm-${{ runner.os }}-${{ hashFiles('ios/App/CapApp-SPM/Package.swift', 'ios/App/App.xcodeproj/project.pbxproj') }}
+          restore-keys: |
+            spm-${{ runner.os }}-
+
+      - name: Resolve Swift Package dependencies
+        # Forces package resolution to finish here, with this step's own generous timeout,
+        # instead of leaving it to happen lazily inside fastlane's `build_app` — where gym's
+        # `-showBuildSettings` preflight has only a ~12s budget (3s × 4 retries) and fails
+        # outright ("timed out after 4 retries") if resolution is still in progress.
+        working-directory: ios
+        timeout-minutes: 10
+        run: xcodebuild -resolvePackageDependencies -project App/App.xcodeproj -scheme App
+
       - name: Build for iOS Simulator (for Appetize.io browser testing)
         # Separate from the App Store build below: simulator builds need no code signing
         # at all (CODE_SIGNING_ALLOWED=NO), so this doesn't touch match/certificates and
@@ -108,6 +132,11 @@ jobs:
           APP_STORE_CONNECT_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_KEY_CONTENT }}
           APPLE_DEVELOPER_TEAM_ID: ${{ secrets.APPLE_DEVELOPER_TEAM_ID }}
           APP_STORE_CONNECT_TEAM_ID: ${{ secrets.APP_STORE_CONNECT_TEAM_ID }}
+          # Defense-in-depth on top of the explicit pre-resolve step above: gym's internal
+          # `xcodebuild -showBuildSettings` preflight otherwise gives up after ~12s
+          # (3s × 4 retries), which is tight if the runner is just being slow that day.
+          FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: "120"
+          FASTLANE_XCODEBUILD_SETTINGS_RETRIES: "3"
         run: bundle exec fastlane ios beta
 
       - name: Build Ad Hoc .ipa for registered test devices
@@ -124,6 +153,8 @@ jobs:
           APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
           APP_STORE_CONNECT_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_KEY_CONTENT }}
           APPLE_DEVELOPER_TEAM_ID: ${{ secrets.APPLE_DEVELOPER_TEAM_ID }}
+          FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: "120"
+          FASTLANE_XCODEBUILD_SETTINGS_RETRIES: "3"
         run: bundle exec fastlane ios adhoc
 
       - name: Publish Ad Hoc build to our own server
