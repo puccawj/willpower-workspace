@@ -32,12 +32,14 @@
               <td>{{ a.appliedLabel }}</td>
               <td><span class="badge" [style.background]="a.statusColor">{{ a.statusLabel }}</span></td>
               <td>
-                @if (a.status === 'pending') {
-                  <div class="action-group">
+                <div class="action-group">
+                  @if (a.status !== 'rejected') {
                     <button type="button" class="btn btn-outline btn-sm" (click)="reject(a)">Reject</button>
+                  }
+                  @if (a.status !== 'approved') {
                     <button type="button" class="btn btn-solid btn-sm" (click)="approve(a)">Approve</button>
-                  </div>
-                }
+                  }
+                </div>
               </td>
             </tr>
           }
@@ -61,14 +63,16 @@
           <div class="muted-label">{{ a.email }}</div>
           <div class="muted-label mcard-meta">{{ a.contactLabel }}</div>
           <div class="muted-label mcard-meta">{{ a.branchName }} · Applied {{ a.appliedLabel }}</div>
-          @if (a.status === 'pending') {
-            <div class="mcard-row">
-              <div class="mcard-actions action-group">
+          <div class="mcard-row">
+            <div class="mcard-actions action-group">
+              @if (a.status !== 'rejected') {
                 <button type="button" class="btn btn-outline btn-sm" (click)="reject(a)">Reject</button>
+              }
+              @if (a.status !== 'approved') {
                 <button type="button" class="btn btn-solid btn-sm" (click)="approve(a)">Approve</button>
-              </div>
+              }
             </div>
-          }
+          </div>
         </div>
       }
       @if (!ctrl.pageItems().length) {

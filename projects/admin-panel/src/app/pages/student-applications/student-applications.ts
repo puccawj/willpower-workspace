@@ -120,7 +120,11 @@ export class StudentApplications {
   }
 
   async reject(row: StudentApplicationRow): Promise<void> {
-    const confirmed = await this.confirm.ask(`Reject ${row.fullName}'s application for ${row.branchName}?`, {
+    const message =
+      row.status === 'approved'
+        ? `Reject ${row.fullName}'s application for ${row.branchName}? This reverses the earlier approval — they'll lose access to this branch (and their student role too, if this was their only branch).`
+        : `Reject ${row.fullName}'s application for ${row.branchName}?`;
+    const confirmed = await this.confirm.ask(message, {
       title: 'Reject application',
       confirmLabel: 'Reject',
       danger: true,
