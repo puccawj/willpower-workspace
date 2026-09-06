@@ -13,6 +13,39 @@
   margin: 0 0 18px;
 }
 
+.filter-row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  margin: 0 -20px 10px;
+  padding: 0 20px 2px;
+  scrollbar-width: none;
+
+  &:last-of-type {
+    margin-bottom: 18px;
+  }
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.filter-btn {
+  flex-shrink: 0;
+  font: 500 calc(14px * var(--text-scale, 1)) var(--w-font-sans);
+  color: var(--w-muted-2);
+  background: #fff;
+  border: 1px solid var(--w-border);
+  border-radius: 20px;
+  padding: 7px 14px;
+
+  &.active {
+    background: var(--w-accent);
+    border-color: var(--w-accent);
+    color: #fff;
+  }
+}
+
 .empty-note {
   font: 400 calc(15px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-muted);

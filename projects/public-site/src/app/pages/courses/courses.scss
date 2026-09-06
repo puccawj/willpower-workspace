@@ -11,6 +11,17 @@
   margin: 0 0 34px;
 }
 
+.filters {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+
+  &:last-of-type {
+    margin-bottom: 28px;
+  }
+}
+
 .course-card-lg {
   background: var(--w-bg-alt);
   border: 1px solid var(--w-border);

@@ -89,6 +89,7 @@ export interface PublicCourseOfferingCard {
   title: string;
   level: string;
   img: string;
+  branchId: string;
   branchName: string;
   branchCity: string | null;
   mode: 'online' | 'onsite';
@@ -215,6 +216,7 @@ function toPublicCourseOfferingCard(row: ApiPublicCourseOfferingCard, index: num
     title: row.title,
     level: row.category ?? 'Course',
     img: row.imageUrl ?? FALLBACK_IMAGES[index % FALLBACK_IMAGES.length],
+    branchId: row.branchId,
     branchName: row.branchName,
     branchCity: row.branchCity,
     mode: row.mode,

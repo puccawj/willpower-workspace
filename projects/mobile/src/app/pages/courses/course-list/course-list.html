@@ -5,6 +5,25 @@
     enroll or donate.
   </p>
 
+  <div class="filter-row">
+    @for (f of statusFilterOptions; track f.key) {
+      <button type="button" class="filter-btn" [class.active]="statusFilter() === f.key" (click)="setStatusFilter(f.key)">
+        {{ f.label }}
+      </button>
+    }
+  </div>
+
+  <div class="filter-row">
+    <button type="button" class="filter-btn" [class.active]="branchFilter() === 'all'" (click)="setBranchFilter('all')">
+      All branches
+    </button>
+    @for (b of branches(); track b.id) {
+      <button type="button" class="filter-btn" [class.active]="branchFilter() === b.id" (click)="setBranchFilter(b.id)">
+        {{ b.name }}
+      </button>
+    }
+  </div>
+
   @if (loading()) {
     <p class="empty-note">Loading courses…</p>
   } @else if (offerings().length === 0) {

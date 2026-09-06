@@ -14,6 +14,17 @@
       }
     </div>
 
+    <div class="filters">
+      <button type="button" class="filter-pill" [class.active]="branchFilter() === 'all'" (click)="setBranchFilter('all')">
+        All branches
+      </button>
+      @for (b of branches(); track b.id) {
+        <button type="button" class="filter-pill" [class.active]="branchFilter() === b.id" (click)="setBranchFilter(b.id)">
+          {{ b.name }}
+        </button>
+      }
+    </div>
+
     @if (error()) {
       <p class="section-lead">{{ error() }}</p>
     } @else if (loading()) {

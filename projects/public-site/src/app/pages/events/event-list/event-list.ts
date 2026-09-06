@@ -1,9 +1,11 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { PublicEventApiService } from '../../../core/services/public-event-api.service';
+import { BranchApiService } from '../../../core/services/branch-api.service';
 import { RatingApiService, RatingSummary } from '../../../core/services/rating-api.service';
 
 type FilterKey = 'upcoming' | 'live' | 'past' | 'all';
+const ALL_BRANCHES = 'all';
 
 @Component({
   selector: 'app-event-list',
@@ -13,6 +15,7 @@ type FilterKey = 'upcoming' | 'live' | 'past' | 'all';
 })
 export class EventList {
   private readonly api = inject(PublicEventApiService);
+  private readonly branchApi = inject(BranchApiService);
   private readonly ratingApi = inject(RatingApiService);
 
   readonly loading = this.api.loading;
@@ -27,9 +30,15 @@ export class EventList {
 
   readonly filter = signal<FilterKey>('upcoming');
 
+  readonly branches = this.branchApi.branches;
+  readonly branchFilter = signal<string>(ALL_BRANCHES);
+
   readonly events = computed(() => {
     const f = this.filter();
-    return f === 'all' ? this.api.events() : this.api.events().filter((ev) => ev.when === f);
+    const branch = this.branchFilter();
+    return this.api
+      .events()
+      .filter((ev) => (f === 'all' || ev.when === f) && (branch === ALL_BRANCHES || ev.branchId === branch));
   });
 
   readonly ratings = signal<Record<string, RatingSummary>>({});
@@ -47,9 +56,14 @@ export class EventList {
     this.api.load().subscribe((rows) => {
       this.ratingApi.bulkSummary('event', rows.map((r) => r.id)).subscribe((s) => this.ratings.set(s));
     });
+    this.branchApi.load().subscribe();
   }
 
   setFilter(key: FilterKey): void {
     this.filter.set(key);
+  }
+
+  setBranchFilter(branchId: string): void {
+    this.branchFilter.set(branchId);
   }
 }
