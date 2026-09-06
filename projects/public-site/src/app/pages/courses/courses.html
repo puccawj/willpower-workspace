@@ -8,23 +8,21 @@
     </p>
 
     <div class="filter-bar">
-      <div class="filters">
-        @for (f of statusFilterOptions; track f.key) {
-          <button type="button" class="filter-pill" [class.active]="statusFilter() === f.key" (click)="setStatusFilter(f.key)">
-            {{ f.label }}
-          </button>
-        }
-      </div>
+      <div class="filter-bar-row">
+        <div class="filters">
+          @for (f of statusFilterOptions; track f.key) {
+            <button type="button" class="filter-pill" [class.active]="statusFilter() === f.key" (click)="setStatusFilter(f.key)">
+              {{ f.label }}
+            </button>
+          }
+        </div>
 
-      <div class="filters">
-        <button type="button" class="filter-pill" [class.active]="branchFilter() === 'all'" (click)="setBranchFilter('all')">
-          All branches
-        </button>
-        @for (b of branches(); track b.id) {
-          <button type="button" class="filter-pill" [class.active]="branchFilter() === b.id" (click)="setBranchFilter(b.id)">
-            {{ b.name }}
-          </button>
-        }
+        <select class="branch-select" [value]="branchFilter()" (change)="setBranchFilter($any($event.target).value)">
+          <option value="all">All branches</option>
+          @for (b of branches(); track b.id) {
+            <option [value]="b.id">{{ b.name }}</option>
+          }
+        </select>
       </div>
     </div>
 

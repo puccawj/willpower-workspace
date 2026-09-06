@@ -1,10 +1,5 @@
 .list-page {
   padding: 20px 20px 24px;
-  // Belt-and-braces: .filter-row below bleeds edge-to-edge via a negative margin, then
-  // scrolls its own overflow — but negative-margin bleed inside a scrolling ancestor is a
-  // known spot for WebKit/Blink to widen the ancestor's scrollable area too, which would let
-  // the whole page pan sideways. Clipping here guarantees that can never happen.
-  overflow-x: hidden;
 }
 
 .page-title {
@@ -23,21 +18,20 @@
   top: 0;
   z-index: 3;
   background: var(--w-bg, #f7f6f3);
-  margin: 0 -20px;
-  padding: 4px 20px 0;
+  margin: 0 -20px 18px;
+  padding: 4px 20px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .filter-row {
   display: flex;
   gap: 8px;
   overflow-x: auto;
-  margin: 0 -20px 10px;
+  margin: 0 -20px;
   padding: 0 20px 2px;
   scrollbar-width: none;
-
-  &:last-of-type {
-    margin-bottom: 18px;
-  }
 
   &::-webkit-scrollbar {
     display: none;
@@ -58,6 +52,16 @@
     border-color: var(--w-accent);
     color: #fff;
   }
+}
+
+.branch-select {
+  align-self: flex-start;
+  font: 500 calc(14px * var(--text-scale, 1)) var(--w-font-sans);
+  color: var(--w-muted-2);
+  background: #fff;
+  border: 1px solid var(--w-border);
+  border-radius: 20px;
+  padding: 7px 14px;
 }
 
 .empty-note {

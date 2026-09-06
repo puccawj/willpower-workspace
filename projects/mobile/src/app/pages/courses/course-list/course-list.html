@@ -14,16 +14,12 @@
       }
     </div>
 
-    <div class="filter-row">
-      <button type="button" class="filter-btn" [class.active]="branchFilter() === 'all'" (click)="setBranchFilter('all')">
-        All branches
-      </button>
+    <select class="branch-select" [value]="branchFilter()" (change)="setBranchFilter($any($event.target).value)">
+      <option value="all">All branches</option>
       @for (b of branches(); track b.id) {
-        <button type="button" class="filter-btn" [class.active]="branchFilter() === b.id" (click)="setBranchFilter(b.id)">
-          {{ b.name }}
-        </button>
+        <option [value]="b.id">{{ b.name }}</option>
       }
-    </div>
+    </select>
   </div>
 
   @if (loading()) {
