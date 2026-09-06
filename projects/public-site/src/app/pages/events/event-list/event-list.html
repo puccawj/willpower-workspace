@@ -6,23 +6,25 @@
       Retreats, dhamma talks, and community gatherings across all three branches. Respond to reserve your place.
     </p>
 
-    <div class="filters">
-      @for (f of filterOptions; track f.key) {
-        <button type="button" class="filter-pill" [class.active]="filter() === f.key" (click)="setFilter(f.key)">
-          {{ f.label }}
-        </button>
-      }
-    </div>
+    <div class="filter-bar">
+      <div class="filters">
+        @for (f of filterOptions; track f.key) {
+          <button type="button" class="filter-pill" [class.active]="filter() === f.key" (click)="setFilter(f.key)">
+            {{ f.label }}
+          </button>
+        }
+      </div>
 
-    <div class="filters">
-      <button type="button" class="filter-pill" [class.active]="branchFilter() === 'all'" (click)="setBranchFilter('all')">
-        All branches
-      </button>
-      @for (b of branches(); track b.id) {
-        <button type="button" class="filter-pill" [class.active]="branchFilter() === b.id" (click)="setBranchFilter(b.id)">
-          {{ b.name }}
+      <div class="filters">
+        <button type="button" class="filter-pill" [class.active]="branchFilter() === 'all'" (click)="setBranchFilter('all')">
+          All branches
         </button>
-      }
+        @for (b of branches(); track b.id) {
+          <button type="button" class="filter-pill" [class.active]="branchFilter() === b.id" (click)="setBranchFilter(b.id)">
+            {{ b.name }}
+          </button>
+        }
+      </div>
     </div>
 
     @if (error()) {

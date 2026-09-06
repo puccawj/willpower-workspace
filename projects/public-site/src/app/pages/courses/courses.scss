@@ -11,14 +11,43 @@
   margin: 0 0 34px;
 }
 
+.filter-bar {
+  position: sticky;
+  top: 56px;
+  z-index: 10;
+  background: var(--w-bg, #f7f1e4);
+  padding-top: 12px;
+  margin: 0 0 16px;
+}
+
 .filters {
   display: flex;
   gap: 10px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   flex-wrap: wrap;
 
-  &:last-of-type {
-    margin-bottom: 28px;
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+// Below this width a row of pills (especially the branch names) can be wider than the
+// screen — flex-wrap only breaks *between* pills, not inside one, so a single long pill
+// would otherwise push the whole row past the viewport edge. Scroll it horizontally instead.
+@media (max-width: 640px) {
+  .filters {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    .filter-pill {
+      flex-shrink: 0;
+    }
   }
 }
 
