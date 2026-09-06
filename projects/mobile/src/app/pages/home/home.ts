@@ -75,7 +75,13 @@ export class Home {
     return [...this.publicEvents.events()].sort((a, b) => priority[a.when] - priority[b.when]).slice(0, 10);
   });
 
-  readonly offerings = computed(() => this.offeringCards().slice(0, 10));
+  /** Same "most actionable first" idea as homeEvents — offerings that have already run
+   * (status 'completed') trail behind and render dimmed rather than being hidden. */
+  readonly offerings = computed(() => {
+    return [...this.offeringCards()]
+      .sort((a, b) => Number(a.status === 'completed') - Number(b.status === 'completed') || a.startDate.localeCompare(b.startDate))
+      .slice(0, 10);
+  });
   private readonly offeringCards = signal<PublicCourseOfferingCard[]>([]);
 
   readonly eventRatings = signal<Record<string, RatingSummary>>({});

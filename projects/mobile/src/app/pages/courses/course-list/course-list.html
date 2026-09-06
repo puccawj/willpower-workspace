@@ -13,7 +13,7 @@
     <div class="course-col">
       @for (group of courseGroups(); track group.courseId) {
         @let o = group.offerings[0];
-        <div class="course-card">
+        <div class="course-card" [class.completed]="o.status === 'completed'">
           <a [routerLink]="['/courses', o.courseId]" [queryParams]="{ offering: o.offeringId }" class="course-card-link">
             <div class="course-card-img">
               <img [src]="group.img" alt="" />
@@ -51,6 +51,7 @@
                     [routerLink]="['/courses', alt.courseId]"
                     [queryParams]="{ offering: alt.offeringId }"
                     class="offering-row"
+                    [class.completed]="alt.status === 'completed'"
                   >
                     <span>
                       <span class="offering-branch">{{ alt.branchName }}{{ alt.code ? ' — ' + alt.code : '' }}</span>

@@ -335,6 +335,14 @@ img {
   &:hover {
     transform: translateY(-2px);
   }
+
+  &.completed {
+    opacity: 0.55;
+
+    &:hover {
+      transform: none;
+    }
+  }
 }
 
 .course-card-img {

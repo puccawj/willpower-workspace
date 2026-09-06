@@ -18,6 +18,10 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+
+  &.completed {
+    opacity: 0.55;
+  }
 }
 
 .course-img {
@@ -174,6 +178,10 @@
 
   &:hover {
     background: var(--w-bg);
+  }
+
+  &.completed {
+    opacity: 0.55;
   }
 }
 

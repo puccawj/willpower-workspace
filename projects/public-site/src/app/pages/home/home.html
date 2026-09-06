@@ -111,7 +111,7 @@
       <button type="button" class="row-nav row-nav-prev" (click)="scrollRow(coursesRow, -1)" aria-label="Scroll courses left">‹</button>
       <div class="home-row-scroll text-left" #coursesRow>
       @for (o of homeOfferings(); track o.offeringId) {
-        <a [routerLink]="['/courses', o.courseId]" [queryParams]="{ offering: o.offeringId }" class="course-card">
+        <a [routerLink]="['/courses', o.courseId]" [queryParams]="{ offering: o.offeringId }" class="course-card" [class.completed]="o.status === 'completed'">
           <div class="course-card-img">
             <img [src]="o.img" alt="" />
             <div class="img-ribbon-corner">

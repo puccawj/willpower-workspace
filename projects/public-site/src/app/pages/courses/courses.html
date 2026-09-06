@@ -10,7 +10,7 @@
     <div class="grid-2 g2">
       @for (group of courseGroups(); track group.courseId) {
         @let o = group.offerings[0];
-        <div class="course-card-lg">
+        <div class="course-card-lg" [class.completed]="o.status === 'completed'">
           <div class="course-img">
             <img [src]="group.img" alt="" />
             <div class="img-ribbon-corner">
@@ -68,6 +68,7 @@
                       [routerLink]="['/courses', alt.courseId]"
                       [queryParams]="{ offering: alt.offeringId }"
                       class="offering-row"
+                      [class.completed]="alt.status === 'completed'"
                     >
                       <span>
                         <span class="offering-branch">{{ alt.branchName }}{{ alt.code ? ' — ' + alt.code : '' }}</span>

@@ -392,6 +392,10 @@
   border: 1px solid var(--w-border);
   border-radius: 10px;
   padding: 12px 14px;
+
+  &.completed {
+    opacity: 0.55;
+  }
 }
 
 .course-row-info {
@@ -436,6 +440,10 @@
   border: 1px solid var(--w-border);
   border-radius: 10px;
   overflow: hidden;
+
+  &.completed {
+    opacity: 0.55;
+  }
 }
 
 .course-card-img {

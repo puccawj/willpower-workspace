@@ -133,7 +133,7 @@
   } @else if (view() === 'list') {
     <div class="course-list">
       @for (o of offerings(); track o.offeringId) {
-        <a [routerLink]="['/courses', o.courseId]" [queryParams]="{ offering: o.offeringId }" class="course-row">
+        <a [routerLink]="['/courses', o.courseId]" [queryParams]="{ offering: o.offeringId }" class="course-row" [class.completed]="o.status === 'completed'">
           <div class="course-row-info">
             <div class="course-row-title">{{ o.title }}</div>
             <div class="course-row-meta">
@@ -157,7 +157,7 @@
   } @else {
     <div class="course-scroll">
       @for (o of offerings(); track o.offeringId) {
-        <a [routerLink]="['/courses', o.courseId]" [queryParams]="{ offering: o.offeringId }" class="course-card">
+        <a [routerLink]="['/courses', o.courseId]" [queryParams]="{ offering: o.offeringId }" class="course-card" [class.completed]="o.status === 'completed'">
           <div class="course-card-img">
             <img [src]="o.img" alt="" />
             <div class="img-ribbon-corner">

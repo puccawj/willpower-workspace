@@ -57,7 +57,12 @@ export class CourseList {
       group.offerings.push(o);
     }
     for (const group of byCourse.values()) {
-      group.offerings.sort((a, b) => a.startDate.localeCompare(b.startDate));
+      // Completed offerings trail behind so the card's featured offering (offerings[0]) is
+      // the soonest one still relevant, not a stale finished run — mirrors how events push
+      // "past" ones to the back instead of hiding them.
+      group.offerings.sort(
+        (a, b) => Number(a.status === 'completed') - Number(b.status === 'completed') || a.startDate.localeCompare(b.startDate),
+      );
     }
     return [...byCourse.values()];
   });
