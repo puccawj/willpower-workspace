@@ -2,13 +2,30 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-09-06 (38) — Student Applications: only Approve can be corrected, not Reject
+
+- Refined (37) same day: rejected is meant to be final — the applicant's
+  path back in is submitting a *new* application (already supported),
+  not having an old rejected row flipped. The Approve button now only
+  shows while a branch is `pending`; it no longer appears on a rejected
+  row at all. Reject still shows on both `pending` and `approved` rows,
+  so a mistaken approval can still be corrected.
+- Prompted by a real production case: a user re-applied to the same
+  branch after an earlier rejection, which is allowed (re-applying is
+  only blocked while a branch is *currently granted*) and left two rows
+  for that branch — one rejected, one approved. Rejecting an *approved*
+  row now checks whether another row for that same user+branch is still
+  approved before revoking real access, so correcting a stale/duplicate
+  row can never strip access that a sibling row still justifies (API
+  change, see its CHANGELOG (20)).
+
 ## 2026-09-06 (37) — Let admin change a student application's decision after the fact
 
 - Student Applications: Approve/Reject were one-way — once a branch was
   decided, neither button showed again, with no way to correct a mistake.
-  Both buttons now stay available (whichever doesn't match the current
-  status) and can flip an existing decision, e.g. approve a previously
-  rejected branch, or reject a previously approved one.
+  Reject now stays available after an approval too, to correct a
+  mistaken decision (refined same day by (38) — re-approving a rejected
+  row was removed).
 - Rejecting a previously-approved branch now warns in the confirm dialog
   that it reverses the approval (loses branch access, and the student
   role too if it was their only branch) — see the matching API change.

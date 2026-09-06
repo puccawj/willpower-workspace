@@ -36,7 +36,7 @@
                   @if (a.status !== 'rejected') {
                     <button type="button" class="btn btn-outline btn-sm" (click)="reject(a)">Reject</button>
                   }
-                  @if (a.status !== 'approved') {
+                  @if (a.status === 'pending') {
                     <button type="button" class="btn btn-solid btn-sm" (click)="approve(a)">Approve</button>
                   }
                 </div>
@@ -68,7 +68,7 @@
               @if (a.status !== 'rejected') {
                 <button type="button" class="btn btn-outline btn-sm" (click)="reject(a)">Reject</button>
               }
-              @if (a.status !== 'approved') {
+              @if (a.status === 'pending') {
                 <button type="button" class="btn btn-solid btn-sm" (click)="approve(a)">Approve</button>
               }
             </div>
