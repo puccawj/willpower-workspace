@@ -41,16 +41,12 @@
 
 .stats {
   display: flex;
+  flex-wrap: wrap;
   gap: 16px;
   padding: 14px 0;
   border-top: 1px solid var(--w-border);
   border-bottom: 1px solid var(--w-border);
   margin-bottom: 14px;
-
-  .stat:last-child {
-    flex: 1;
-    min-width: 0;
-  }
 }
 
 .stat-label {
