@@ -2,6 +2,63 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-09-06 (37) — Let admin change a student application's decision after the fact
+
+- Student Applications: Approve/Reject were one-way — once a branch was
+  decided, neither button showed again, with no way to correct a mistake.
+  Both buttons now stay available (whichever doesn't match the current
+  status) and can flip an existing decision, e.g. approve a previously
+  rejected branch, or reject a previously approved one.
+- Rejecting a previously-approved branch now warns in the confirm dialog
+  that it reverses the approval (loses branch access, and the student
+  role too if it was their only branch) — see the matching API change.
+
+## 2026-09-06 (36) — Switch branch filter to a dropdown; fix sticky filter bar broken by (35)
+
+- Events/Courses list branch filter changed from a row of pill buttons to
+  a native `<select>` dropdown (both platforms) — removes the overflow
+  risk from long branch names entirely instead of just working around it.
+- Root-caused why the sticky filter bar from (35) wasn't sticking on the
+  mobile app: the `overflow-x: hidden` added as an overflow guard has a
+  CSS side effect — setting overflow non-visible on one axis forces the
+  other axis to compute as `auto`, turning that container into a scroll
+  container in its own right. That made it the *nearest* scrolling
+  ancestor for the sticky filter bar instead of the real one
+  (`.tab-content`), and since the guarded container's height is
+  intrinsic (it never actually scrolls), the bar never stuck. Removed
+  now that branch pills are gone and no longer need the guard.
+- Also corrected public-site's sticky `top` offset to better match the
+  site header's actual rendered height.
+
+## 2026-09-06 (35) — Add branch filter to Events/Courses lists, and status filter to Courses
+
+- Events and Courses list pages (public-site + mobile) gained a branch
+  filter (All branches / per-branch) alongside the existing filters.
+  Courses also gained a status filter: All / Open for enrollment /
+  Completed, backed by the offering's existing `isOpenForEnrollment`/
+  `status` fields.
+- Required adding `branchId` to `PublicCourseOfferingCard` — the API
+  already returned it but the frontend mapping had been dropping it.
+- Made the whole filter block sticky while the list scrolls (see (36)
+  for a bug this introduced and fixed same day).
+
+## 2026-09-06 (34) — Fix mobile event-detail Location column overflow under long addresses
+
+- The Date/Time/Location stats row on the mobile app's event-detail page
+  forced Location into a `flex:1` column squeezed alongside the other
+  two, so long location text (e.g. a full venue address) wrapped into
+  many narrow lines instead of dropping to its own row.
+- Switched the row to `flex-wrap` instead, matching the pattern the
+  desktop site's event-detail page already used.
+
+## 2026-09-06 (33) — Dim completed course offerings and sort them behind upcoming
+
+- Home page course row and the full Courses list (public-site + mobile):
+  offerings whose status is `completed` now sort behind active ones
+  (soonest-first within each group) and render at reduced opacity,
+  mirroring the existing "past" treatment for events instead of being
+  mixed in or shown first.
+
 ## 2026-09-03 (32) — Fix prereq-pill spacing and a lock-icon CSS bug from (31)
 
 - The "✓ Ready to enroll" pill had no bottom margin, so on Home it sat
