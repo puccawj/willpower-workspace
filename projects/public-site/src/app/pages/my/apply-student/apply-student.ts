@@ -19,6 +19,7 @@ export class ApplyStudent {
 
   readonly isGeneral = () => this.auth.currentUser()?.role === 'general';
   readonly isStudent = () => this.auth.currentUser()?.role === 'student';
+  readonly isEligible = () => this.isGeneral() || this.isStudent();
 
   readonly loading = signal(true);
   readonly profile = signal<MyProfile | null>(null);
@@ -28,12 +29,20 @@ export class ApplyStudent {
   readonly submitting = signal(false);
   readonly error = signal('');
 
-  /** Show the apply form again once every branch on the latest application has a decision —
-   * either there's never been one, or every branch was rejected (a still-pending branch means
-   * there's nothing new to submit until that admin decides). */
+  /** Branches the account isn't registered at yet — a student adding a branch must only be
+   * offered ones they don't already belong to; a general account (no branches yet) sees all. */
+  readonly availableBranches = computed(() => {
+    const registeredIds = new Set((this.profile()?.branches ?? []).map((b) => b.branchId));
+    return this.branches().filter((b) => !registeredIds.has(b.id));
+  });
+
+  /** Show the apply form again once the latest application has no branch still awaiting a
+   * decision — either there's never been one, or every branch on it was approved/rejected.
+   * A student adding another branch always starts from this state, since by definition their
+   * previous application was already decided (that's how they became a student). */
   readonly canApply = computed(() => {
     const app = this.application();
-    return !app || app.branches.every((b) => b.status === 'rejected');
+    return !app || !app.branches.some((b) => b.status === 'pending');
   });
 
   constructor() {

@@ -16,6 +16,8 @@
       <a routerLink="/my/donations" routerLinkActive="active">Donations</a>
       @if (auth.currentUser()?.role === 'general') {
         <a routerLink="/my/apply-student" routerLinkActive="active">Become a Student</a>
+      } @else if (auth.currentUser()?.role === 'student') {
+        <a routerLink="/my/apply-student" routerLinkActive="active">Register at Another Branch</a>
       }
     </nav>
 

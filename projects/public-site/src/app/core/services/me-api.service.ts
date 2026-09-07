@@ -126,6 +126,11 @@ export interface UpdateStudentApplicationRequest {
   photoUrl?: string;
 }
 
+export interface MyProfileBranch {
+  branchId: string;
+  branchName: string;
+}
+
 export interface MyProfile {
   id: string;
   firstName: string;
@@ -139,6 +144,7 @@ export interface MyProfile {
   role: string;
   initials: string;
   registrationSource: string;
+  branches: MyProfileBranch[];
 }
 
 export interface UpdateMyProfileRequest {

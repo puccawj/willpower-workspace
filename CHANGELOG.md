@@ -2,6 +2,29 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-09-07 (44) — Restore "register at another branch" for public-site students
+
+- On public-site, My Account's nav only ever showed the "Become a Student" tab for
+  `role === 'general'`, so it silently vanished the moment an account became a
+  `student` (approved for its first branch) — with no way back to apply for a
+  second branch. Mobile's Profile menu already handled this correctly (a `student`
+  sees "Register at another branch" instead of the tab disappearing); public-site's
+  `my-shell.html` never got the equivalent fix when multi-branch applications
+  shipped ((37)/(38)).
+- Added the missing `role === 'student'` branch to `my-shell.html`'s nav.
+- The `apply-student` page itself was also stuck on the old single-branch logic
+  (`isStudent()` always short-circuited to a dead-end "you're already a student"
+  message, and the branch picker listed every branch, not just unregistered ones).
+  Ported mobile's already-correct `apply-student.ts`/`.html` logic: `isEligible()` =
+  general or student, `availableBranches()` filters out branches the account is
+  already registered at, `canApply()` keyed off any branch still pending (not
+  "every branch rejected"). Also added the missing `branches: MyProfileBranch[]`
+  field to public-site's `MyProfile` interface (`me-api.service.ts`) — the backend
+  already returned it; only the TS type and this filtering ever used it.
+- Verified end-to-end against the local API/DB logged in as `member.demo@willpower.org`
+  (a `student`, US branch): nav now shows "Register at Another Branch", and the page
+  correctly offers only Canada/Australia/QA branches (US excluded).
+
 ## 2026-09-07 (43) — Actually fix the site header's sticky positioning
 
 - (42) worked around the site header's broken `position: sticky` by pinning the

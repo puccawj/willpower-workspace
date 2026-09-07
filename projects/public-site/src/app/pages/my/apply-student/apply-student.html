@@ -1,16 +1,12 @@
 <div class="apply-wrap">
-  <div class="eyebrow">Become a student</div>
-  <h2 class="section-title">Apply to become a student</h2>
+  <div class="eyebrow">{{ isStudent() ? 'Register at another branch' : 'Become a student' }}</div>
+  <h2 class="section-title">{{ isStudent() ? 'Register at another branch' : 'Apply to become a student' }}</h2>
 
   @if (loading()) {
     <p class="muted-label">Loading…</p>
-  } @else if (isStudent()) {
-    <div class="status-card status-approved">
-      <p>You're already a student — you can enroll in courses directly from any course page.</p>
-    </div>
-  } @else if (!isGeneral()) {
+  } @else if (!isEligible()) {
     <div class="status-card">
-      <p>This form is only available to general member accounts.</p>
+      <p>This form is only available to general and student accounts.</p>
     </div>
   } @else if (application(); as app) {
     @if (app.branches.length) {
@@ -35,7 +31,11 @@
     }
   }
 
-  @if (isGeneral() && canApply()) {
+  @if (isEligible() && canApply() && availableBranches().length === 0) {
+    <div class="status-card status-approved">
+      <p>You're already registered at every branch.</p>
+    </div>
+  } @else if (isEligible() && canApply()) {
     <form class="apply-form" (submit)="$event.preventDefault(); submit()">
       <p class="apply-note">
         Uses your name, nickname, phone, LINE ID, and photo from your account profile —
@@ -73,9 +73,11 @@
       }
 
       <div class="field-inline">
-        <label class="muted-label">Which branch(es) do you want to attend?</label>
+        <label class="muted-label">
+          {{ isStudent() ? 'Which additional branch(es) do you want to attend?' : 'Which branch(es) do you want to attend?' }}
+        </label>
         <div class="branch-picker">
-          @for (b of branches(); track b.id) {
+          @for (b of availableBranches(); track b.id) {
             <label class="branch-checkbox">
               <input
                 type="checkbox"
