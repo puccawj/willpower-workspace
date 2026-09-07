@@ -2,6 +2,23 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-09-07 (42) — Pin the sticky filter bar flush to the real top
+
+- (41) calibrated the filter bar's sticky offset (`top: 68px`) to sit directly under
+  the site header, on the assumption the header (`position: sticky; top: 0`) stays
+  pinned while scrolling. Investigating a follow-up report that it still looked
+  wrong found the header isn't actually sticky in practice: `<app-header>` wraps
+  only the header element with no extra height, so its containing block is exactly
+  the header's own size — a well-known CSS sticky pitfall where the element has no
+  room to "travel" and just scrolls away with the page like static content.
+- Rather than fix the header's sticky bug (out of scope here), changed
+  `.filter-bar`'s `top` from `68px` to `0` in both `courses.scss` and
+  `event-list.scss` (public-site) so it pins flush to the actual viewport top once
+  the header has scrolled past — matching the flush-top look mobile's equivalent
+  filter bar (`top: 0`) already had.
+- Verified visually: filter bar now sits flush at the very top on scroll on both
+  Courses and Events, no dead gap above it.
+
 ## 2026-09-07 (41) — Give the sticky filter bar clear visual separation on scroll
 
 - On Courses and Events (public-site), the sticky filter bar ("All / Open for
