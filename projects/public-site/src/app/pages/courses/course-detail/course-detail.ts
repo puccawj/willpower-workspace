@@ -45,6 +45,11 @@ export class CourseDetail {
   readonly isLoggedIn = this.auth.isLoggedIn;
   readonly isStudent = computed(() => this.auth.currentUser()?.role === 'student');
 
+  /** Branches the current student is actually registered at — the Enroll button only ever shows
+   * for offerings run by one of these; the API rejects a mismatch too, this just avoids the
+   * dead-end of confirming an enrollment that's guaranteed to fail. */
+  readonly myBranchIds = signal<Set<string>>(new Set());
+
   private readonly id = toSignal(this.route.paramMap.pipe(map((params) => params.get('id') ?? '')), {
     initialValue: '',
   });
@@ -105,6 +110,10 @@ export class CourseDetail {
 
   enrollErrorFor(offeringId: string): string {
     return this.enrollErrors().get(offeringId) ?? '';
+  }
+
+  canEnrollAtBranch(branchId: string): boolean {
+    return this.myBranchIds().has(branchId);
   }
 
   /** Whether the current student already has a completed enrollment in every prerequisite course, by title. */
@@ -348,6 +357,10 @@ export class CourseDetail {
   }
 
   constructor() {
+    if (this.auth.isLoggedIn() && this.isStudent()) {
+      this.meApi.getProfile().subscribe((p) => this.myBranchIds.set(new Set(p.branches.map((b) => b.branchId))));
+    }
+
     effect(() => {
       const id = this.id();
       this.offerings.set([]);

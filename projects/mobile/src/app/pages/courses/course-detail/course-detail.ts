@@ -59,6 +59,15 @@ export class CourseDetail {
   readonly isLoggedIn = this.auth.isLoggedIn;
   readonly isStudent = computed(() => this.auth.currentUser()?.role === 'student');
 
+  /** Branches the current student is actually registered at — the Enroll button only ever shows
+   * for offerings run by one of these; the API rejects a mismatch too, this just avoids the
+   * dead-end of confirming an enrollment that's guaranteed to fail. */
+  readonly myBranchIds = signal<Set<string>>(new Set());
+
+  canEnrollAtBranch(branchId: string): boolean {
+    return this.myBranchIds().has(branchId);
+  }
+
   /** Only the offering the visitor arrived to view, if any — otherwise every open offering. */
   readonly visibleOfferings = computed(() => {
     const target = this.targetOfferingId;
@@ -265,6 +274,10 @@ export class CourseDetail {
   }
 
   constructor() {
+    if (this.auth.isLoggedIn() && this.isStudent()) {
+      this.meApi.getProfile().subscribe((p) => this.myBranchIds.set(new Set(p.branches.map((b) => b.branchId))));
+    }
+
     const targetOfferingId = this.targetOfferingId;
     if (targetOfferingId) this.expandedOfferingId.set(targetOfferingId);
 

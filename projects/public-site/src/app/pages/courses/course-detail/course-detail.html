@@ -78,6 +78,8 @@
                           <span class="muted-label">Enrolled ✓</span>
                         } @else if (o.status === 'completed') {
                           <span class="muted-label">Completed</span>
+                        } @else if (!canEnrollAtBranch(o.branchId)) {
+                          <span class="muted-label" title="You're not registered at this branch">Not your branch</span>
                         } @else if (o.isOpenForEnrollment) {
                           <button
                             type="button"

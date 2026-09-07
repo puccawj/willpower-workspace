@@ -2,6 +2,20 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-09-07 (46) — Hide the Enroll button for offerings outside the student's branch(es)
+
+- Paired frontend half of the API fix (backend CHANGELOG (21)): even with the API now
+  rejecting a cross-branch self-enroll, the course-detail page's Enroll button still showed
+  as clickable for every branch's offerings, so a student would see the confirm dialog and
+  only find out it fails after confirming.
+- Both `course-detail.ts` (public-site and mobile) now load the current student's registered
+  branches once (`MeApiService.getProfile().branches`) and gate the Enroll button on it: a
+  registered branch shows Enroll as before; any other branch now shows a muted "Not your
+  branch" label instead, matching the existing "Completed"/"Full" states.
+- Verified end-to-end against the local API/DB logged in as the US-only demo student
+  (`member.demo@willpower.org`): opening an Australia offering's card now shows "Not your
+  branch" with no Enroll button, confirmed via screenshot.
+
 ## 2026-09-07 (45) — Add a sort toggle to Manage Events and Manage Course
 
 - Both admin-panel lists had one fixed sort order — Events by `startAt` ascending,
