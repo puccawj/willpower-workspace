@@ -2,6 +2,19 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-09-07 (41) — Give the sticky filter bar clear visual separation on scroll
+
+- On Courses and Events (public-site), the sticky filter bar ("All / Open for
+  enrollment / Completed / branch") sits `top: 68px` right under the sticky header —
+  correctly calibrated (header renders at 67px), but with a flat background and no
+  edge, it read as awkwardly cutting into card images mid-scroll rather than sitting
+  on top of them.
+- Added a `border-bottom` + soft downward `box-shadow` and more generous
+  padding/margin to `.filter-bar` in both `courses.scss` and `event-list.scss`, so the
+  bar now has a clear "elevated" edge separating it from the content scrolling
+  beneath it.
+- Verified visually at multiple scroll positions on both pages.
+
 ## 2026-09-07 (40) — Give the branch pill its own line so long names don't get clipped
 
 - (39) put the branch pill beside a date/status/level tag on every card — fine for a
