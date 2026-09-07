@@ -37,10 +37,12 @@
             </div>
           </div>
           <div class="course-body">
+            <div class="branch-pill-row">
+              <span [class]="'branch-pill ' + branchClass(o.branchId)">{{ o.branchName }}</span>
+            </div>
             <div class="course-tags">
               <span class="eyebrow small inline">{{ group.level }}</span>
               <span class="course-format">· {{ o.format }}</span>
-              <span [class]="'branch-pill course-branch-pill ' + branchClass(o.branchId)">{{ o.branchName }}</span>
             </div>
             <h3 class="course-title-lg">
               <a [routerLink]="['/courses', o.courseId]" [queryParams]="{ offering: o.offeringId }" class="course-title-link">{{ group.title }}</a>

@@ -36,9 +36,11 @@
         <a [routerLink]="['/events', ev.id]" class="event-card event-card-lg">
           <div class="event-card-img"><img [src]="ev.img" alt="" /></div>
           <div class="event-card-body">
+            <div class="branch-pill-row">
+              <span [class]="'branch-pill ' + branchClass(ev.branchId)">{{ ev.branch }}</span>
+            </div>
             <div class="event-card-meta">
               <div class="event-date"><div class="event-day">{{ ev.day }}</div><div class="event-mon">{{ ev.mon }}</div></div>
-              <span [class]="'branch-pill ' + branchClass(ev.branchId)">{{ ev.branch }}</span>
               @if (ev.when === 'live') {
                 <span class="live-pill">Live</span>
               }

@@ -2,6 +2,17 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-09-07 (40) — Give the branch pill its own line so long names don't get clipped
+
+- (39) put the branch pill beside a date/status/level tag on every card — fine for a
+  short name, but the pill's own `max-width`/ellipsis clipped anything longer (visibly
+  cut off on a QA test branch's long auto-generated name, e.g. "QA TEST BRANCH…").
+- The branch pill now gets a dedicated row of its own (`.branch-pill-row`, shared
+  globally) above the rest of a card's tags, on every Home/Events/Courses card on both
+  platforms — full branch name always shows, nothing shares its width.
+- Verified visually (screenshots): the previously-clipped QA test branch name now
+  renders in full on its own line.
+
 ## 2026-09-07 (39) — Color-code branch pills on Home/Events/Courses cards
 
 - The branch label on event/course cards was a single generic color for

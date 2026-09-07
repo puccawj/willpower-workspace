@@ -157,6 +157,16 @@ img {
   }
 }
 
+// Give the branch pill its own row instead of squeezing it in beside a date/status/level
+// tag — sharing a row left long branch names clipped by the pill's own max-width/ellipsis.
+.branch-pill-row {
+  margin-bottom: 8px;
+
+  .branch-pill {
+    max-width: 100%;
+  }
+}
+
 .live-pill,
 .upcoming-pill {
   flex-shrink: 0;

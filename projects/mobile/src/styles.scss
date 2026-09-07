@@ -136,6 +136,12 @@ img {
   }
 }
 
+// Give the branch pill its own row instead of squeezing it in beside a date/status/level
+// tag — sharing a row left long branch names clipped by the pill's own max-width/ellipsis.
+.branch-pill-row {
+  margin-bottom: 6px;
+}
+
 // Native QR scan (@capacitor-mlkit/barcode-scanning): the camera preview renders behind
 // the WebView, so the page must go transparent for it to show through. The scan page's own
 // root re-asserts visibility so its corner-bracket overlay still renders on top.
