@@ -2,6 +2,23 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-09-07 (43) — Actually fix the site header's sticky positioning
+
+- (42) worked around the site header's broken `position: sticky` by pinning the
+  filter bar to the real viewport top instead. Root-caused the header bug itself:
+  `<app-header>` (a custom element wrapping only `.site-header`) collapsed to
+  exactly the header's own height, leaving `position: sticky` no room in its
+  containing block to ever engage — it silently behaved like static content.
+- Fixed with `:host { display: contents; }` on the header component, so
+  `<app-header>` no longer renders its own box and `.site-header` becomes a real
+  flex child of `.app-shell` (which has actual scrollable height to travel within).
+  The header now correctly stays pinned to the top while scrolling.
+- Reverted the filter bar's sticky offset from (42) back to `top: 68px` on both
+  Courses and Events, so it once again sits directly under the (now genuinely
+  sticky) header instead of underneath it.
+- Verified visually: header and filter bar both stay pinned together at the top
+  through a full scroll on both pages.
+
 ## 2026-09-07 (42) — Pin the sticky filter bar flush to the real top
 
 - (41) calibrated the filter bar's sticky offset (`top: 68px`) to sit directly under

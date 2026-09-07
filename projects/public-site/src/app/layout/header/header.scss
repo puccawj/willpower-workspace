@@ -1,3 +1,10 @@
+// Without this, <app-header>'s own box is exactly the height of its one child
+// (.site-header), leaving position: sticky no room to travel within its containing
+// block — it silently never engages and just scrolls away like static content.
+:host {
+  display: contents;
+}
+
 .site-header {
   position: sticky;
   top: 0;
