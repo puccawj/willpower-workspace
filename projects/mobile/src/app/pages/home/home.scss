@@ -356,10 +356,17 @@
   padding: 10px;
 }
 
+.event-card-tags {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 3px;
+}
+
 .event-card-date {
   font: 600 calc(10.5px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-accent);
-  margin-bottom: 3px;
 }
 
 .event-card-title {
@@ -512,10 +519,17 @@
   padding: 12px 14px;
 }
 
+.course-card-tags {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 5px;
+}
+
 .course-level {
   font: 400 calc(11.5px * var(--text-scale, 1)) var(--w-font-sans);
   color: var(--w-muted-2);
-  margin-bottom: 5px;
 }
 
 .course-title {

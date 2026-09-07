@@ -38,7 +38,7 @@
           <div class="event-card-body">
             <div class="event-card-meta">
               <div class="event-date"><div class="event-day">{{ ev.day }}</div><div class="event-mon">{{ ev.mon }}</div></div>
-              <span class="branch-pill">{{ ev.branch }}</span>
+              <span [class]="'branch-pill ' + branchClass(ev.branchId)">{{ ev.branch }}</span>
               @if (ev.when === 'live') {
                 <span class="live-pill">Live</span>
               }

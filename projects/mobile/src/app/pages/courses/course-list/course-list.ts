@@ -7,6 +7,7 @@ import { MeApiService } from '../../../core/services/me-api.service';
 import { PublicCourseApiService, PublicCourseOfferingCard } from '../../../core/services/public-course-api.service';
 import { PullToRefreshService } from '../../../core/services/pull-to-refresh.service';
 import { RatingApiService, RatingSummary } from '../../../core/services/rating-api.service';
+import { branchColorClass } from '../../../core/branch-color.util';
 
 type StatusFilterKey = 'all' | 'open' | 'completed';
 const ALL_BRANCHES = 'all';
@@ -37,6 +38,7 @@ export class CourseList {
   readonly loading = signal(false);
   readonly offerings = signal<PublicCourseOfferingCard[]>([]);
   readonly ratings = signal<Record<string, RatingSummary>>({});
+  readonly branchClass = branchColorClass;
 
   readonly statusFilterOptions: { key: StatusFilterKey; label: string }[] = [
     { key: 'all', label: 'All' },

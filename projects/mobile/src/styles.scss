@@ -103,6 +103,39 @@ img {
   }
 }
 
+.branch-pill {
+  font: 600 calc(11.5px * var(--text-scale, 1)) var(--w-font-sans);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--w-green);
+  background: rgba(124, 144, 104, 0.1);
+  border: 1px solid rgba(124, 144, 104, 0.4);
+  padding: 3px 8px;
+  border-radius: 20px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+
+  // Color-coded per branch so a grid of cards reads as "which branch" at a glance —
+  // mirrors public-site's same treatment. branch-other keeps the original neutral look.
+  &.branch-us {
+    color: #2f5f8a;
+    background: rgba(47, 95, 138, 0.1);
+    border-color: rgba(47, 95, 138, 0.4);
+  }
+  &.branch-ca {
+    color: #b23b3b;
+    background: rgba(178, 59, 59, 0.1);
+    border-color: rgba(178, 59, 59, 0.4);
+  }
+  &.branch-au {
+    color: #3f7d4f;
+    background: rgba(63, 125, 79, 0.1);
+    border-color: rgba(63, 125, 79, 0.4);
+  }
+}
+
 // Native QR scan (@capacitor-mlkit/barcode-scanning): the camera preview renders behind
 // the WebView, so the page must go transparent for it to show through. The scan page's own
 // root re-asserts visibility so its corner-bracket overlay still renders on top.

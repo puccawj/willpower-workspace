@@ -70,7 +70,7 @@
           <div class="event-card-body">
             <div class="event-card-meta">
               <div class="event-date"><div class="event-day">{{ ev.day }}</div><div class="event-mon">{{ ev.mon }}</div></div>
-              <span class="branch-pill">{{ ev.branch }}</span>
+              <span [class]="'branch-pill ' + branchClass(ev.branchId)">{{ ev.branch }}</span>
               @if (ev.when === 'live') {
                 <span class="live-pill">Live</span>
               } @else if (ev.when === 'upcoming') {
@@ -119,7 +119,10 @@
             </div>
           </div>
           <div class="course-card-body">
-            <div class="eyebrow small">{{ o.level }}</div>
+            <div class="course-card-tags">
+              <div class="eyebrow small">{{ o.level }}</div>
+              <span [class]="'branch-pill ' + branchClass(o.branchId)">{{ o.branchName }}</span>
+            </div>
             <h3 class="course-title">{{ o.title }}</h3>
             @if (offeringRatingFor(o.offeringId).count) {
               <div class="home-rating">

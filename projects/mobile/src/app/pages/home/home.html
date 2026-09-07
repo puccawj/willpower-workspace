@@ -85,7 +85,8 @@
               }
             </div>
             <div class="event-meta">
-              {{ e.branch }} · {{ e.time }}
+              <span [class]="'branch-pill ' + branchClass(e.branchId)">{{ e.branch }}</span>
+              · {{ e.time }}
               @if (eventRatingFor(e.id).count) {
                 · ★ {{ eventRatingFor(e.id).average }} ({{ eventRatingFor(e.id).count }})
               }
@@ -107,7 +108,10 @@
             }
           </div>
           <div class="event-card-body">
-            <div class="event-card-date">{{ e.mon }} {{ e.day }}</div>
+            <div class="event-card-tags">
+              <div class="event-card-date">{{ e.mon }} {{ e.day }}</div>
+              <span [class]="'branch-pill ' + branchClass(e.branchId)">{{ e.branch }}</span>
+            </div>
             <div class="event-card-title">{{ e.title }}</div>
             @if (eventRatingFor(e.id).count) {
               <div class="home-rating">
@@ -137,7 +141,8 @@
           <div class="course-row-info">
             <div class="course-row-title">{{ o.title }}</div>
             <div class="course-row-meta">
-              {{ o.branchName }} · {{ o.format }} · {{ o.shortStartDate }}
+              <span [class]="'branch-pill ' + branchClass(o.branchId)">{{ o.branchName }}</span>
+              · {{ o.format }} · {{ o.shortStartDate }}
               @if (offeringRatingFor(o.offeringId).count) {
                 · ★ {{ offeringRatingFor(o.offeringId).average }} ({{ offeringRatingFor(o.offeringId).count }})
               }
@@ -178,7 +183,10 @@
             </div>
           </div>
           <div class="course-card-body">
-            <div class="course-level">{{ o.branchName }} · {{ o.format }}</div>
+            <div class="course-card-tags">
+              <div class="course-level">{{ o.format }}</div>
+              <span [class]="'branch-pill ' + branchClass(o.branchId)">{{ o.branchName }}</span>
+            </div>
             <div class="course-title">{{ o.title }}</div>
             @if (offeringRatingFor(o.offeringId).count) {
               <div class="home-rating">

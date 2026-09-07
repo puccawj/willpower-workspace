@@ -9,6 +9,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { MeApiService } from '../../core/services/me-api.service';
 import { SiteContentApiService } from '../../core/services/site-content-api.service';
 import { ImageViewerService } from '../../core/services/image-viewer.service';
+import { branchColorClass } from '../../core/branch-color.util';
 
 const AUTO_ADVANCE_MS = 6000;
 const SWIPE_THRESHOLD_PX = 40;
@@ -68,6 +69,7 @@ export class Home implements OnDestroy {
     const completed = this.completedCourseTitles();
     return required.every((t) => completed.has(t));
   }
+  readonly branchClass = branchColorClass;
   readonly hero = signal<HomeHeroContent>({ ...DEFAULT_HERO });
   readonly banners = this.bannerApi.banners;
   readonly activeSlide = signal(0);

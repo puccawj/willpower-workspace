@@ -39,7 +39,10 @@
               </div>
             </div>
             <div class="course-card-body">
-              <div class="course-level">{{ o.branchName }}{{ o.code ? ' — ' + o.code : '' }} · {{ o.format }}</div>
+              <div class="course-card-tags">
+                <div class="course-level">{{ o.code ? o.code + ' · ' : '' }}{{ o.format }}</div>
+                <span [class]="'branch-pill ' + branchClass(o.branchId)">{{ o.branchName }}</span>
+              </div>
               <div class="course-title">{{ group.title }}</div>
               <div class="course-open">
                 {{ o.shortStartDate }} · {{ o.open }}

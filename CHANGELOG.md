@@ -2,6 +2,25 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-09-07 (39) — Color-code branch pills on Home/Events/Courses cards
+
+- The branch label on event/course cards was a single generic color for
+  every branch, so a grid of cards required actually reading each pill's
+  text to tell which branch it belonged to. Home's course cards didn't
+  even show a branch pill at all.
+- Added a shared `branchColorClass()` helper (public-site and mobile) that
+  maps each real branch to its own color — United States blue, Canada
+  red, Australia green — with any other/unrecognized branch (a newly
+  added one, or a QA test branch) keeping the original neutral style as a
+  safe fallback.
+- Applied to every card list that shows a branch: Home (event cards +
+  course cards, both platforms), the Events page, and the Courses page.
+  Mobile's Home course *card* view (as opposed to list view) also had no
+  branch indicator before this — added one there too.
+- Verified visually (screenshots) on public-site: Home, Events, and
+  Courses all show correctly color-coded pills, with unrecognized
+  branches falling back cleanly.
+
 ## 2026-09-06 (38) — Student Applications: only Approve can be corrected, not Reject
 
 - Refined (37) same day: rejected is meant to be final — the applicant's

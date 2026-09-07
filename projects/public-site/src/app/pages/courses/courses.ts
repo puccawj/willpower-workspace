@@ -9,6 +9,7 @@ import { BranchApiService } from '../../core/services/branch-api.service';
 import { RatingApiService, RatingSummary } from '../../core/services/rating-api.service';
 import { AuthService } from '../../core/services/auth.service';
 import { MeApiService } from '../../core/services/me-api.service';
+import { branchColorClass } from '../../core/branch-color.util';
 
 type StatusFilterKey = 'all' | 'open' | 'completed';
 const ALL_BRANCHES = 'all';
@@ -71,6 +72,7 @@ export class Courses {
     const completed = this.completedCourseTitles();
     return required.every((t) => completed.has(t));
   }
+  readonly branchClass = branchColorClass;
 
   readonly ratings = signal<Record<string, RatingSummary>>({});
 

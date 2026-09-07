@@ -5,6 +5,7 @@ import { PublicEventApiService } from '../../../core/services/public-event-api.s
 import { BranchApiService, PublicBranch } from '../../../core/services/branch-api.service';
 import { PullToRefreshService } from '../../../core/services/pull-to-refresh.service';
 import { RatingApiService, RatingSummary } from '../../../core/services/rating-api.service';
+import { branchColorClass } from '../../../core/branch-color.util';
 
 type FilterKey = 'upcoming' | 'live' | 'past' | 'all';
 const ALL_BRANCHES = 'all';
@@ -42,6 +43,7 @@ export class EventList {
   });
 
   readonly ratings = signal<Record<string, RatingSummary>>({});
+  readonly branchClass = branchColorClass;
 
   ratingFor(eventId: string): RatingSummary {
     return this.ratings()[eventId] ?? { average: 0, count: 0 };

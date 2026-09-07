@@ -13,6 +13,7 @@ import { PublicCourseApiService, PublicCourseOfferingCard } from '../../core/ser
 import { PullToRefreshService } from '../../core/services/pull-to-refresh.service';
 import { RatingApiService, RatingSummary } from '../../core/services/rating-api.service';
 import { ImageViewerService } from '../../core/services/image-viewer.service';
+import { branchColorClass } from '../../core/branch-color.util';
 
 const AUTO_ADVANCE_MS = 6000;
 const SWIPE_THRESHOLD_PX = 40;
@@ -66,6 +67,7 @@ export class Home {
     const completed = this.completedCourseTitles();
     return required.every((t) => completed.has(t));
   }
+  readonly branchClass = branchColorClass;
 
   /** Every event — upcoming and live shown first (most actionable), past events trail behind
    * and are rendered dimmed rather than hidden, so this doubles as a lightweight history view.
