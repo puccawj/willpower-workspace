@@ -162,8 +162,15 @@ img {
 .branch-pill-row {
   margin-bottom: 8px;
 
+  // Override the base pill's single-line nowrap/ellipsis/140px cap — on its own row there's no
+  // sibling tag to protect, so let a long branch name wrap onto a second line instead of
+  // clipping (some branch names, especially QA/test ones, exceed a single line's width).
   .branch-pill {
+    display: inline-block;
     max-width: 100%;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
   }
 }
 

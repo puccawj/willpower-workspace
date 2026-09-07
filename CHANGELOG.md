@@ -2,6 +2,15 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-09-07 (47) — Let long branch names wrap instead of clipping
+
+- (40) gave the branch pill its own row so it no longer shared width with a sibling tag, but the
+  pill itself still forced `white-space: nowrap` + `text-overflow: ellipsis` (plus a 140px cap on
+  public-site), so a name long enough to exceed even a full row's width — reported on mobile's
+  Home screen — still got clipped.
+- Since the pill has no sibling to protect on its own row, overrode it to wrap instead: `.branch-pill-row .branch-pill` now allows normal wrapping (`white-space: normal`, `overflow: visible`) so a long name flows onto a second line inside the pill's rounded shape rather than being cut off. Applied to both public-site and mobile's global styles.
+- Verified visually: a long branch name now wraps cleanly onto two lines and displays in full.
+
 ## 2026-09-07 (46) — Hide the Enroll button for offerings outside the student's branch(es)
 
 - Paired frontend half of the API fix (backend CHANGELOG (21)): even with the API now

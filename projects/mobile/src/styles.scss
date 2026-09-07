@@ -140,6 +140,17 @@ img {
 // tag — sharing a row left long branch names clipped by the pill's own max-width/ellipsis.
 .branch-pill-row {
   margin-bottom: 6px;
+
+  // The base pill still forces a single line via nowrap/ellipsis, which on its own row just
+  // clips instead of truncating gracefully — long branch names (QA/test ones especially) need
+  // to wrap onto a second line since there's no sibling tag left to protect from being crowded.
+  .branch-pill {
+    display: inline-block;
+    max-width: 100%;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+  }
 }
 
 // Native QR scan (@capacitor-mlkit/barcode-scanning): the camera preview renders behind
