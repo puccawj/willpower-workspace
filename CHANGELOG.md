@@ -2,6 +2,27 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-09-07 (45) — Add a sort toggle to Manage Events and Manage Course
+
+- Both admin-panel lists had one fixed sort order — Events by `startAt` ascending,
+  Courses alphabetically by title — with no way to see recently-added rows
+  together. Reported as: after creating a new event or course, it lands wherever
+  its date/title happens to sort, so it's genuinely hard to find right after
+  creating it.
+- Added a second `<app-filter-tabs>` toggle next to each page's existing
+  filter/toolbar: Events gets "Upcoming first" (unchanged default) / "Newest
+  added"; Courses gets "Title (A–Z)" (unchanged default) / "Newest added". Sorts
+  client-side by `createdAt` — added that field to the `ApiEvent`/`ApiCourse`
+  frontend types (`event-api.service.ts`, `course-api.service.ts`); the backend
+  entities already had it, it just wasn't surfaced to admin-panel.
+- Verified against the local API/DB logged in as `admin@willpower.org`: Courses'
+  "Newest added" correctly reorders to show the most recently created rows first
+  (visibly different from the alphabetical default); Events' toggle switches
+  correctly too, though the local seed events all share one batch-seeded
+  `createdAt` timestamp so the reorder isn't visually distinguishable there — the
+  sort logic itself (`createdAtMs` descending vs `startAtMs` ascending) is the
+  same code path proven correct on Courses.
+
 ## 2026-09-07 (44) — Restore "register at another branch" for public-site students
 
 - On public-site, My Account's nav only ever showed the "Become a Student" tab for

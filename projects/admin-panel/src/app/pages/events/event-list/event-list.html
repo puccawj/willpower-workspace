@@ -1,5 +1,8 @@
 <div class="page-toolbar">
-  <app-filter-tabs [options]="filterOptions" [active]="filter()" [select]="setFilter"></app-filter-tabs>
+  <div class="toolbar-tabs-group">
+    <app-filter-tabs [options]="filterOptions" [active]="filter()" [select]="setFilter"></app-filter-tabs>
+    <app-filter-tabs [options]="sortOptions" [active]="sort()" [select]="setSort"></app-filter-tabs>
+  </div>
   <button type="button" class="btn btn-solid" (click)="addEvent()">+ New Event</button>
 </div>
 

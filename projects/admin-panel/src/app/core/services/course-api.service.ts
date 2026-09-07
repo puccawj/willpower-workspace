@@ -18,6 +18,7 @@ export interface ApiCourse {
   status: ApiCourseStatus;
   offeringsCount: number;
   prerequisiteCourseIds: string[];
+  createdAt: string;
 }
 
 export interface CoursePayload {

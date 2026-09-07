@@ -22,6 +22,7 @@ export interface ApiEvent {
   maybe: number;
   cancel: number;
   waitlist: number;
+  createdAt: string;
 }
 
 export interface EventPayload {

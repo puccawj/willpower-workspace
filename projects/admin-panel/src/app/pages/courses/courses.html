@@ -1,8 +1,9 @@
-@if (!roleService.isInstructor()) {
-  <div class="page-toolbar toolbar-end">
+<div class="page-toolbar">
+  <app-filter-tabs [options]="sortOptions" [active]="sort()" [select]="setSort"></app-filter-tabs>
+  @if (!roleService.isInstructor()) {
     <button type="button" class="btn btn-solid" (click)="addCourse()">+ New Course</button>
-  </div>
-}
+  }
+</div>
 
 @if (error()) {
   <div class="state-error card">{{ error() }}</div>

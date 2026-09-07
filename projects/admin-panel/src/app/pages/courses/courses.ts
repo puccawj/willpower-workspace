@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, from, map, of, switchMap, tap, throwError } from 'rxjs';
 import { ApiCourse, CourseApiService, CoursePayload } from '../../core/services/course-api.service';
@@ -12,6 +12,7 @@ import { ToastService } from '../../core/services/toast.service';
 import { UploadApiService } from '../../core/services/upload-api.service';
 import { ListController } from '../../core/list-controller';
 import { TableToolbar } from '../../shared/table-toolbar/table-toolbar';
+import { FilterTabs, FilterOption } from '../../shared/filter-tabs/filter-tabs';
 import { FieldDef } from '../../core/models/admin.models';
 
 interface CourseRow {
@@ -30,6 +31,7 @@ interface CourseRow {
   isActive: boolean;
   prerequisiteCourseIds: string[];
   prerequisiteTitles: string;
+  createdAtMs: number;
 }
 
 function toRow(c: ApiCourse, titleById: Map<string, string>): CourseRow {
@@ -49,12 +51,13 @@ function toRow(c: ApiCourse, titleById: Map<string, string>): CourseRow {
     isActive: c.status === 'active',
     prerequisiteCourseIds: c.prerequisiteCourseIds,
     prerequisiteTitles: c.prerequisiteCourseIds.map((id) => titleById.get(id) ?? '?').join(MULTISELECT_DELIM),
+    createdAtMs: new Date(c.createdAt).getTime(),
   };
 }
 
 @Component({
   selector: 'app-courses',
-  imports: [TableToolbar],
+  imports: [TableToolbar, FilterTabs],
   templateUrl: './courses.html',
   styleUrl: './courses.scss',
 })
@@ -78,12 +81,27 @@ export class Courses {
 
   private readonly rows = computed<CourseRow[]>(() => this.api.courses().map((c) => toRow(c, this.titleById())));
 
-  readonly ctrl = new ListController<CourseRow>(this.rows);
+  readonly sort = signal<'title' | 'newest'>('title');
+  readonly sortOptions: FilterOption[] = [
+    { key: 'title', label: 'Title (A–Z)' },
+    { key: 'newest', label: 'Newest added' },
+  ];
+
+  private readonly sortedRows = computed(() => {
+    const rows = [...this.rows()];
+    return this.sort() === 'newest'
+      ? rows.sort((a, b) => b.createdAtMs - a.createdAtMs)
+      : rows.sort((a, b) => a.title.localeCompare(b.title));
+  });
+
+  readonly ctrl = new ListController<CourseRow>(this.sortedRows);
 
   constructor() {
     this.api.load().subscribe();
     this.categoryApi.load().subscribe();
   }
+
+  setSort = (key: string) => this.sort.set(key as 'title' | 'newest');
 
   private showError(err: unknown, fallback: string): void {
     const message = (err as { error?: { message?: string } })?.error?.message ?? fallback;

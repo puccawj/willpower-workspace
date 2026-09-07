@@ -30,6 +30,8 @@ interface EventRow {
   statusKey: ApiEventStatus;
   status: string;
   coverImageUrl: string;
+  startAtMs: number;
+  createdAtMs: number;
 }
 
 const STATUS_OPTIONS = ['Draft', 'Publish', 'Closed'];
@@ -145,6 +147,8 @@ export class EventList {
       statusKey: ev.status,
       status: STATUS_LABEL[ev.status],
       coverImageUrl: ev.coverImageUrl ?? '',
+      startAtMs: new Date(ev.startAt).getTime(),
+      createdAtMs: new Date(ev.createdAt).getTime(),
     }));
   });
 
@@ -153,7 +157,20 @@ export class EventList {
     return f === 'all' ? this.rows() : this.rows().filter((ev) => ev.status === f);
   });
 
-  readonly ctrl = new ListController<EventRow>(this.filteredRows);
+  readonly sort = signal<'upcoming' | 'newest'>('upcoming');
+  readonly sortOptions: FilterOption[] = [
+    { key: 'upcoming', label: 'Upcoming first' },
+    { key: 'newest', label: 'Newest added' },
+  ];
+
+  private readonly sortedRows = computed(() => {
+    const rows = [...this.filteredRows()];
+    return this.sort() === 'newest'
+      ? rows.sort((a, b) => b.createdAtMs - a.createdAtMs)
+      : rows.sort((a, b) => a.startAtMs - b.startAtMs);
+  });
+
+  readonly ctrl = new ListController<EventRow>(this.sortedRows);
 
   constructor() {
     this.api.load().subscribe();
@@ -161,6 +178,7 @@ export class EventList {
   }
 
   setFilter = (key: string) => this.filter.set(key);
+  setSort = (key: string) => this.sort.set(key as 'upcoming' | 'newest');
 
   private showError(err: unknown, fallback: string): void {
     const message = (err as { error?: { message?: string } })?.error?.message ?? fallback;
