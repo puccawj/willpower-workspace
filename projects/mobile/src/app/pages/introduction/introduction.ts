@@ -13,18 +13,18 @@ interface Step {
 const STEPS: Step[] = [
   {
     img: 'https://images.unsplash.com/photo-1749642955698-ebe5e4579034?q=80&w=800&auto=format&fit=crop',
-    headline: 'Train the mind, strengthen the will',
-    body: 'A center for meditation and contemplative study, guiding you toward clarity and inner discipline.',
+    headline: 'One institute, many branches',
+    body: 'Explore courses and events across our United States, Canada, and Australia branches — all from one app.',
   },
   {
     img: 'https://images.unsplash.com/photo-1772034292097-447be2dd32ea?q=80&w=800&auto=format&fit=crop',
-    headline: 'Structured courses, real progress',
-    body: 'Follow guided courses at your own pace, track your attendance, and earn certificates as you complete each milestone.',
+    headline: 'Enroll, attend, and earn your certificate',
+    body: 'Browse structured courses, enroll in the ones you need, and track your attendance. See every course you’re taking — and every one you’ve completed — in My Learning, with a certificate for each milestone reached.',
   },
   {
     img: 'https://images.unsplash.com/photo-1716805825299-70bcd837605e?q=80&w=800&auto=format&fit=crop',
-    headline: 'Stay connected to your Sangha',
-    body: "RSVP to events, check in with a simple QR scan, and see your community's journey unfold together.",
+    headline: 'RSVP, check in, and revisit your journey',
+    body: 'Reserve your spot at upcoming events, check in with a quick QR scan, and look back at your full RSVP and attendance history anytime.',
   },
 ];
 

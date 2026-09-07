@@ -2,6 +2,19 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-09-07 (48) — Rewrite mobile's first-launch intro to match what the app actually does
+
+- Mobile's 3-step onboarding carousel (`pages/introduction/`) predated most of the app's current
+  feature set — its copy talked generically about "meditation and contemplative study" and never
+  mentioned branches, enrolling in courses, My Learning, certificates, or RSVP/attendance history.
+- Rewrote the three steps to map directly onto real features: (1) multi-branch browsing
+  (US/Canada/Australia) across Events and Courses, (2) enrolling in courses, tracking attendance,
+  and earning a certificate per completed course (My Learning), (3) RSVPing to events, QR
+  check-in, and reviewing RSVP/attendance history.
+- Verified on-device (Note 9, fresh install): step 1 and step 3 render correctly with the new
+  copy, wrapping, dot indicator, and button label ("Next" → "Get Started"); step 2 is the same
+  binding pattern, confirmed via typecheck.
+
 ## 2026-09-07 (47) — Let long branch names wrap instead of clipping
 
 - (40) gave the branch pill its own row so it no longer shared width with a sibling tag, but the
