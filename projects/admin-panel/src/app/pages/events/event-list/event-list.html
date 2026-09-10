@@ -17,7 +17,7 @@
     <div class="card" style="padding:0;overflow:hidden">
       <table>
         <thead>
-          <tr><th>Cover</th><th>Event</th><th>Branch</th><th>Date &amp; time</th><th>Capacity</th><th>RSVP</th><th>Status</th><th>Action</th></tr>
+          <tr><th>Cover</th><th>Event</th><th>Branch</th><th>Start</th><th>End</th><th>Capacity</th><th>RSVP</th><th>Status</th><th>Action</th></tr>
         </thead>
         <tbody>
           @for (ev of ctrl.pageItems(); track ev.id) {
@@ -32,6 +32,7 @@
               <td style="font-weight:500">{{ ev.title }}</td>
               <td>{{ ev.branchName }}</td>
               <td>{{ ev.dateFull }}</td>
+              <td>{{ ev.endDateFull }}</td>
               <td>{{ ev.going }} / {{ ev.capacity }}</td>
               <td>{{ rsvpSummary(ev) }}</td>
               <td><span class="badge" [style.background]="statusColors[ev.status]">{{ ev.status }}</span></td>
@@ -64,7 +65,9 @@
             </div>
             <span class="badge badge-sm" [style.background]="statusColors[ev.status]">{{ ev.status }}</span>
           </div>
-          <div class="muted-label mcard-meta">{{ ev.branchName }} · {{ ev.dateFull }}</div>
+          <div class="muted-label mcard-meta">{{ ev.branchName }}</div>
+          <div class="muted-label mcard-meta">Start: {{ ev.dateFull }}</div>
+          <div class="muted-label mcard-meta">End: {{ ev.endDateFull }}</div>
           <div class="mcard-row">
             <span>Capacity {{ ev.going }}/{{ ev.capacity }}</span>
             <span class="muted-label">{{ rsvpSummary(ev) }}</span>

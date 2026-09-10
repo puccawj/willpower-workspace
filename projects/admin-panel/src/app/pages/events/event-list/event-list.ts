@@ -20,6 +20,7 @@ interface EventRow {
   location: string;
   description: string;
   dateFull: string;
+  endDateFull: string;
   startAtLocal: string;
   endAtLocal: string;
   capacity: number;
@@ -137,6 +138,7 @@ export class EventList {
       location: ev.location ?? '',
       description: ev.description ?? '',
       dateFull: formatDateFull(new Date(ev.startAt)),
+      endDateFull: formatDateFull(new Date(ev.endAt)),
       startAtLocal: toDateTimeLocalValue(new Date(ev.startAt)),
       endAtLocal: toDateTimeLocalValue(new Date(ev.endAt)),
       capacity: ev.capacity ?? 0,

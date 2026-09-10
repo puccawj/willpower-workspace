@@ -2,6 +2,15 @@
 
 Product-impacting changes to admin-panel, public-site, and mobile. Newest first.
 
+## 2026-09-10 (49) — Show both Start and End on Manage Events
+
+- Manage Events' table only showed one "Date & time" column (the event's `startAt`) — the end
+  date/time wasn't visible anywhere in the list, only inside the Edit modal.
+- Split it into separate **Start** and **End** columns (table view) and matching "Start:"/"End:"
+  rows (card view), both using the existing `formatDateFull()` formatter.
+- Verified against production (logged in as `admin@willpower.org`): both columns render correct,
+  independent values — including a multi-day event showing genuinely different Start/End dates.
+
 ## 2026-09-07 (48) — Rewrite mobile's first-launch intro to match what the app actually does
 
 - Mobile's 3-step onboarding carousel (`pages/introduction/`) predated most of the app's current
